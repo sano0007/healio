@@ -56,20 +56,26 @@ export const MSG = {
   AUTH_VALIDATE: 'auth.validate',
 
   // Patient Service
+  PATIENT_CREATE: 'patient.create',
   PATIENT_GET: 'patient.get',
+  PATIENT_GET_ALL: 'patient.get_all',
   PATIENT_UPDATE: 'patient.update',
   PATIENT_UPLOAD_REPORT: 'patient.upload_report',
   PATIENT_GET_HISTORY: 'patient.get_history',
 
   // Doctor Service
+  DOCTOR_CREATE: 'doctor.create',
+  DOCTOR_VERIFY: 'doctor.verify',
   DOCTOR_GET: 'doctor.get',
   DOCTOR_UPDATE: 'doctor.update',
   DOCTOR_SET_AVAILABILITY: 'doctor.set_availability',
   DOCTOR_GET_ALL: 'doctor.get_all',
+  DOCTOR_GET_ALL_ADMIN: 'doctor.get_all_admin',
   DOCTOR_ISSUE_PRESCRIPTION: 'doctor.issue_prescription',
   DOCTOR_GET_PRESCRIPTIONS: 'doctor.get_prescriptions',
 
   // Appointment Service
+  APPOINTMENT_GET_ALL: 'appointment.get_all',
   APPOINTMENT_BOOK: 'appointment.book',
   APPOINTMENT_CANCEL: 'appointment.cancel',
   APPOINTMENT_UPDATE_STATUS: 'appointment.update_status',
@@ -86,6 +92,7 @@ export const MSG = {
   PAYMENT_INITIATE: 'payment.initiate',
   PAYMENT_CONFIRM: 'payment.confirm',
   PAYMENT_GET: 'payment.get',
+  PAYMENT_GET_ALL: 'payment.get_all',
 
   // Notification Service
   NOTIFY_SEND: 'notify.send',

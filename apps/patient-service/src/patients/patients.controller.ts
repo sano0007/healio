@@ -7,6 +7,16 @@ import { PatientsService } from './patients.service';
 export class PatientsController {
   constructor(private patientsService: PatientsService) {}
 
+  @MessagePattern(MSG.PATIENT_GET_ALL)
+  getAll() {
+    return this.patientsService.getAll();
+  }
+
+  @MessagePattern(MSG.PATIENT_CREATE)
+  createProfile(@Payload() data: { userId: string; name: string; email: string }) {
+    return this.patientsService.createProfile(data);
+  }
+
   @MessagePattern(MSG.PATIENT_GET)
   getProfile(@Payload() data: { userId: string }) {
     return this.patientsService.getProfile(data.userId);

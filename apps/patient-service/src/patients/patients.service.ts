@@ -36,6 +36,10 @@ export class PatientsService {
     return patient.medicalReports;
   }
 
+  async getAll() {
+    return this.patientModel.find().select('-__v').sort({ createdAt: -1 }).exec();
+  }
+
   async createProfile(data: Partial<Patient>) {
     const patient = new this.patientModel(data);
     return patient.save();
