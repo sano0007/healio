@@ -31,8 +31,28 @@ export class DoctorsGatewayController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.DOCTOR)
   @Post('availability')
-  setAvailability(@Request() req: { user: { userId: string } }, @Body() availability: unknown[]) {
+  setAvailability(
+    @Request() req: { user: { userId: string } },
+    @Body() body: { availability: { day?: string; dayOfWeek?: number; startTime: string; endTime: string }[] } | { day?: string; dayOfWeek?: number; startTime: string; endTime: string }[],
+  ) {
+    const DAY_MAP: Record<string, number> = {
+      sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
+      thursday: 4, friday: 5, saturday: 6,
+    };
+    const slots = Array.isArray(body) ? body : body.availability;
+    const availability = slots.map((s) => ({
+      dayOfWeek: s.dayOfWeek ?? DAY_MAP[s.day!.toLowerCase()] ?? 0,
+      startTime: s.startTime,
+      endTime: s.endTime,
+    }));
     return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_SET_AVAILABILITY, { userId: req.user.userId, availability }));
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch(':id/verify')
+  verifyDoctor(@Param('id') id: string, @Body() body: { isVerified: boolean }) {
+    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_VERIFY, { userId: id, isVerified: body.isVerified }));
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
