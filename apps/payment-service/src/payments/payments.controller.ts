@@ -7,6 +7,11 @@ import { PaymentsService } from './payments.service';
 export class PaymentsController {
   constructor(private paymentsService: PaymentsService) {}
 
+  @MessagePattern(MSG.PAYMENT_GET_ALL)
+  getAll() {
+    return this.paymentsService.getAll();
+  }
+
   @MessagePattern(MSG.PAYMENT_INITIATE)
   initiatePayment(@Payload() dto: { appointmentId: string; patientId: string; amount: number; currency: string }) {
     return this.paymentsService.initiatePayment(dto);

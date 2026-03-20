@@ -7,6 +7,11 @@ import { AppointmentsService } from './appointments.service';
 export class AppointmentsController {
   constructor(private appointmentsService: AppointmentsService) {}
 
+  @MessagePattern(MSG.APPOINTMENT_GET_ALL)
+  getAll() {
+    return this.appointmentsService.getAll();
+  }
+
   @MessagePattern(MSG.APPOINTMENT_BOOK)
   book(@Payload() dto: { patientId: string; doctorId: string; scheduledAt: string; notes?: string }) {
     return this.appointmentsService.book(dto);

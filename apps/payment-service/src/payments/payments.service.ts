@@ -52,4 +52,8 @@ export class PaymentsService {
     if (!payment) throw new RpcException('Payment not found');
     return payment;
   }
+
+  async getAll() {
+    return this.paymentModel.find().sort({ createdAt: -1 }).exec();
+  }
 }

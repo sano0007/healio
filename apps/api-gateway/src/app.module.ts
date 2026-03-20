@@ -7,6 +7,7 @@ import { DoctorsGatewayModule } from './doctors/doctors-gateway.module';
 import { AppointmentsGatewayModule } from './appointments/appointments-gateway.module';
 import { TelemedicineGatewayModule } from './telemedicine/telemedicine-gateway.module';
 import { PaymentGatewayModule } from './payment/payment-gateway.module';
+import { AdminGatewayModule } from './admin/admin-gateway.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PaymentGatewayModule } from './payment/payment-gateway.module';
     AppointmentsGatewayModule,
     TelemedicineGatewayModule,
     PaymentGatewayModule,
+    AdminGatewayModule,
   ],
 })
 export class AppModule {}

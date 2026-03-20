@@ -42,6 +42,10 @@ export class AppointmentsService {
     return appt;
   }
 
+  async getAll() {
+    return this.appointmentModel.find().sort({ scheduledAt: -1 }).exec();
+  }
+
   async getByPatient(patientId: string) {
     return this.appointmentModel.find({ patientId }).sort({ scheduledAt: -1 }).exec();
   }
