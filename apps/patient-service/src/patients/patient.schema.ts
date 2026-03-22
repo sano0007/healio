@@ -1,7 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type PatientDocument = Patient & Document;
+
+const MedicalReportSchema = new MongooseSchema(
+  {
+    filename:     { type: String, required: true },
+    originalName: { type: String, required: true },
+    url:          { type: String, required: true },
+    uploadedAt:   { type: Date,   default: Date.now },
+  },
+  { _id: false },
+);
 
 @Schema({ timestamps: true })
 export class Patient {
@@ -26,8 +36,8 @@ export class Patient {
   @Prop()
   address: string;
 
-  @Prop({ type: [{ filename: String, originalName: String, uploadedAt: Date, url: String }] })
-  medicalReports: { filename: string; originalName: string; uploadedAt: Date; url: string }[];
+  @Prop({ type: [MedicalReportSchema], default: [] })
+  medicalReports: { filename: string; originalName: string; url: string; uploadedAt: Date }[];
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);
