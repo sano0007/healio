@@ -1,8 +1,8 @@
-# Healio — Architecture Findings & Restructuring Plan
+# Healio — Architecture Findings & Implementation Reference
 
-> **Generated:** 2026-04-13
+> **Generated:** 2026-04-13 | **Last Updated:** 2026-04-13 (Session 2)
 > **Course:** SE3020 – Distributed Systems | Assignment 1
-> **Status:** Pre-restructuring audit
+> **Status:** Implementation complete — frontend & infra in progress
 
 ---
 
@@ -16,361 +16,381 @@
 | Duration | 5 weeks |
 | Deadline | Week 11 of semester |
 
-### Required Services (from spec)
-| Service | Required? |
-|---|---|
-| Patient Management Service | Mandatory |
-| Doctor Management Service | Mandatory |
-| Appointment Service | Mandatory |
-| Telemedicine Service (Video) | Mandatory |
-| Payment Service | Mandatory |
-| Notification Service (SMS + Email) | Mandatory |
-| AI Symptom Checker | Optional Enhancement |
+### Required Services
+| Service | Required? | Status |
+|---|---|---|
+| Patient Management Service | Mandatory | ✅ Running |
+| Doctor Management Service | Mandatory | ✅ Running |
+| Appointment Service | Mandatory | ✅ Running |
+| Telemedicine Service (Video) | Mandatory | ✅ Running |
+| Payment Service | Mandatory | ✅ Running |
+| Notification Service (SMS + Email) | Mandatory | ✅ Running |
+| AI Symptom Checker | Optional Enhancement | ⬜ Not scaffolded |
 
 ### Tech Constraints
 - **Architecture:** Microservices (not monolith)
 - **Containerisation:** Docker (mandatory)
 - **Orchestration:** Kubernetes (mandatory)
-- **Frontend:** Any async JS framework (Next.js/React qualifies)
+- **Frontend:** Any async JS framework (Next.js 15)
 - **Auth:** JWT with three roles — Patient, Doctor, Admin
-- **Video:** Agora / Twilio / Jitsi Meet
-- **Payment:** Stripe / PayPal (sandbox) or PayHere / Dialog Genie / FriMi
-- **Notifications:** Third-party SMS + email services
+- **Video:** Jitsi Meet (no API key needed)
+- **Payment:** Stripe sandbox
+- **Notifications:** Twilio (SMS) + nodemailer SMTP (email)
 
 ---
 
-## 2. Current Repository State
+## 2. Current Directory Structure
 
-### Directory Tree (as audited)
 ```
 healio/
 ├── apps/
-│   ├── server/                  # ❌ Single NestJS monolith — NOT microservices
-│   │   └── src/
-│   │       ├── app.module.ts    # All modules imported here
-│   │       ├── main.ts
-│   │       ├── auth/
-│   │       ├── users/
-│   │       ├── appointments/
-│   │       ├── doctors/
-│   │       ├── prescriptions/
-│   │       └── chatbot/
-│   └── web/                     # Next.js 15 frontend (OK)
-├── package.json                 # Bun workspaces — references packages/* (dir missing)
-├── turbo.json                   # Turborepo pipeline (OK)
-└── bun.lock
-```
-
-### What Exists
-- Turborepo monorepo with Bun as package manager
-- NestJS app with JWT auth, Mongoose, Socket.IO already added as deps
-- Next.js 15 frontend with Tailwind CSS
-- Module stubs for: auth, users, doctors, appointments, prescriptions, chatbot
-
----
-
-## 3. Critical Issues Found
-
-### 3.1 Architecture Violation (Blocking)
-**Current:** All domain logic lives in a single NestJS app (`apps/server`). This is a **monolith**.
-
-**Required:** Each domain must be an **independently deployable NestJS microservice** with its own process, port, and database connection. The assignment explicitly requires microservices + Docker + Kubernetes.
-
-### 3.2 Missing Services (Blocking)
-The following required services have zero implementation:
-
-| Service | Status |
-|---|---|
-| Payment Service | Missing entirely |
-| Notification Service | Missing entirely |
-| Telemedicine Service | Missing entirely |
-| API Gateway | Missing entirely |
-
-### 3.3 No Docker or Kubernetes Configuration (Blocking)
-No `Dockerfile`, `docker-compose.yml`, or `k8s/` manifests exist anywhere in the repo. Docker and Kubernetes are mandatory per the assignment spec.
-
-### 3.4 No Shared Packages
-`packages/*` is declared in the root workspace but the `packages/` directory does not exist. Shared TypeScript types, DTOs, and enums cannot be shared between services without this.
-
-### 3.5 No Database Initialisation
-No Mongoose schemas are defined, no seed scripts exist, and no docker-compose brings up a MongoDB instance for local development.
-
-### 3.6 No Environment Configuration
-No `.env`, `.env.example`, or environment variable documentation exists in any service directory.
-
-### 3.7 Missing Submission Deliverables
-The assignment requires `submission.txt`, `readme.txt`, and `members.txt` at repo root — none exist.
-
----
-
-## 4. Required Target Architecture
-
-### 4.1 Service Map
-
-| Service | Port | Transport | Database | Key Responsibilities |
-|---|---|---|---|---|
-| `api-gateway` | 3001 | HTTP (external) | — | Route all client requests, validate JWT at edge |
-| `auth-service` | 4001 | TCP | MongoDB (users) | Register, login, JWT issuance, role management |
-| `patient-service` | 4002 | TCP | MongoDB (patients) | Patient profiles, medical reports, medical history |
-| `doctor-service` | 4003 | TCP | MongoDB (doctors) | Doctor profiles, availability, prescriptions |
-| `appointment-service` | 4004 | TCP | MongoDB (appointments) | Booking, cancellation, real-time status |
-| `telemedicine-service` | 4005 | TCP | — | Video session tokens (Jitsi/Agora/Twilio) |
-| `payment-service` | 4006 | TCP | MongoDB (payments) | Stripe/PayHere sandbox integration |
-| `notification-service` | 4007 | TCP | — | SMS (Twilio) + Email (SendGrid) |
-| `ai-symptom-service` | 4008 | TCP | — | Optional: AI symptom checker |
-
-### 4.2 Target Directory Structure
-```
-healio/
-├── apps/
-│   ├── web/                        # Next.js frontend — API calls go to gateway only
-│   ├── api-gateway/                # HTTP entry point, TCP client to all services
-│   ├── auth-service/               # Patient/Doctor/Admin auth + JWT
-│   ├── patient-service/            # Patient profile, reports, history
-│   ├── doctor-service/             # Doctor profile, availability, prescriptions
-│   ├── appointment-service/        # Booking, status, Socket.IO
-│   ├── telemedicine-service/       # Video session management
-│   ├── payment-service/            # Payment gateway integration
-│   ├── notification-service/       # SMS + email dispatch
-│   └── ai-symptom-service/         # (optional) AI symptom checker
+│   ├── web/                        # Next.js 15 frontend
+│   ├── api-gateway/                # HTTP :3001 — JWT edge, routes to all services
+│   ├── auth-service/               # TCP :9001 — register, login, JWT
+│   ├── patient-service/            # TCP :9002 — patient profiles, medical reports
+│   ├── doctor-service/             # TCP :9003 — doctor profiles, availability, prescriptions
+│   ├── appointment-service/        # TCP :9004 — booking, status, availability validation
+│   ├── telemedicine-service/       # TCP :9005 — Jitsi session management
+│   ├── payment-service/            # TCP :9006 — Stripe payment intents
+│   └── notification-service/       # TCP :9007 — Twilio SMS + nodemailer email
 ├── packages/
-│   ├── shared-types/               # Enums, interfaces, DTOs shared across services
-│   └── shared-utils/               # Common helpers and response formatters
+│   ├── shared-types/               # Enums, interfaces, DTOs, MSG constants
+│   └── shared-utils/               # Common response helpers
 ├── infra/
-│   ├── docker/                     # One Dockerfile per service (multi-stage)
-│   ├── k8s/                        # Kubernetes manifests (Deployments, Services, PVCs)
-│   └── docker-compose.yml          # Full local dev stack inc. MongoDB + Redis
-├── scripts/
-│   └── seed.ts                     # Database seed data
+│   ├── docker/                     # Multi-stage Dockerfiles per service
+│   ├── k8s/                        # Kubernetes manifests
+│   └── docker-compose.yml
 ├── docs/
 │   ├── DS SE3020 Assignment 1 2026.pdf
-│   └── ARCHITECTURE_FINDINGS.md    # This file
-├── .env.example                    # Root env template
-├── .gitignore
-├── package.json
-├── turbo.json
-├── members.txt                     # Required deliverable
-├── readme.txt                      # Required deliverable
-└── submission.txt                  # Required deliverable
+│   ├── ARCHITECTURE_FINDINGS.md
+│   └── healio.postman_collection.json
+├── .env                            # Root env (all service secrets consolidated)
+├── .env.example
+├── members.txt
+├── readme.txt
+└── submission.txt
 ```
 
-### 4.3 Inter-Service Communication Pattern
+---
+
+## 3. Architecture
+
+### 3.1 Communication Flow
+
 ```
-Frontend (Next.js :3000)
-        │
-        │ HTTP REST
-        ▼
-  API Gateway (:3001)          ← validates JWT, routes requests
-        │
-        │ TCP (NestJS Microservices transport)
-        ├──► auth-service        (:4001)
-        ├──► patient-service     (:4002)
-        ├──► doctor-service      (:4003)
-        ├──► appointment-service (:4004)
-        ├──► telemedicine-service(:4005)
-        ├──► payment-service     (:4006)
-        └──► notification-service(:4007)
-                    │
-                    ├── MongoDB  (per-service collections)
-                    └── Redis    (optional: pub/sub for events)
-```
-
-### 4.4 Transport Decision — TCP (NestJS built-in)
-
-**Decision:** Use NestJS TCP transport for all inter-service communication.
-
-**Rationale (vs. gRPC / Message Broker):**
-- Assignment requires "RESTful web services" — graders evaluate REST interfaces, not the internal transport layer
-- TCP is built into `@nestjs/microservices` with zero extra infrastructure
-- gRPC adds proto files + code generation overhead that consumes time better spent on features
-- Message brokers (RabbitMQ/Kafka) require additional infra and are unjustified at this scale
-- TCP can be swapped to gRPC/NATS in production — architecture remains the same
-
-**Pattern used — Message Patterns:**
-
-Each microservice exposes handlers via `@MessagePattern`:
-```typescript
-// apps/auth-service/src/auth/auth.controller.ts
-@Controller()
-export class AuthController {
-  @MessagePattern({ cmd: 'auth_login' })
-  async login(@Payload() dto: LoginDto) { ... }
-
-  @MessagePattern({ cmd: 'auth_register' })
-  async register(@Payload() dto: RegisterDto) { ... }
-
-  @MessagePattern({ cmd: 'auth_validate_token' })
-  async validateToken(@Payload() token: string) { ... }
-}
+Browser / Postman
+      │
+      │ HTTP REST
+      ▼
+  API Gateway (:3001/api)      ← JWT validation at edge, role guards
+      │
+      │ NestJS TCP transport
+      ├──► auth-service        (:9001)
+      ├──► patient-service     (:9002)
+      ├──► doctor-service      (:9003)
+      ├──► appointment-service (:9004)
+      ├──► telemedicine-service(:9005)
+      ├──► payment-service     (:9006)
+      └──► notification-service(:9007)
+                  │
+                  └── MongoDB Atlas (per-service database)
 ```
 
-API Gateway sends requests to services via `ClientsModule`:
-```typescript
-// apps/api-gateway/src/app.module.ts
-ClientsModule.register([
-  { name: 'AUTH_SERVICE',        transport: Transport.TCP, options: { host: 'auth-service',        port: 4001 } },
-  { name: 'PATIENT_SERVICE',     transport: Transport.TCP, options: { host: 'patient-service',     port: 4002 } },
-  { name: 'DOCTOR_SERVICE',      transport: Transport.TCP, options: { host: 'doctor-service',      port: 4003 } },
-  { name: 'APPOINTMENT_SERVICE', transport: Transport.TCP, options: { host: 'appointment-service', port: 4004 } },
-  { name: 'TELEMEDICINE_SERVICE',transport: Transport.TCP, options: { host: 'telemedicine-service',port: 4005 } },
-  { name: 'PAYMENT_SERVICE',     transport: Transport.TCP, options: { host: 'payment-service',     port: 4006 } },
-  { name: 'NOTIFICATION_SERVICE',transport: Transport.TCP, options: { host: 'notification-service',port: 4007 } },
-])
-```
+### 3.2 Service Map
 
-Each microservice `main.ts`:
-```typescript
-// apps/auth-service/src/main.ts
-async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-    transport: Transport.TCP,
-    options: { host: '0.0.0.0', port: 4001 },
-  });
-  await app.listen();
-}
-```
-
-### 4.5 Message Pattern Registry
-
-All `cmd` strings used across services — must be unique and kept in sync via `@healio/shared-types`.
-
-| Service | cmd | Direction | Payload |
+| Service | Port | Database | Key Responsibilities |
 |---|---|---|---|
-| auth-service | `auth_register` | gateway → auth | `RegisterDto` |
-| auth-service | `auth_login` | gateway → auth | `LoginDto` |
-| auth-service | `auth_validate_token` | gateway → auth | `string` (JWT) |
-| patient-service | `patient_get_profile` | gateway → patient | `{ userId }` |
-| patient-service | `patient_update_profile` | gateway → patient | `UpdatePatientDto` |
-| patient-service | `patient_upload_report` | gateway → patient | `UploadReportDto` |
-| doctor-service | `doctor_get_profile` | gateway → doctor | `{ doctorId }` |
-| doctor-service | `doctor_set_availability` | gateway → doctor | `AvailabilityDto` |
-| doctor-service | `doctor_issue_prescription` | gateway → doctor | `PrescriptionDto` |
-| appointment-service | `appointment_book` | gateway → appointment | `BookAppointmentDto` |
-| appointment-service | `appointment_cancel` | gateway → appointment | `{ appointmentId }` |
-| appointment-service | `appointment_get_status` | gateway → appointment | `{ appointmentId }` |
-| telemedicine-service | `telemedicine_create_session` | gateway → telemedicine | `{ appointmentId }` |
-| payment-service | `payment_create_intent` | gateway → payment | `{ appointmentId, amount }` |
-| payment-service | `payment_confirm` | gateway → payment | `{ paymentIntentId }` |
-| notification-service | `notification_send_sms` | appointment/payment → notification | `SmsDto` |
-| notification-service | `notification_send_email` | appointment/payment → notification | `EmailDto` |
+| `api-gateway` | 3001 (HTTP) | — | Route requests, validate JWT, file uploads to Cloudinary |
+| `auth-service` | 9001 (TCP) | `helio-auth` | Register/login, bcrypt, JWT issuance |
+| `patient-service` | 9002 (TCP) | `helio-patients` | Patient profiles, medical reports (Cloudinary URLs) |
+| `doctor-service` | 9003 (TCP) | `helio-doctors` | Doctor profiles, availability schedule, prescriptions, verification |
+| `appointment-service` | 9004 (TCP) | `helio-appointments` | Booking with availability validation, status lifecycle |
+| `telemedicine-service` | 9005 (TCP) | — | Jitsi session creation/join/end |
+| `payment-service` | 9006 (TCP) | `helio-payments` | Stripe payment intents, confirmation |
+| `notification-service` | 9007 (TCP) | — | Twilio SMS + SMTP email per notification type |
+
+### 3.3 Authentication & Roles
+
+JWT is validated at the API gateway edge using `JwtAuthGuard` + Passport strategy. Role enforcement uses `RolesGuard` + `@Roles()` decorator.
+
+| Role | Value | Access |
+|---|---|---|
+| `patient` | `UserRole.PATIENT` | Own profile, book appointments, join sessions, initiate payments |
+| `doctor` | `UserRole.DOCTOR` | Own profile, set availability, manage appointment status, create sessions, issue prescriptions, upload patient reports |
+| `admin` | `UserRole.ADMIN` | All of the above + list all users, verify/revoke doctors, view system stats |
+
+**Key rule:** `isVerified` on doctor profiles can **only** be set by an admin via `PATCH /admin/doctors/:id/verify`. Doctors cannot set it on themselves — it is silently stripped from `PATCH /doctors/me` updates.
 
 ---
 
-## 5. Migration Map — Existing Code
+## 4. Message Pattern Registry
 
-The existing module code is salvageable. It just needs to move into the correct service container:
+All patterns defined as constants in `packages/shared-types/src/index.ts` under the `MSG` object.
 
-| Existing Path | Destination Service |
+| Pattern | Service | Direction | Payload |
+|---|---|---|---|
+| `auth.register` | auth-service | gateway → auth | `{ name, email, password, role }` |
+| `auth.login` | auth-service | gateway → auth | `{ email, password }` |
+| `auth.validate` | auth-service | gateway → auth | `{ token }` |
+| `patient.create` | patient-service | gateway → patient | `{ userId, name, email }` |
+| `patient.get` | patient-service | gateway → patient | `{ userId }` |
+| `patient.get_all` | patient-service | gateway → patient | `{}` |
+| `patient.update` | patient-service | gateway → patient | `{ userId, updates }` |
+| `patient.upload_report` | patient-service | gateway → patient | `{ userId, report: { filename, originalName, url } }` |
+| `patient.get_history` | patient-service | gateway → patient | `{ userId }` |
+| `doctor.create` | doctor-service | gateway → doctor | `{ userId, name, email }` |
+| `doctor.get` | doctor-service | gateway → doctor | `{ userId }` |
+| `doctor.get_all` | doctor-service | gateway → doctor | `{}` — returns verified only |
+| `doctor.get_all_admin` | doctor-service | gateway → doctor | `{}` — returns all |
+| `doctor.update` | doctor-service | gateway → doctor | `{ userId, updates }` — strips `isVerified` |
+| `doctor.verify` | doctor-service | gateway → doctor | `{ userId, isVerified }` — admin only |
+| `doctor.set_availability` | doctor-service | gateway → doctor | `{ userId, availability[] }` |
+| `doctor.issue_prescription` | doctor-service | gateway → doctor | `{ doctorId, patientId, appointmentId, medications[], notes }` |
+| `doctor.get_prescriptions` | doctor-service | gateway → doctor | `{ doctorId }` |
+| `appointment.get_all` | appointment-service | gateway → appointment | `{}` |
+| `appointment.book` | appointment-service | gateway → appointment | `{ patientId, doctorId, scheduledAt, notes? }` |
+| `appointment.cancel` | appointment-service | gateway → appointment | `{ appointmentId, reason? }` |
+| `appointment.update_status` | appointment-service | gateway → appointment | `{ appointmentId, status }` |
+| `appointment.get` | appointment-service | gateway → appointment | `{ appointmentId }` |
+| `appointment.get_by_patient` | appointment-service | gateway → appointment | `{ patientId }` |
+| `appointment.get_by_doctor` | appointment-service | gateway → appointment | `{ doctorId }` |
+| `tele.create_session` | telemedicine-service | gateway → tele | `{ appointmentId }` |
+| `tele.join_session` | telemedicine-service | gateway → tele | `{ sessionId }` |
+| `tele.end_session` | telemedicine-service | gateway → tele | `{ sessionId }` |
+| `payment.initiate` | payment-service | gateway → payment | `{ appointmentId, patientId, amount, currency }` |
+| `payment.confirm` | payment-service | gateway → payment | `{ stripePaymentIntentId }` |
+| `payment.get` | payment-service | gateway → payment | `{ paymentId }` |
+| `payment.get_all` | payment-service | gateway → payment | `{}` |
+| `notify.send` | notification-service | gateway → notify | `{ type, recipientEmail, recipientPhone?, payload }` |
+
+---
+
+## 5. API Route Reference
+
+All routes served by `api-gateway` at `http://localhost:3001/api`.
+
+### Auth
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/auth/register` | — | Register patient, doctor, or admin. Creates profile in relevant service. |
+| POST | `/auth/login` | — | Returns `{ access_token, user }` |
+
+### Patients
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/patients/me` | patient | Own profile |
+| PATCH | `/patients/me` | patient | Update profile (phone, bloodGroup, address) |
+| POST | `/patients/:id/reports` | doctor | Upload medical report (multipart/form-data, field: `file`, max 10 MB) → Cloudinary |
+
+### Doctors
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/doctors` | any | All **verified** doctors |
+| GET | `/doctors/:id` | any | Doctor by userId |
+| PATCH | `/doctors/me` | doctor | Update own profile (`isVerified` is ignored) |
+| POST | `/doctors/availability` | doctor | Set availability slots. Accepts `{ day: "Monday" }` or `{ dayOfWeek: 1 }` |
+| POST | `/doctors/prescriptions` | doctor | Issue prescription to patient |
+
+### Appointments
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/appointments` | patient | Book appointment — validates doctor availability + checks slot conflicts |
+| GET | `/appointments/my` | patient/doctor | Own appointments (role-aware) |
+| PATCH | `/appointments/:id/cancel` | patient | Cancel with optional reason |
+| PATCH | `/appointments/:id/status` | doctor | Update status: `pending → confirmed → completed` |
+
+### Payments
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/payments/initiate` | patient | Create Stripe PaymentIntent, returns `{ paymentId, clientSecret }` |
+| GET | `/payments/:id` | patient | Get payment by ID |
+
+### Telemedicine
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/sessions` | doctor | Create Jitsi session for an appointment |
+| POST | `/sessions/join` | patient | Join session by sessionId |
+
+### Admin *(admin role required)*
+| Method | Path | Description |
+|---|---|---|
+| GET | `/admin/stats` | Aggregated counts: patients, doctors, appointments by status, revenue |
+| GET | `/admin/patients` | All patients |
+| GET | `/admin/doctors` | All doctors including unverified |
+| GET | `/admin/appointments` | All appointments |
+| GET | `/admin/payments` | All payments |
+| PATCH | `/admin/doctors/:id/verify` | Set `{ isVerified: true/false }` |
+
+---
+
+## 6. Key Business Logic
+
+### 6.1 Registration Flow
+1. `POST /auth/register` → auth-service creates user + issues JWT
+2. Gateway fans out: `patient.create` or `doctor.create` → creates profile in respective service
+3. Returns `{ access_token, user }` — client is immediately logged in
+
+### 6.2 Appointment Booking with Availability Validation
+Validation is done in the **gateway** before forwarding to appointment-service:
+1. Fetch doctor profile from doctor-service
+2. If doctor has availability set, check requested `scheduledAt` falls within a `dayOfWeek + startTime/endTime` window
+3. Fetch existing doctor appointments and check for 30-minute slot conflicts
+4. If invalid → `400 Bad Request` with descriptive message
+5. If valid → forward `appointment.book` to appointment-service
+
+### 6.3 Doctor Availability Format
+```json
+{ "availability": [
+  { "day": "Monday", "startTime": "09:00", "endTime": "17:00" },
+  { "day": "Wednesday", "startTime": "09:00", "endTime": "13:00" }
+]}
+```
+Gateway normalises `day` string → `dayOfWeek` number (0=Sunday … 6=Saturday) before storing. The stored schema is `{ dayOfWeek: number, startTime: string, endTime: string }` with no `_id` on subdocuments.
+
+### 6.4 Medical Report Upload (Cloudinary)
+1. Doctor calls `POST /patients/:patientId/reports` with `multipart/form-data`
+2. Gateway streams file buffer to Cloudinary under `healio/medical-reports/`
+3. Cloudinary returns `secure_url`
+4. Gateway sends `patient.upload_report` to patient-service
+5. Patient-service `$push`es `{ filename, originalName, url, uploadedAt }` to `medicalReports[]`
+
+### 6.5 Doctor Verification
+- Doctors register with `isVerified: false` by default
+- `GET /doctors` returns only verified doctors (for patient booking)
+- `GET /admin/doctors` returns all doctors including unverified
+- Only admin can call `PATCH /admin/doctors/:id/verify`
+- `PATCH /doctors/me` silently strips `isVerified` — doctors cannot self-verify
+
+---
+
+## 7. Environment Variables
+
+All variables consolidated in root `.env`. Services load it via `ConfigModule.forRoot({ envFilePath: ['../../.env', '.env'] })`.
+
+| Variable | Used By |
 |---|---|
-| `apps/server/src/auth/` | `apps/auth-service/src/auth/` |
-| `apps/server/src/users/` | `apps/auth-service/src/users/` (identity) + `apps/patient-service/src/` (profile) |
-| `apps/server/src/doctors/` | `apps/doctor-service/src/doctors/` |
-| `apps/server/src/appointments/` | `apps/appointment-service/src/appointments/` |
-| `apps/server/src/prescriptions/` | `apps/doctor-service/src/prescriptions/` |
-| `apps/server/src/chatbot/` | `apps/ai-symptom-service/src/` |
-| `apps/web/` | Keep as-is — only update API base URL to gateway |
+| `JWT_SECRET` | auth-service, api-gateway |
+| `MONGO_*_URI` | per-service (AUTH, PATIENT, DOCTOR, APPOINTMENT, PAYMENT) |
+| `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET` | api-gateway |
+| `STRIPE_SECRET_KEY` | payment-service |
+| `TWILIO_ACCOUNT_SID/AUTH_TOKEN/PHONE_NUMBER` | notification-service |
+| `SMTP_HOST/PORT/USER/PASS/FROM` | notification-service |
+| `JITSI_BASE_URL` | telemedicine-service |
+| `*_SERVICE_PORT` | each service `main.ts` |
+| `*_SERVICE_HOST` | api-gateway `clients.module.ts` |
+| `FRONTEND_URL` | api-gateway CORS |
+| `NEXT_PUBLIC_API_URL` | web app |
 
 ---
 
-## 6. Task Breakdown
+## 8. Task Breakdown
 
-### Phase 1 — Foundation (Blocking, do first)
+### Phase 1 — Foundation
+| # | Task | Status |
+|---|---|---|
+| 1 | Remove monolith, scaffold microservice directories | ✅ Done |
+| 2 | `packages/shared-types` with enums, DTOs, MSG constants | ✅ Done |
+| 3 | `packages/shared-utils` with response helpers | ✅ Done |
+| 4 | Root `package.json` + `turbo.json` with correct pipeline | ✅ Done |
 
+### Phase 2 — Service Scaffolds
+| # | Service | Status | Notes |
+|---|---|---|---|
+| 5 | `api-gateway` | ✅ Done | HTTP, JWT strategy, global ClientsProxyModule |
+| 6 | `auth-service` | ✅ Done | AuthModule imported in AppModule (was missing, now fixed) |
+| 7 | `patient-service` | ✅ Done | createProfile handler added |
+| 8 | `doctor-service` | ✅ Done | createProfile handler + verify handler added |
+| 9 | `appointment-service` | ✅ Done | |
+| 10 | `telemedicine-service` | ✅ Done | |
+| 11 | `payment-service` | ✅ Done | |
+| 12 | `notification-service` | ✅ Done | |
+
+### Phase 3 — Business Logic
 | # | Task | Status | Notes |
 |---|---|---|---|
-| 1 | Remove `apps/server` monolith | ✅ Done | Deleted in session 1 |
-| 2 | Create `packages/shared-types` | ✅ Done | Domain models, DTOs, enums |
-| 3 | Create `packages/shared-utils` | ✅ Done | Response formatters, helpers |
-| 4 | Update root `package.json` + `turbo.json` | ✅ Done | Bun workspaces wired |
-
-### Phase 2 — Microservice Scaffolds
-
-Each service needs: `main.ts`, `app.module.ts`, `package.json`, `tsconfig.json`, `.env.example`
-
-| # | Service | Status | TCP Port | Key `@MessagePattern` cmds |
-|---|---|---|---|---|
-| 5 | `api-gateway` | ✅ Done | 3001 (HTTP) | HTTP controllers only — JWT strategy + ClientsModule wired to all 7 services |
-| 6 | `auth-service` | ✅ Done | 4001 | `auth.register`, `auth.login`, `auth.validate` |
-| 7 | `patient-service` | ✅ Done | 4002 | `patient.get`, `patient.update`, `patient.upload_report`, `patient.get_history` |
-| 8 | `doctor-service` | ✅ Done | 4003 | `doctor.get`, `doctor.update`, `doctor.set_availability`, `doctor.get_all` |
-| 9 | `appointment-service` | ✅ Done | 4004 | `appointment.book`, `appointment.cancel`, `appointment.update_status`, `appointment.get_by_patient`, `appointment.get_by_doctor` |
-| 10 | `telemedicine-service` | ✅ Done | 4005 | `tele.create_session`, `tele.join_session`, `tele.end_session` |
-| 11 | `payment-service` | ✅ Done | 4006 | `payment.initiate`, `payment.confirm`, `payment.get` |
-| 12 | `notification-service` | ✅ Done | 4007 | `notify.send` (routes to Twilio SMS + nodemailer email) |
-
-### Phase 3 — Business Logic (Per Service)
-
-| # | Task | Status | Service | Notes |
-|---|---|---|---|---|
-| 13 | JWT issuance + validation | ✅ Done | auth-service | bcrypt + `jwtService.sign/verify`, `RpcException` on bad creds |
-| 14 | JWT Passport strategy + role guards | ✅ Done | api-gateway | `JwtStrategy`, `JwtAuthGuard`, `RolesGuard`, `@Roles()` decorator |
-| 15 | Patient profile CRUD + report upload | ✅ Done | patient-service | MongoDB `$push` for reports array; `createProfile` on register |
-| 16 | Doctor profile + availability schedule | ✅ Done | doctor-service | `setAvailability` stores array; `getAll` filters `isVerified: true` |
-| 17 | Appointment booking + status tracking | ✅ Done | appointment-service | Full CRUD; `paymentStatus` + `sessionId` fields on schema |
-| 18 | Digital prescription issuance | ✅ Done | doctor-service | `prescriptions/` module with schema + controller + service |
-| 19 | Jitsi Meet session management | ✅ Done | telemedicine-service | In-memory session map; Jitsi URL generated from `appointmentId` |
-| 20 | Stripe sandbox payment | ✅ Done | payment-service | `stripe.paymentIntents.create()` → stores `clientSecret` in MongoDB |
-| 21 | Twilio SMS notifications | ✅ Done | notification-service | `twilio` SDK; per-`NotificationType` message templates |
-| 22 | nodemailer email notifications | ✅ Done | notification-service | SMTP transport; per-`NotificationType` HTML email templates |
-| 23 | AI symptom checker (optional) | ⬜ Todo | ai-symptom-service | Not yet scaffolded — Claude API or OpenAI |
+| 13 | JWT issuance + validation | ✅ Done | bcrypt, `jwtService.sign/verify` |
+| 14 | JWT Passport strategy + role guards | ✅ Done | `JwtStrategy`, `JwtAuthGuard`, `RolesGuard`, `@Roles()` |
+| 15 | Patient profile CRUD + Cloudinary report upload | ✅ Done | `$push` for reports; `createProfile` on register |
+| 16 | Doctor profile + availability schedule | ✅ Done | day-name → dayOfWeek normalisation; `_id: false` on slots |
+| 17 | Appointment booking with availability validation | ✅ Done | Gateway-level day/time + conflict check |
+| 18 | Digital prescription issuance | ✅ Done | Doctor-only, stores in prescriptions collection |
+| 19 | Jitsi Meet session management | ✅ Done | In-memory session map + Jitsi URL from appointmentId |
+| 20 | Stripe sandbox payment | ✅ Done | `paymentIntents.create()`, stores clientSecret |
+| 21 | Twilio SMS notifications | ✅ Done | Per-NotificationType templates |
+| 22 | nodemailer email notifications | ✅ Done | SMTP transport, HTML templates |
+| 23 | Doctor verification (admin-only) | ✅ Done | Separated from doctor self-update; admin endpoint added |
+| 24 | Admin module (stats + management) | ✅ Done | Aggregates from all services; list/verify endpoints |
+| 25 | AI symptom checker | ⬜ Todo | Optional — not scaffolded |
 
 ### Phase 4 — Infrastructure
-
 | # | Task | Status | Notes |
 |---|---|---|---|
-| 24 | Multi-stage `Dockerfile` per service | ✅ Done | `infra/docker/` — one per service |
-| 25 | `infra/docker-compose.yml` | ✅ Done | Full local dev stack |
-| 26 | `infra/k8s/` — Deployment + Service per app | ✅ Done | `10-` through `17-` manifests |
-| 27 | `infra/k8s/` — MongoDB StatefulSet + PVC | ✅ Done | `03-mongodb-statefulset.yaml` + `04-mongodb-service.yaml` |
-| 28 | `infra/k8s/` — ConfigMaps + Secrets | ✅ Done | `01-secrets.yaml` + `02-configmap.yaml` |
-| 29 | `infra/k8s/` — Ingress for api-gateway | ⬜ Todo | Single external entry point — not yet created |
+| 26 | Multi-stage `Dockerfile` per service | ✅ Done | `infra/docker/` |
+| 27 | `infra/docker-compose.yml` | ✅ Done | Full local dev stack |
+| 28 | `infra/k8s/` — Deployments + Services | ✅ Done | All 8 apps |
+| 29 | `infra/k8s/` — MongoDB StatefulSet + PVC | ✅ Done | |
+| 30 | `infra/k8s/` — ConfigMaps + Secrets | ✅ Done | |
+| 31 | `infra/k8s/` — Ingress for api-gateway | ⬜ Todo | External routing not yet created |
 
-### Phase 5 — Frontend Wiring
-
+### Phase 5 — Frontend
 | # | Task | Status | Notes |
 |---|---|---|---|
-| 30 | API base URL → api-gateway + `api.ts` client | ✅ Done | `NEXT_PUBLIC_API_URL=http://localhost:3001/api`; fetch wrapper with JWT header |
-| 31 | `api.ts` — auth, doctors, appointments, patients, sessions, payments | ✅ Done | All API call functions defined |
-| 32 | Auth pages (register / login) | ⬜ Todo | Only `layout.tsx` + `page.tsx` exist — no pages yet |
-| 33 | Appointment booking UI | ⬜ Todo | Browse doctors → pick slot → pay → confirm |
-| 34 | Video consultation UI | ⬜ Todo | Embed Jitsi iframe with `jitsiUrl` from session |
-| 35 | Patient dashboard (appointments, reports, prescriptions) | ⬜ Todo | Fetch via `appointments.getMine()`, `patients.getProfile()` |
-| 36 | Doctor dashboard (schedule, accept/reject, prescriptions) | ⬜ Todo | Fetch via `appointments.getMine()` with doctor role |
+| 32 | `lib/api.ts` — full typed API client | ✅ Done | All endpoints, admin methods, typed responses |
+| 33 | `lib/auth.ts` — localStorage token helpers | ✅ Done | |
+| 34 | `AuthContext` + `AuthProvider` | ✅ Done | React context wrapping app |
+| 35 | Landing page | ✅ Done | Feature highlights, patient/doctor CTAs |
+| 36 | Login page | ✅ Done | |
+| 37 | Register page | ✅ Done | Role toggle (patient/doctor), pre-filled from query param |
+| 38 | Dashboard layout + `Nav` | ✅ Done | Role-aware navigation |
+| 39 | Admin dashboard (overview + tables) | ✅ Done | Stats, doctors list with verify toggle, patients, appointments, payments |
+| 40 | Patient dashboard | ⬜ Todo | Appointments list, profile |
+| 41 | Doctor dashboard | ⬜ Todo | Availability setup, appointment queue, prescriptions |
+| 42 | Appointment booking UI | ⬜ Todo | Browse doctors → pick slot → book |
+| 43 | Telemedicine session UI | ⬜ Todo | Jitsi iframe embed |
+| 44 | Payment flow UI | ⬜ Todo | Stripe Elements form using `clientSecret` |
 
 ### Phase 6 — Submission Deliverables
-
 | # | Task | Status | Notes |
 |---|---|---|---|
-| 37 | `members.txt` | ✅ Done | Group member details at repo root |
-| 38 | `readme.txt` with deployment steps | ✅ Done | At repo root |
-| 39 | `submission.txt` with GitHub + YouTube links | ⬜ Todo | Fill after video recorded |
-| 40 | `report.pdf` — architecture diagram + service interfaces | ⬜ Todo | Use this doc as source |
+| 45 | `members.txt` | ✅ Done | |
+| 46 | `readme.txt` | ✅ Done | |
+| 47 | `submission.txt` | ⬜ Todo | Fill after recording demo video |
+| 48 | `report.pdf` | ⬜ Todo | Architecture diagram, service interfaces, auth flow, individual contributions |
 
 ---
 
-## 7. Technology Decisions
+## 9. Technology Decisions
 
 | Concern | Choice | Reason |
 |---|---|---|
-| Service transport | NestJS TCP | No extra infra (no RabbitMQ/Kafka needed for this scale) |
-| Video API | Jitsi Meet | Free, self-hostable, no API key required for basic use |
-| Payment | Stripe (sandbox) | Well-documented, works globally, sandbox is free |
-| SMS | Twilio | Industry standard, free trial tier |
-| Email | SendGrid | Free tier (100 emails/day), simple REST API |
-| Database | MongoDB (per service) | Already set up as dep, flexible for healthcare schemas |
-| Auth | JWT (RS256 or HS256) | Stateless, works across microservices |
+| Service transport | NestJS TCP | Built-in, zero extra infra — no RabbitMQ/Kafka needed at this scale |
+| Video | Jitsi Meet | Free, no API key, embeds as iframe |
+| Payment | Stripe sandbox | Well-documented, globally accessible, free sandbox |
+| SMS | Twilio | Industry standard, free trial |
+| Email | nodemailer + SMTP | Works with any SMTP provider (Gmail, SendGrid) |
+| File storage | Cloudinary | Free tier, SDK streams buffers directly, returns CDN URLs |
+| Database | MongoDB Atlas M0 | Free tier, single cluster, 5 databases, per-service isolation |
+| Auth | JWT HS256 | Stateless, works across microservices, no shared session store needed |
+| Package manager | Bun | Fast, native workspace support, compatible with Node ecosystem |
+| Monorepo | Turborepo | `dependsOn: ["^build"]` ensures shared packages compile before services |
 
 ---
 
-## 8. Submission Checklist
+## 10. Submission Checklist
 
-- [ ] All services independently runnable via `docker compose up`
+- [ ] All services run via `bun run dev` (Turborepo)
+- [ ] All services build via `docker compose up`
 - [ ] All services deployable to Kubernetes via `kubectl apply -f infra/k8s/`
 - [ ] JWT auth enforced with Patient / Doctor / Admin roles
-- [ ] Appointment booking flow works end-to-end (book → notify → video session → payment)
-- [ ] `submission.txt` contains GitHub repo URL + YouTube demo link
+- [ ] Registration creates profile in correct service (patient or doctor)
+- [ ] Doctor availability validation works on appointment booking
+- [ ] Doctor verification flow works (register → admin verifies → appears in GET /doctors)
+- [ ] Medical report upload to Cloudinary works
+- [ ] Appointment flow works end-to-end (book → confirm → session → payment)
+- [ ] Admin dashboard shows live stats from all services
+- [ ] `submission.txt` has GitHub URL + YouTube demo link
 - [ ] `readme.txt` has complete deployment steps
 - [ ] `members.txt` has all group member details
-- [ ] `report.pdf` includes: architecture diagram, service interfaces, workflows, auth details, individual contributions, code appendix
-- [ ] Turnitin similarity below 20% for report
+- [ ] `report.pdf` includes architecture diagram, service interfaces, auth flow, individual contributions
+- [ ] Turnitin similarity below 20%
 - [ ] ZIP named `GroupID_DS-Assignment.zip`
