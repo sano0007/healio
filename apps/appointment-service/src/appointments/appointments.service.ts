@@ -30,8 +30,10 @@ export class AppointmentsService {
     return appt;
   }
 
-  async updateStatus(appointmentId: string, status: string) {
-    const appt = await this.appointmentModel.findByIdAndUpdate(appointmentId, { status }, { new: true }).exec();
+  async updateStatus(appointmentId: string, status: string, paymentStatus?: string) {
+    const update: Record<string, string> = { status };
+    if (paymentStatus) update.paymentStatus = paymentStatus;
+    const appt = await this.appointmentModel.findByIdAndUpdate(appointmentId, update, { new: true }).exec();
     if (!appt) throw new RpcException('Appointment not found');
     return appt;
   }

@@ -14,7 +14,7 @@ export class Appointment {
   @Prop({ required: true })
   scheduledAt: Date;
 
-  @Prop({ default: 'pending', enum: ['pending', 'confirmed', 'cancelled', 'completed'] })
+  @Prop({ default: 'pending', enum: ['pending', 'awaiting_payment', 'confirmed', 'cancelled', 'completed'] })
   status: string;
 
   @Prop()
