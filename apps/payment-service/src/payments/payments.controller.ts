@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { MSG } from '@healio/shared-types';
+import { MSG, InitiatePaymentDto } from '@healio/shared-types';
 import { PaymentsService } from './payments.service';
 
 @Controller()
@@ -13,13 +13,13 @@ export class PaymentsController {
   }
 
   @MessagePattern(MSG.PAYMENT_INITIATE)
-  initiatePayment(@Payload() dto: { appointmentId: string; patientId: string; amount: number; currency: string }) {
+  initiatePayment(@Payload() dto: InitiatePaymentDto) {
     return this.paymentsService.initiatePayment(dto);
   }
 
   @MessagePattern(MSG.PAYMENT_CONFIRM)
-  confirmPayment(@Payload() data: { stripePaymentIntentId: string }) {
-    return this.paymentsService.confirmPayment(data.stripePaymentIntentId);
+  confirmPayment(@Payload() data: { checkoutSessionId: string }) {
+    return this.paymentsService.confirmPayment(data.checkoutSessionId);
   }
 
   @MessagePattern(MSG.PAYMENT_GET)

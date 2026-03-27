@@ -27,7 +27,10 @@ export class Payment {
   stripePaymentIntentId: string;
 
   @Prop()
-  stripeClientSecret: string;
+  stripeCheckoutSessionId: string;
+
+  @Prop()
+  stripeCheckoutUrl: string;
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);

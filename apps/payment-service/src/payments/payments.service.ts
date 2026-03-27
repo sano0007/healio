@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
 import { RpcException } from '@nestjs/microservices';
 import Stripe from 'stripe';
@@ -10,17 +11,34 @@ import { InitiatePaymentDto } from '@healio/shared-types';
 export class PaymentsService {
   private stripe: Stripe;
 
-  constructor(@InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>) {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  constructor(
+    @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
+    private config: ConfigService,
+  ) {
+    this.stripe = new Stripe(this.config.get('STRIPE_SECRET_KEY', ''), {
       apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
     });
   }
 
   async initiatePayment(dto: InitiatePaymentDto) {
-    const intent = await this.stripe.paymentIntents.create({
-      amount: Math.round(dto.amount * 100),
-      currency: dto.currency || 'usd',
+    const session = await this.stripe.checkout.sessions.create({
+      mode: 'payment',
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: dto.currency || 'usd',
+            unit_amount: Math.round(dto.amount * 100),
+            product_data: {
+              name: `Healio — Consultation with Dr. ${dto.doctorName ?? 'Doctor'}`,
+              description: `Appointment ID: ${dto.appointmentId}`,
+            },
+          },
+        },
+      ],
       metadata: { appointmentId: dto.appointmentId, patientId: dto.patientId },
+      success_url: dto.successUrl,
+      cancel_url: dto.cancelUrl,
     });
 
     const payment = new this.paymentModel({
@@ -28,22 +46,27 @@ export class PaymentsService {
       patientId: dto.patientId,
       amount: dto.amount,
       currency: dto.currency || 'usd',
-      stripePaymentIntentId: intent.id,
-      stripeClientSecret: intent.client_secret,
+      stripeCheckoutSessionId: session.id,
+      stripeCheckoutUrl: session.url,
       status: 'pending',
     });
     await payment.save();
 
-    return { paymentId: payment._id.toString(), clientSecret: intent.client_secret };
+    return { paymentId: payment._id.toString(), checkoutUrl: session.url };
   }
 
-  async confirmPayment(stripePaymentIntentId: string) {
+  async confirmPayment(checkoutSessionId: string) {
+    const session = await this.stripe.checkout.sessions.retrieve(checkoutSessionId);
+    if (session.payment_status !== 'paid') {
+      throw new RpcException('Payment has not been completed');
+    }
+
     const payment = await this.paymentModel.findOneAndUpdate(
-      { stripePaymentIntentId },
-      { status: 'success' },
+      { stripeCheckoutSessionId: checkoutSessionId },
+      { status: 'success', stripePaymentIntentId: session.payment_intent as string },
       { new: true },
     ).exec();
-    if (!payment) throw new RpcException('Payment not found');
+    if (!payment) throw new RpcException('Payment record not found');
     return payment;
   }
 
