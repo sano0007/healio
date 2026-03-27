@@ -8,6 +8,7 @@ export enum UserRole {
 
 export enum AppointmentStatus {
   PENDING = 'pending',
+  AWAITING_PAYMENT = 'awaiting_payment',
   CONFIRMED = 'confirmed',
   CANCELLED = 'cancelled',
   COMPLETED = 'completed',
@@ -25,6 +26,7 @@ export enum NotificationType {
   APPOINTMENT_CONFIRMED = 'appointment_confirmed',
   APPOINTMENT_CANCELLED = 'appointment_cancelled',
   CONSULTATION_COMPLETED = 'consultation_completed',
+  PAYMENT_REQUESTED = 'payment_requested',
   PAYMENT_SUCCESS = 'payment_success',
 }
 
@@ -105,6 +107,7 @@ export interface RegisterDto {
   email: string;
   password: string;
   role: UserRole;
+  phone?: string;
 }
 
 export interface LoginDto {
@@ -123,6 +126,7 @@ export interface SendNotificationDto {
   type: NotificationType;
   recipientEmail: string;
   recipientPhone?: string;
+  recipientRole: 'patient' | 'doctor';
   payload: Record<string, unknown>;
 }
 
@@ -131,4 +135,7 @@ export interface InitiatePaymentDto {
   patientId: string;
   amount: number;
   currency: string;
+  successUrl: string;
+  cancelUrl: string;
+  doctorName?: string;
 }
