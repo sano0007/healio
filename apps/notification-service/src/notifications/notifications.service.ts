@@ -13,11 +13,11 @@ export class NotificationsService {
   async handleNotification(dto: SendNotificationDto) {
     try {
       if (dto.recipientEmail) {
-        const { subject, html } = this.emailService.getEmailContent(dto.type, dto.payload);
+        const { subject, html } = this.emailService.getEmailContent(dto.type, dto.recipientRole, dto.payload);
         await this.emailService.sendEmail(dto.recipientEmail, subject, html);
       }
       if (dto.recipientPhone) {
-        const message = this.smsService.getSmsMessage(dto.type, dto.payload);
+        const message = this.smsService.getSmsMessage(dto.type, dto.recipientRole, dto.payload);
         await this.smsService.sendSms(dto.recipientPhone, message);
       }
     } catch (error) {
