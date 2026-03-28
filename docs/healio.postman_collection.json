@@ -33,7 +33,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"name\": \"John Patient\",\n  \"email\": \"patient@test.com\",\n  \"password\": \"Password123\",\n  \"role\": \"patient\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"John Patient\",\n  \"email\": \"patient@test.com\",\n  \"password\": \"Password123\",\n  \"role\": \"patient\",\n  \"phone\": \"0771234567\"\n}" },
             "url": { "raw": "{{base}}/auth/register", "host": ["{{base}}"], "path": ["auth", "register"] }
           }
         },
@@ -50,7 +50,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Dr. Sarah Smith\",\n  \"email\": \"doctor@test.com\",\n  \"password\": \"Password123\",\n  \"role\": \"doctor\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Dr. Sarah Smith\",\n  \"email\": \"doctor@test.com\",\n  \"password\": \"Password123\",\n  \"role\": \"doctor\",\n  \"phone\": \"0777654321\"\n}" },
             "url": { "raw": "{{base}}/auth/register", "host": ["{{base}}"], "path": ["auth", "register"] }
           }
         },
@@ -141,7 +141,7 @@
               { "key": "Authorization", "value": "Bearer {{token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+94771234567\",\n  \"bloodGroup\": \"O+\",\n  \"address\": \"123 Main St, Colombo\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"0771234567\",\n  \"bloodGroup\": \"O+\",\n  \"address\": \"123 Main St, Colombo\"\n}" },
             "url": { "raw": "{{base}}/patients/me", "host": ["{{base}}"], "path": ["patients", "me"] }
           }
         },
@@ -199,7 +199,7 @@
               { "key": "Authorization", "value": "Bearer {{doctor_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"specialty\": \"Cardiology\",\n  \"qualifications\": [\"MBBS\", \"MD\"],\n  \"consultationFee\": 2500,\n  \"bio\": \"10 years experience in cardiology\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"0777654321\",\n  \"specialty\": \"Cardiology\",\n  \"qualifications\": [\"MBBS\", \"MD\"],\n  \"consultationFee\": 2500,\n  \"bio\": \"10 years experience in cardiology\"\n}" },
             "url": { "raw": "{{base}}/doctors/me", "host": ["{{base}}"], "path": ["doctors", "me"] },
             "description": "isVerified is silently stripped — doctors cannot self-verify."
           }
