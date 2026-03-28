@@ -17,7 +17,7 @@ export class AuthController {
     const result = await firstValueFrom(this.authClient.send(MSG.AUTH_REGISTER, dto));
 
     // Create profile in the appropriate service after auth registers the user
-    const profilePayload = { userId: result.user.id, name: dto.name, email: dto.email };
+    const profilePayload = { userId: result.user.id, name: dto.name, email: dto.email, ...(dto.phone && { phone: dto.phone }) };
     if (dto.role === UserRole.PATIENT) {
       await firstValueFrom(this.patientClient.send(MSG.PATIENT_CREATE, profilePayload));
     } else if (dto.role === UserRole.DOCTOR) {

@@ -24,6 +24,9 @@ export class Doctor {
   email: string;
 
   @Prop()
+  phone: string;
+
+  @Prop()
   specialty: string;
 
   @Prop({ type: [String] })
