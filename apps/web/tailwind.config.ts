@@ -10,35 +10,22 @@ const config: Config = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ["var(--font-geist-sans)", ...fontFamily.sans],
-                mono: ["var(--font-geist-mono)", ...fontFamily.mono],
+                sans: ["var(--font-inter)", ...fontFamily.sans],
             },
             colors: {
-                primary: {
-                    50: "#f0f9ff",
-                    100: "#e0f2fe",
-                    200: "#bae6fd",
-                    300: "#7dd3fc",
-                    400: "#38bdf8",
-                    500: "#0ea5e9",
-                    600: "#0284c7",
-                    700: "#0369a1",
-                    800: "#075985",
-                    900: "#0c4a6e",
-                    950: "#082f49",
+                brand: {
+                    dark: "#243B42",
+                    DEFAULT: "#2D4A53",
+                    medium: "#3A5F6A",
+                    light: "#C5DEE6",
+                    lighter: "#E1EFF4",
+                    lightest: "#F0F7FA",
+                    offwhite: "#FAFAFA",
+                    black: "#0D0D0D",
                 },
-                medical: {
-                    50: "#f0fdfa",
-                    100: "#ccfbf1",
-                    200: "#99f6e4",
-                    300: "#5eead4",
-                    400: "#2dd4bf",
-                    500: "#14b8a6",
-                    600: "#0d9488",
-                    700: "#0f766e",
-                    800: "#115e59",
-                    900: "#134e4a",
-                },
+            },
+            borderRadius: {
+                '4xl': '2rem',
             },
         },
     },
