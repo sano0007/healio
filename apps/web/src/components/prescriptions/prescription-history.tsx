@@ -86,7 +86,7 @@ export function PrescriptionHistory() {
                 </td>
                 <td className="py-5 pr-8 rounded-r-[2rem] text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <Button variant="ghost" size="icon" className="w-10 h-10 rounded-xl hover:bg-white border border-transparent hover:border-gray-100 shadow-sm opacity-0 group-hover:opacity-100 transition-all">
+                    <Button variant="outline" size="sm" className="h-8 w-8 rounded-lg p-0 hover:bg-white border border-transparent hover:border-gray-100 shadow-sm opacity-0 group-hover:opacity-100 transition-all">
                       <Download className="w-4 h-4 text-gray-400" />
                     </Button>
                     <Button variant="dark" size="sm" className="h-10 px-4 rounded-xl text-[9px] font-black gap-2 uppercase tracking-widest shadow-lg shadow-brand-dark/10 group-hover:scale-105 transition-all">
