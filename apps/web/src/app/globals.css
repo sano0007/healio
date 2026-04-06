@@ -2,11 +2,126 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --font-geist-sans: ui-sans-serif, system-ui, sans-serif;
-    --font-geist-mono: ui-monospace, monospace;
+@layer base {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+        color: #0D0D0D;
+        background-color: #FFFFFF;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
 }
 
-body {
-    font-family: var(--font-geist-sans);
+@layer components {
+    .section-label {
+        @apply text-sm text-brand-dark/70 tracking-wide mb-3 inline-block;
+        font-style: normal;
+    }
+
+    .section-container {
+        @apply max-w-[1280px] mx-auto px-6 lg:px-8;
+    }
+
+    .floating-card {
+        @apply bg-white rounded-2xl shadow-lg border border-gray-100 p-4;
+        backdrop-filter: blur(10px);
+    }
+
+    .stat-card {
+        @apply rounded-2xl p-6 flex flex-col justify-between;
+    }
+
+    .stat-card-dark {
+        @apply bg-brand-dark text-white rounded-2xl p-6 flex flex-col justify-between;
+    }
+
+    .cta-primary {
+        @apply bg-brand-dark text-white px-6 py-3 rounded-full font-medium 
+               inline-flex items-center gap-2 hover:bg-brand-dark/90 transition-all duration-300;
+    }
+
+    .cta-outline {
+        @apply border border-brand-dark/30 text-brand-black px-6 py-3 rounded-full font-medium 
+               inline-flex items-center gap-2 hover:bg-brand-lightest transition-all duration-300;
+    }
+
+    .specialty-card {
+        @apply bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-md 
+               hover:border-brand-light transition-all duration-300 cursor-pointer;
+    }
+
+    .doctor-card {
+        @apply bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg 
+               transition-all duration-300;
+    }
+
+    .faq-item {
+        @apply border-b border-gray-200 py-5 cursor-pointer;
+    }
+
+    .testimonial-card {
+        @apply bg-white rounded-2xl p-6 border border-gray-100 shadow-sm;
+    }
+}
+
+@layer utilities {
+    .text-gradient {
+        background: linear-gradient(135deg, #243B42 0%, #3A5F6A 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-gradient {
+        background: linear-gradient(180deg, #F0F7FA 0%, #E1EFF4 40%, #FFFFFF 100%);
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-float-delayed {
+        animation: float 6s ease-in-out 2s infinite;
+    }
+
+    .animate-float-slow {
+        animation: float 8s ease-in-out 1s infinite;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #C5DEE6;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #243B42;
 }
