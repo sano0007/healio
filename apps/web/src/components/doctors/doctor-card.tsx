@@ -39,32 +39,37 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <h3 className="text-lg font-bold text-brand-black truncate group-hover:text-brand-dark transition-colors">
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <h3 className="text-base font-black text-brand-black truncate group-hover:text-brand-dark transition-colors leading-tight">
               {doctor.name}
             </h3>
-            <div className="flex items-center gap-1.5 px-2 py-1 bg-amber-50 rounded-lg">
-              <Star className="w-3.5 h-3.5 text-amber-500" fill="currentColor" />
-              <span className="text-[11px] font-bold text-amber-700">{doctor.rating}</span>
+            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 rounded-lg border border-amber-100 shrink-0">
+              <Star className="w-3 h-3 text-amber-500" fill="currentColor" />
+              <span className="text-[10px] font-black text-amber-700">{doctor.rating}</span>
             </div>
           </div>
           
-          <p className="text-sm font-medium text-brand-dark mb-3">{doctor.specialization}</p>
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">{doctor.specialization}</p>
           
-          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 mb-4">
-            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-wider">
               <GraduationCap className="w-3.5 h-3.5 text-brand-light" />
               {doctor.experience} yrs exp.
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-brand-dark font-bold bg-brand-light/20 px-2 py-0.5 rounded-md">
-              ${doctor.fee} <span className="font-medium text-brand-dark/60 ml-0.5">/ session</span>
+            <div className="w-px h-3 bg-gray-100 mx-1" />
+            <div className="flex items-center gap-1 text-[10px] text-brand-dark font-black bg-brand-light/20 px-2 py-0.5 rounded-md">
+              ${doctor.fee} <span className="font-bold text-brand-dark/40 ml-0.5">/ session</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 py-3 border-t border-gray-50">
-            <Clock className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Next Available:</span>
-            <span className="text-[11px] font-bold text-emerald-600">{doctor.nextAvailable}</span>
+          <div className="flex items-center gap-2 py-3 border-t border-gray-50 mt-1">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
+               <Clock className="w-3.5 h-3.5" />
+            </div>
+            <div className="flex flex-col min-w-0">
+               <span className="text-[8px] font-black text-gray-300 uppercase tracking-[0.15em] leading-none mb-1">Next Available</span>
+               <span className="text-[10px] font-black text-emerald-600 truncate">{doctor.nextAvailable}</span>
+            </div>
           </div>
         </div>
       </div>

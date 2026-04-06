@@ -83,7 +83,7 @@ const doctors: Doctor[] = [
 export function DoctorList({ isLoading = false }: { isLoading?: boolean }) {
   if (isLoading) {
     return (
-      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="h-[280px] bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm animate-pulse space-y-4">
             <div className="flex items-start gap-5">
@@ -116,7 +116,7 @@ export function DoctorList({ isLoading = false }: { isLoading?: boolean }) {
   }
 
   return (
-    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
       {doctors.map((doctor) => (
         <DoctorCard key={doctor.id} doctor={doctor} />
       ))}
