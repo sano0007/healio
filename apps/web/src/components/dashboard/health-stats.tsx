@@ -1,37 +1,37 @@
 "use client";
 
-import { Activity, Heart, Droplets, Moon } from "lucide-react";
+import { Calendar, UserCheck, Clock, CheckCircle2 } from "lucide-react";
 import { StatCard } from "@/components/ui/stat-card";
 import { motion } from "framer-motion";
 
 const stats = [
   {
-    title: "Heart Rate",
-    value: "72",
-    unit: "bpm",
-    icon: Heart,
-    trend: { value: "+2%", type: "negative" as const },
+    title: "Total Appointments",
+    value: "24",
+    unit: "this month",
+    icon: UserCheck,
+    trend: { value: "+12%", type: "positive" as const },
   },
   {
-    title: "Blood Pressure",
-    value: "120/80",
-    unit: "mmHg",
-    icon: Droplets,
-    trend: { value: "Normal", type: "neutral" as const },
+    title: "Upcoming Sessions",
+    value: "3",
+    unit: "next 7 days",
+    icon: Clock,
+    trend: { value: "On Track", type: "neutral" as const },
   },
   {
-    title: "Sleep Quality",
-    value: "7.5",
-    unit: "hrs",
-    icon: Moon,
-    trend: { value: "+15%", type: "positive" as const },
+    title: "Last Consultation",
+    value: "2d ago",
+    unit: "June 22",
+    icon: Calendar,
+    trend: { value: "Completed", type: "positive" as const },
   },
   {
-    title: "Activity",
-    value: "8,432",
-    unit: "steps",
-    icon: Activity,
-    trend: { value: "+8%", type: "positive" as const },
+    title: "Health Progress",
+    value: "85%",
+    unit: "Recovery",
+    icon: CheckCircle2,
+    trend: { value: "+5%", type: "positive" as const },
   },
 ];
 
