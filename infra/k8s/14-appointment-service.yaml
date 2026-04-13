@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appointment-service
+  namespace: healio
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: appointment-service
+  template:
+    metadata:
+      labels:
+        app: appointment-service
+    spec:
+      containers:
+        - name: appointment-service
+          image: healio/appointment-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4004
+          env:
+            - name: PORT
+              value: "4004"
+            - name: MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: MONGODB_URI_APPOINTMENT
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appointment-service
+  namespace: healio
+spec:
+  selector:
+    app: appointment-service
+  ports:
+    - port: 4004
+      targetPort: 4004
+  clusterIP: None
