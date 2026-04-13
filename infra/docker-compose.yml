@@ -1,0 +1,148 @@
+version: '3.9'
+
+services:
+  # ─── Databases ────────────────────────────────────────────────────────────────
+  mongodb-auth:
+    image: mongo:7
+    container_name: healio-mongo-auth
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_auth:/data/db
+    networks:
+      - healio-net
+
+  # ─── Microservices ───────────────────────────────────────────────────────────
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: infra/docker/api-gateway.Dockerfile
+    container_name: healio-api-gateway
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-healio-secret}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+    depends_on:
+      - auth-service
+      - patient-service
+      - doctor-service
+      - appointment-service
+      - telemedicine-service
+      - payment-service
+      - notification-service
+    networks:
+      - healio-net
+
+  auth-service:
+    build:
+      context: ..
+      dockerfile: infra/docker/auth-service.Dockerfile
+    container_name: healio-auth-service
+    restart: unless-stopped
+    environment:
+      - PORT=4001
+      - MONGODB_URI=mongodb://mongodb-auth:27017/healio-auth
+      - JWT_SECRET=${JWT_SECRET:-healio-secret}
+    depends_on:
+      - mongodb-auth
+    networks:
+      - healio-net
+
+  patient-service:
+    build:
+      context: ..
+      dockerfile: infra/docker/patient-service.Dockerfile
+    container_name: healio-patient-service
+    restart: unless-stopped
+    environment:
+      - PORT=4002
+      - MONGODB_URI=mongodb://mongodb-auth:27017/healio-patients
+    depends_on:
+      - mongodb-auth
+    networks:
+      - healio-net
+
+  doctor-service:
+    build:
+      context: ..
+      dockerfile: infra/docker/doctor-service.Dockerfile
+    container_name: healio-doctor-service
+    restart: unless-stopped
+    environment:
+      - PORT=4003
+      - MONGODB_URI=mongodb://mongodb-auth:27017/healio-doctors
+    depends_on:
+      - mongodb-auth
+    networks:
+      - healio-net
+
+  appointment-service:
+    build:
+      context: ..
+      dockerfile: infra/docker/appointment-service.Dockerfile
+    container_name: healio-appointment-service
+    restart: unless-stopped
+    environment:
+      - PORT=4004
+      - MONGODB_URI=mongodb://mongodb-auth:27017/healio-appointments
+    depends_on:
+      - mongodb-auth
+    networks:
+      - healio-net
+
+  telemedicine-service:
+    build:
+      context: ..
+      dockerfile: infra/docker/telemedicine-service.Dockerfile
+    container_name: healio-telemedicine-service
+    restart: unless-stopped
+    environment:
+      - PORT=4005
+      - VIDEO_PROVIDER=jitsi
+      - JITSI_BASE_URL=https://meet.jit.si
+    networks:
+      - healio-net
+
+  payment-service:
+    build:
+      context: ..
+      dockerfile: infra/docker/payment-service.Dockerfile
+    container_name: healio-payment-service
+    restart: unless-stopped
+    environment:
+      - PORT=4006
+      - MONGODB_URI=mongodb://mongodb-auth:27017/healio-payments
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+    depends_on:
+      - mongodb-auth
+    networks:
+      - healio-net
+
+  notification-service:
+    build:
+      context: ..
+      dockerfile: infra/docker/notification-service.Dockerfile
+    container_name: healio-notification-service
+    restart: unless-stopped
+    environment:
+      - PORT=4007
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-noreply@healio.app}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER:-}
+    networks:
+      - healio-net
+
+networks:
+  healio-net:
+    driver: bridge
+
+volumes:
+  mongo_auth:
