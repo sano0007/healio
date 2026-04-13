@@ -10,7 +10,11 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
-    "clean": "turbo clean && rm -rf node_modules"
+    "clean": "turbo clean && rm -rf node_modules",
+    "docker:up": "docker compose -f infra/docker-compose.yml up --build",
+    "docker:down": "docker compose -f infra/docker-compose.yml down -v",
+    "k8s:apply": "kubectl apply -f infra/k8s/ --recursive",
+    "k8s:delete": "kubectl delete -f infra/k8s/ --recursive"
   },
   "devDependencies": {
     "prettier": "^3.4.2",
