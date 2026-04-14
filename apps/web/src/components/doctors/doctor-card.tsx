@@ -8,19 +8,27 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 
 export interface Doctor {
-  id: string;
+  _id: string;
+  userId: string;
   name: string;
-  specialization: string;
-  image: string;
-  experience: number;
-  rating: number;
-  reviews: number;
-  fee: number;
-  nextAvailable: string;
+  email: string;
+  specialty?: string;
+  qualifications?: string[];
+  experience?: number;
+  bio?: string;
+  consultationFee?: number;
+  rating?: number;
+  reviewCount?: number;
   isVerified?: boolean;
+  availability?: { dayOfWeek: number; startTime: string; endTime: string }[];
 }
 
 export function DoctorCard({ doctor }: { doctor: Doctor }) {
+  const experience = doctor.experience || 0;
+  const rating = doctor.rating || 0;
+  const reviewCount = doctor.reviewCount || 0;
+  const fee = doctor.consultationFee || 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -30,7 +38,7 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
     >
       <div className="flex items-start gap-5">
         <div className="relative">
-          <Avatar src={doctor.image} className="w-20 h-20 lg:w-24 lg:h-24 border-2 border-brand-light/10" />
+          <Avatar src="/images/doctor-1.png" className="w-20 h-20 lg:w-24 lg:h-24 border-2 border-brand-light/10" />
           {doctor.isVerified && (
             <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm">
               <CheckCircle2 className="w-5 h-5 text-brand-dark" fill="currentColor" />
@@ -45,46 +53,43 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
             </h3>
             <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 rounded-lg border border-amber-100 shrink-0">
               <Star className="w-3 h-3 text-amber-500" fill="currentColor" />
-              <span className="text-[10px] font-black text-amber-700">{doctor.rating}</span>
-            </div>
-          </div>
-          
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">{doctor.specialization}</p>
-          
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-wider">
-              <GraduationCap className="w-3.5 h-3.5 text-brand-light" />
-              {doctor.experience} yrs exp.
-            </div>
-            <div className="w-px h-3 bg-gray-100 mx-1" />
-            <div className="flex items-center gap-1 text-[10px] text-brand-dark font-black bg-brand-light/20 px-2 py-0.5 rounded-md">
-              ${doctor.fee} <span className="font-bold text-brand-dark/40 ml-0.5">/ session</span>
+              <span className="text-[10px] font-black text-amber-700">{rating.toFixed(1)}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 py-3 border-t border-gray-50 mt-1">
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
-               <Clock className="w-3.5 h-3.5" />
+          <p className="text-xs text-gray-400 font-medium mb-2 truncate">
+            {doctor.specialty || "General Physician"}
+          </p>
+
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            <div className="flex items-center gap-1">
+              <GraduationCap className="w-3.5 h-3.5" />
+              <span>{experience}+ years</span>
             </div>
-            <div className="flex flex-col min-w-0">
-               <span className="text-[8px] font-black text-gray-300 uppercase tracking-[0.15em] leading-none mb-1">Next Available</span>
-               <span className="text-[10px] font-black text-emerald-600 truncate">{doctor.nextAvailable}</span>
+            <div className="flex items-center gap-1">
+              <Star className="w-3.5 h-3.5" />
+              <span>{reviewCount} reviews</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 mt-6">
-        <Button variant={"dark"} className="flex-1 rounded-xl h-11 text-xs font-bold gap-2 shadow-lg shadow-brand-dark/10">
-          Book Appointment
-        </Button>
-        <Link 
-          href={`/doctors/${doctor.id}`}
-          className="flex items-center justify-center w-11 h-11 rounded-xl border border-gray-100 text-gray-400 hover:text-brand-dark hover:bg-white hover:border-gray-200 transition-all group/btn"
-        >
-          <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-0.5 transition-transform" />
+      <div className="mt-4 flex items-center justify-between">
+        <div className="flex flex-col">
+          <span className="text-xs text-gray-400">Consultation Fee</span>
+          <span className="font-bold text-brand-dark text-lg">${fee}</span>
+        </div>
+        <Link href={`/doctors/${doctor.userId || doctor._id}`}>
+          <Button variant="ghost" size="sm" className="group/btn">
+            View Profile
+            <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+          </Button>
         </Link>
       </div>
+
+      <Badge variant="secondary" className="absolute top-4 right-4">
+        {doctor.isVerified ? "Verified" : "Pending"}
+      </Badge>
     </motion.div>
   );
 }

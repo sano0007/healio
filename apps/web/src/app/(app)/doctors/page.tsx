@@ -1,20 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { DoctorFilter } from "@/components/doctors/doctor-filter";
+import { useState } from "react";
+import { DoctorFilter, type DoctorFilters } from "@/components/doctors/doctor-filter";
 import { DoctorList } from "@/components/doctors/doctor-list";
 import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { useDoctors } from "@/hooks/use-doctors";
 
 export default function DoctorsPage() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState<DoctorFilters>({
+    search: "",
+    specialty: "All Specialties",
+    availability: "",
+    sort: "rating",
+  });
 
-  // Simulate loading state
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
+  const { data: doctors, isLoading, error } = useDoctors(filters);
+
+  function handleFilterChange(newFilters: DoctorFilters) {
+    setFilters(newFilters);
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
@@ -41,26 +46,35 @@ export default function DoctorsPage() {
             Available Doctors
           </p>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-2xl font-bold text-emerald-600">542</span>
+            {!isLoading && doctors && (
+              <>
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-2xl font-bold text-emerald-600">{doctors.length}</span>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-10">
         {/* Left Side: Filter Sidebar */}
-        <DoctorFilter />
+        <DoctorFilter onFilterChange={handleFilterChange} />
 
         {/* Right Side: Results Grid */}
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-lg font-bold text-brand-black">Showing Result</h2>
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="font-bold text-brand-dark">6</span> doctors found for <span className="font-bold text-brand-dark italic">"All Specialties"</span>
+              <span className="font-bold text-brand-dark">{doctors?.length || 0}</span> 
+              doctors found for <span className="font-bold text-brand-dark italic">"{filters.specialty}"</span>
             </div>
           </div>
 
-          <DoctorList isLoading={isLoading} />
+          <DoctorList 
+            doctors={doctors || []} 
+            isLoading={isLoading} 
+            error={error} 
+          />
         </div>
       </div>
     </div>

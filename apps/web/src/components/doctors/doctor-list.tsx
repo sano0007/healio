@@ -5,82 +5,15 @@ import { DoctorCard, type Doctor } from "./doctor-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Stethoscope } from "lucide-react";
 
-const doctors: Doctor[] = [
-  {
-    id: "1",
-    name: "Dr. Sarah Johnson",
-    specialization: "Cardiologist",
-    image: "/images/doctor-1.png",
-    experience: 12,
-    rating: 4.9,
-    reviews: 120,
-    fee: 150,
-    nextAvailable: "Today, 10:30 AM",
-    isVerified: true,
-  },
-  {
-    id: "2",
-    name: "Dr. Michael Chen",
-    specialization: "Dermatologist",
-    image: "/images/doctor-2.png",
-    experience: 8,
-    rating: 4.8,
-    reviews: 85,
-    fee: 120,
-    nextAvailable: "Tomorrow, 02:15 PM",
-    isVerified: true,
-  },
-  {
-    id: "3",
-    name: "Dr. Emily Wilson",
-    specialization: "General Physician",
-    image: "/images/doctor-3.png",
-    experience: 15,
-    rating: 5.0,
-    reviews: 210,
-    fee: 100,
-    nextAvailable: "Wednesday, 09:00 AM",
-    isVerified: true,
-  },
-  {
-    id: "4",
-    name: "Dr. James Miller",
-    specialization: "Pediatrician",
-    image: "/images/doctor-1.png",
-    experience: 10,
-    rating: 4.7,
-    reviews: 95,
-    fee: 130,
-    nextAvailable: "Today, 04:30 PM",
-    isVerified: false,
-  },
-  {
-    id: "5",
-    name: "Dr. Robert Garcia",
-    specialization: "Neurologist",
-    image: "/images/doctor-2.png",
-    experience: 20,
-    rating: 4.9,
-    reviews: 150,
-    fee: 200,
-    nextAvailable: "Thursday, 11:15 AM",
-    isVerified: true,
-  },
-  {
-    id: "6",
-    name: "Dr. Linda Taylor",
-    specialization: "Psychiatrist",
-    image: "/images/doctor-3.png",
-    experience: 14,
-    rating: 4.8,
-    reviews: 110,
-    fee: 180,
-    nextAvailable: "Monday, 10:00 AM",
-    isVerified: true,
-  },
-];
-
-export function DoctorList({ isLoading = false }: { isLoading?: boolean }) {
+export function DoctorList({ 
+  doctors = [], 
+  isLoading = false,
+  error,
+}: { 
+  doctors?: Doctor[];
+  isLoading?: boolean;
+  error?: Error | null;
+}) {
   if (isLoading) {
     return (
       <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
@@ -97,6 +30,20 @@ export function DoctorList({ isLoading = false }: { isLoading?: boolean }) {
             <div className="h-10 w-full bg-gray-100 rounded-xl" />
           </div>
         ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-white rounded-[2rem] border border-dashed border-gray-200">
+        <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mb-6">
+          <Stethoscope className="w-10 h-10 text-red-300" />
+        </div>
+        <h3 className="text-xl font-bold text-brand-black mb-2">Failed to load doctors</h3>
+        <p className="text-sm text-gray-400 max-w-xs mx-auto">
+          We couldn't load the doctors. Please check your connection and try again.
+        </p>
       </div>
     );
   }
@@ -118,7 +65,7 @@ export function DoctorList({ isLoading = false }: { isLoading?: boolean }) {
   return (
     <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
       {doctors.map((doctor) => (
-        <DoctorCard key={doctor.id} doctor={doctor} />
+        <DoctorCard key={doctor._id} doctor={doctor} />
       ))}
     </div>
   );
