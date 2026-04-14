@@ -22,7 +22,7 @@ const next7Days = [...Array(7)].map((_, i) => {
   };
 });
 
-export function BookingWidget({ fee }: { fee: number }) {
+export function BookingWidget({ fee, doctorId }: { fee: number; doctorId?: string }) {
   const [type, setType] = useState<"in-person" | "video">("video");
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTime, setSelectedTime] = useState("");
