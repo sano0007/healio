@@ -41,6 +41,12 @@ export class Doctor {
   @Prop({ default: 0 })
   consultationFee: number;
 
+  @Prop({ default: 0 })
+  rating: number;
+
+  @Prop({ default: 0 })
+  reviewCount: number;
+
   @Prop({ default: false })
   isVerified: boolean;
 

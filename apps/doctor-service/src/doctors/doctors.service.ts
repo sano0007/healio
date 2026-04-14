@@ -16,8 +16,23 @@ function normalisePhone(raw: string): string {
 export class DoctorsService {
   constructor(@InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>) {}
 
-  async getAll() {
-    return this.doctorModel.find({ isVerified: true }).exec();
+  async getAll(filters: { search?: string; specialty?: string; availability?: string; sort?: string } = {}) {
+    const query: any = { isVerified: true };
+
+    if (filters.search) {
+      query.name = { $regex: filters.search, $options: 'i' };
+    }
+
+    if (filters.specialty && filters.specialty !== 'All Specialties') {
+      query.specialty = filters.specialty;
+    }
+
+    let sortOption: any = { createdAt: -1 };
+    if (filters.sort === 'rating') sortOption = { rating: -1, reviewCount: -1 };
+    if (filters.sort === 'experience') sortOption = { experience: -1 };
+    if (filters.sort === 'fee') sortOption = { consultationFee: 1 };
+
+    return this.doctorModel.find(query).sort(sortOption).exec();
   }
 
   async getAllAdmin() {
