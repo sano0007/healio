@@ -6,21 +6,21 @@ import { api, Doctor } from '@/lib/api';
 import { CheckCircle, XCircle, Clock } from 'lucide-react';
 
 export default function AdminDoctorsPage() {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) return;
-    api.admin.getDoctors(token).then(setDoctors).finally(() => setLoading(false));
-  }, [token]);
+    if (!isAuthenticated) return;
+    api.admin.getDoctors().then(setDoctors).finally(() => setLoading(false));
+  }, [isAuthenticated]);
 
   async function toggleVerify(userId: string, current: boolean) {
-    if (!token) return;
+    if (!isAuthenticated) return;
     setVerifying(userId);
     try {
-      const updated = await api.admin.verifyDoctor(token, userId, !current);
+      const updated = await api.admin.verifyDoctor(userId, !current);
       setDoctors(prev => prev.map(d => d._id === updated._id ? updated : d));
     } finally {
       setVerifying(null);

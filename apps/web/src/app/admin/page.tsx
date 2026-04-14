@@ -24,16 +24,16 @@ function StatCard({ label, value, sub, icon: Icon, color }: {
 }
 
 export default function AdminOverviewPage() {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) return;
-    api.admin.getStats(token)
+    if (!isAuthenticated) return;
+    api.admin.getStats()
       .then(setStats)
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [isAuthenticated]);
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>;
   if (!stats) return <div className="text-gray-400">Failed to load stats.</div>;

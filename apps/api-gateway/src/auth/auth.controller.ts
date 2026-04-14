@@ -31,4 +31,10 @@ export class AuthController {
   login(@Body() dto: LoginDto) {
     return firstValueFrom(this.authClient.send(MSG.AUTH_LOGIN, dto));
   }
+
+  @Post('refresh')
+  async refresh(@Body() dto: { refreshToken: string }) {
+    const result = await firstValueFrom(this.authClient.send(MSG.AUTH_REFRESH, dto));
+    return result;
+  }
 }

@@ -5,14 +5,14 @@ import { useAuth } from '@/contexts/auth';
 import { api, PatientProfile } from '@/lib/api';
 
 export default function AdminPatientsPage() {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [patients, setPatients] = useState<PatientProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) return;
-    api.admin.getPatients(token).then(setPatients).finally(() => setLoading(false));
-  }, [token]);
+    if (!isAuthenticated) return;
+    api.admin.getPatients().then(setPatients).finally(() => setLoading(false));
+  }, [isAuthenticated]);
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>;
 

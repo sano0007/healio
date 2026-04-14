@@ -12,15 +12,15 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default function AdminAppointmentsPage() {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    if (!token) return;
-    api.admin.getAppointments(token).then(setAppointments).finally(() => setLoading(false));
-  }, [token]);
+    if (!isAuthenticated) return;
+    api.admin.getAppointments().then(setAppointments).finally(() => setLoading(false));
+  }, [isAuthenticated]);
 
   const filtered = filter === 'all' ? appointments : appointments.filter(a => a.status === filter);
 

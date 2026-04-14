@@ -2,7 +2,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "secondary" | "outline" | "dark" | "light"
+  variant?: "default" | "secondary" | "outline" | "dark" | "light" | "success"
 }
 
 function Badge({ className, variant = "default", ...props }: BadgeProps) {
@@ -12,6 +12,7 @@ function Badge({ className, variant = "default", ...props }: BadgeProps) {
     outline: "border-gray-200 text-gray-500",
     dark: "bg-brand-black text-white border-transparent",
     light: "bg-brand-lightest text-brand-dark border-transparent",
+    success: "bg-emerald-500 text-white border-transparent",
   }
 
   return (

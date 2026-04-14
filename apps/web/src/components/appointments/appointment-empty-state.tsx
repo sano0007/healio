@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+const defaultContent = {
+  title: "No Upcoming Appointments",
+  description: "You don't have any scheduled consultations. Need medical advice? Browse our top-rated specialists.",
+  action: "Find a Doctor",
+  link: "/doctors"
+};
+
 export function AppointmentEmptyState({ type }: { type: string }) {
-  const content = {
-    upcoming: {
-      title: "No Upcoming Appointments",
-      description: "You don't have any scheduled consultations. Need medical advice? Browse our top-rated specialists.",
-      action: "Find a Doctor",
-      link: "/doctors"
-    },
+  const content: typeof defaultContent = {
+    upcoming: defaultContent,
     completed: {
       title: "No Completed Visits",
       description: "Your past appointment history will appear here once you finish a consultation.",
@@ -25,7 +27,7 @@ export function AppointmentEmptyState({ type }: { type: string }) {
       action: "Go to Dashboard",
       link: "/dashboard"
     }
-  }[type] || content.upcoming;
+  }[type] || defaultContent;
 
   return (
     <motion.div

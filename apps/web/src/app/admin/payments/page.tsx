@@ -12,14 +12,14 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default function AdminPaymentsPage() {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) return;
-    api.admin.getPayments(token).then(setPayments).finally(() => setLoading(false));
-  }, [token]);
+    if (!isAuthenticated) return;
+    api.admin.getPayments().then(setPayments).finally(() => setLoading(false));
+  }, [isAuthenticated]);
 
   const revenue = payments.filter(p => p.status === 'success').reduce((s, p) => s + p.amount, 0);
 
