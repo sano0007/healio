@@ -4,19 +4,43 @@ import { useState } from "react";
 import { AppointmentTabs } from "./appointment-tabs";
 import { AppointmentCard, Appointment } from "./appointment-card";
 import { AppointmentEmptyState } from "./appointment-empty-state";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, Calendar as CalendarIcon, Filter } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { AppointmentWithDoctor } from "@/hooks/use-appointments";
 
 interface AppointmentListProps {
-  initialAppointments: Appointment[];
+  appointments: AppointmentWithDoctor[];
 }
 
-export function AppointmentList({ initialAppointments }: AppointmentListProps) {
+function formatDate(isoString: string): string {
+  const date = new Date(isoString);
+  return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function formatTime(isoString: string): string {
+  const date = new Date(isoString);
+  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+export function AppointmentList({ appointments }: AppointmentListProps) {
   const [activeTab, setActiveTab] = useState("upcoming");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredAppointments = initialAppointments.filter((app) => {
+  const transformedAppointments: Appointment[] = appointments.map((apt) => ({
+    id: apt._id,
+    doctorId: apt.doctorId,
+    doctorName: apt.doctor?.name || "Unknown Doctor",
+    doctorSpecialty: apt.doctor?.specialty || "General Physician",
+    doctorImage: "/images/doctor-placeholder.png",
+    date: formatDate(apt.scheduledAt),
+    time: formatTime(apt.scheduledAt),
+    type: "video" as const,
+    status: apt.status as "confirmed" | "completed" | "canceled" | "rescheduled",
+    fee: apt.doctor?.consultationFee || 0,
+  }));
+
+  const filteredAppointments = transformedAppointments.filter((app) => {
     const matchesTab = 
       (activeTab === "upcoming" && (app.status === "confirmed" || app.status === "rescheduled")) ||
       (activeTab === "completed" && app.status === "completed") ||

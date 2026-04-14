@@ -1,71 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useAppointments } from "@/hooks/use-appointments";
 import { AppointmentList } from "@/components/appointments/appointment-list";
 import { Skeleton } from "@/components/ui/skeleton";
-import { motion } from "framer-motion";
 import { Calendar, ChevronRight, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-const mockAppointments = [
-  {
-    id: "1",
-    doctorId: "d1",
-    doctorName: "Dr. Sarah Johnson",
-    doctorSpecialty: "Senior Cardiologist",
-    doctorImage: "/images/doctor-1.png",
-    date: "Tuesday, July 7, 2026",
-    time: "09:30 AM",
-    type: "video" as const,
-    status: "confirmed" as const,
-    fee: 150,
-  },
-  {
-    id: "2",
-    doctorId: "d2",
-    doctorName: "Dr. Michael Chen",
-    doctorSpecialty: "Dermatologist",
-    doctorImage: "/images/doctor-2.png",
-    date: "Wednesday, July 8, 2026",
-    time: "02:15 PM",
-    type: "in-person" as const,
-    status: "confirmed" as const,
-    fee: 120,
-  },
-  {
-    id: "3",
-    doctorId: "d3",
-    doctorName: "Dr. Emily Wilson",
-    doctorSpecialty: "General Physician",
-    doctorImage: "/images/doctor-3.png",
-    date: "Monday, June 30, 2026",
-    time: "10:00 AM",
-    type: "video" as const,
-    status: "completed" as const,
-    fee: 100,
-  },
-  {
-    id: "4",
-    doctorId: "d4",
-    doctorName: "Dr. James Brown",
-    doctorSpecialty: "Pediatrician",
-    doctorImage: "/images/doctor-4.png",
-    date: "Friday, June 26, 2026",
-    time: "04:30 PM",
-    type: "video" as const,
-    status: "canceled" as const,
-    fee: 130,
-  }
-];
-
 export default function AppointmentsPage() {
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: appointments, isLoading, error } = useAppointments();
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  const upcomingCount = appointments?.filter(
+    (apt) => apt.status === "confirmed" || apt.status === "pending"
+  ).length || 0;
 
   if (isLoading) {
     return (
@@ -98,12 +45,12 @@ export default function AppointmentsPage() {
 
         <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-xl border border-emerald-100/50">
           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest">2 Upcoming Sessions</span>
+          <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest">{upcomingCount} Upcoming Session{upcomingCount !== 1 ? 's' : ''}</span>
         </div>
       </div>
 
       {/* 2. Main List Filter & Results */}
-      <AppointmentList initialAppointments={mockAppointments} />
+      <AppointmentList appointments={appointments || []} />
 
       {/* 3. Helper Note */}
       <div className="mt-20 p-8 bg-brand-light/5 rounded-[2.5rem] border border-brand-light/10 flex flex-col md:flex-row gap-8 items-center text-center md:text-left transition-all hover:bg-brand-light/10">

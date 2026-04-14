@@ -1,31 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { BookingStepper } from "@/components/appointments/booking/booking-stepper";
 import { BookingSummarySidebar } from "@/components/appointments/booking/booking-summary-sidebar";
 import { PatientInfoStep } from "@/components/appointments/booking/steps/patient-info-step";
 import { ConsultationDetailsStep } from "@/components/appointments/booking/steps/consultation-details-step";
 import { PaymentStep } from "@/components/appointments/booking/steps/payment-step";
 import { SuccessState } from "@/components/appointments/booking/success-state";
-import { motion, AnimatePresence } from "framer-motion";
-
-const mockDoctor = {
-  name: "Dr. Sarah Johnson",
-  specialization: "Senior Cardiologist",
-  image: "/images/doctor-1.png",
-  fee: 150,
-};
-
-const mockDetails = {
-  date: "Tuesday, July 7, 2026",
-  time: "09:30 AM",
-  type: "video" as const,
-};
+import { AnimatePresence } from "framer-motion";
+import { useDoctor } from "@/hooks/use-doctors";
+import { useBookAppointment } from "@/hooks/use-appointments";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppointmentBookingPage() {
+  const params = useParams();
+  const router = useRouter();
+  const doctorId = params.doctorId as string;
+
+  const { data: doctor, isLoading: isLoadingDoctor } = useDoctor(doctorId);
+  const bookAppointment = useBookAppointment();
+
   const [step, setStep] = useState(1);
   const [bookingData, setBookingData] = useState<any>({});
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [bookedAppointment, setBookedAppointment] = useState<any>(null);
+
+  useEffect(() => {
+    if (!doctorId && !isLoadingDoctor) {
+      router.push("/doctors");
+    }
+  }, [doctorId, isLoadingDoctor, router]);
 
   const handleNext = (data: any) => {
     setBookingData({ ...bookingData, ...data });
@@ -34,15 +38,60 @@ export default function AppointmentBookingPage() {
 
   const handleBack = () => setStep(step - 1);
 
-  if (isSuccess) {
+  const handlePaymentComplete = async () => {
+    try {
+      const scheduledAt = new Date().toISOString();
+      const result = await bookAppointment.mutateAsync({
+        doctorId,
+        scheduledAt,
+        notes: bookingData.reason,
+      });
+      setBookedAppointment(result);
+    } catch (error) {
+      console.error("Booking failed:", error);
+    }
+  };
+
+  if (bookedAppointment) {
+    const scheduleDate = new Date(bookedAppointment.scheduledAt);
     return (
       <SuccessState 
-        appointmentId="HL-98231-A" 
-        date={mockDetails.date} 
-        time={mockDetails.time} 
+        appointmentId={bookedAppointment._id} 
+        date={scheduleDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        time={scheduleDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
       />
     );
   }
+
+  if (isLoadingDoctor) {
+    return (
+      <div className="max-w-7xl mx-auto py-8 lg:py-12 px-4 space-y-8">
+        <Skeleton className="h-12 w-64 mx-auto rounded-2xl" />
+        <Skeleton className="h-32 w-full rounded-[2rem]" />
+      </div>
+    );
+  }
+
+  if (!doctor) {
+    return (
+      <div className="max-w-7xl mx-auto py-8 lg:py-12 px-4 text-center">
+        <p className="text-gray-500">Doctor not found</p>
+      </div>
+    );
+  }
+
+  const doctorDisplay = {
+    name: doctor.name,
+    specialization: doctor.specialty || "General Physician",
+    image: "/images/doctor-placeholder.png",
+    fee: doctor.consultationFee || 0,
+  };
+
+  const details = {
+    date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+    time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+    type: "video" as const,
+  };
 
   return (
     <div className="max-w-7xl mx-auto py-8 lg:py-12">
@@ -66,7 +115,13 @@ export default function AppointmentBookingPage() {
               <ConsultationDetailsStep key="step2" onNext={handleNext} onBack={handleBack} />
             )}
             {step === 3 && (
-              <PaymentStep key="step3" onComplete={() => setIsSuccess(true)} onBack={handleBack} data={bookingData} />
+              <PaymentStep 
+                key="step3" 
+                onComplete={handlePaymentComplete} 
+                onBack={handleBack} 
+                data={bookingData} 
+                isLoading={bookAppointment.isPending}
+              />
             )}
           </AnimatePresence>
         </div>
@@ -74,8 +129,8 @@ export default function AppointmentBookingPage() {
         {/* Right Column: Sticky Summary */}
         <div className="order-first lg:order-last">
           <BookingSummarySidebar 
-            doctor={mockDoctor} 
-            details={mockDetails} 
+            doctor={doctorDisplay} 
+            details={details} 
           />
         </div>
       </div>

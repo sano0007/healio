@@ -15,7 +15,7 @@ export interface Appointment {
   date: string;
   time: string;
   type: "video" | "in-person";
-  status: "confirmed" | "completed" | "canceled" | "rescheduled";
+  status: "confirmed" | "pending" | "completed" | "canceled" | "rescheduled";
   fee: number;
 }
 
@@ -24,6 +24,7 @@ interface AppointmentCardProps {
 }
 
 const statusConfig = {
+  pending: { label: "Pending", color: "bg-amber-50 text-amber-600 border-amber-100" },
   confirmed: { label: "Confirmed", color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
   completed: { label: "Completed", color: "bg-blue-50 text-blue-600 border-blue-100" },
   canceled: { label: "Canceled", color: "bg-rose-50 text-rose-600 border-rose-100" },

@@ -10,18 +10,16 @@ interface PaymentStepProps {
   onComplete: () => void;
   onBack: () => void;
   data: any;
+  isLoading?: boolean;
 }
 
-export function PaymentStep({ onComplete, onBack, data }: PaymentStepProps) {
+export function PaymentStep({ onComplete, onBack, data, isLoading }: PaymentStepProps) {
   const [method, setMethod] = useState<"card" | "insurance">("card");
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleBooking = () => {
     setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      onComplete();
-    }, 2000);
+    onComplete();
   };
 
   return (
@@ -127,9 +125,9 @@ export function PaymentStep({ onComplete, onBack, data }: PaymentStepProps) {
             variant="dark" 
             onClick={handleBooking}
             className="h-14 px-12 rounded-2xl text-sm font-bold gap-3 shadow-xl shadow-brand-dark/10 flex items-center"
-            disabled={isProcessing}
+            disabled={isProcessing || isLoading}
           >
-            {isProcessing ? (
+            {(isProcessing || isLoading) ? (
               <>
                 <motion.div 
                   className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full" 
