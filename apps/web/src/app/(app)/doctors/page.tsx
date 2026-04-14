@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { DoctorFilter, type DoctorFilters } from "@/components/doctors/doctor-filter";
 import { DoctorList } from "@/components/doctors/doctor-list";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight, Home, ChevronLeft, ChevronRightLeft } from "lucide-react";
 import Link from "next/link";
-import { useDoctors } from "@/hooks/use-doctors";
+import { useDoctors, type PaginatedDoctors } from "@/hooks/use-doctors";
 
 export default function DoctorsPage() {
   const [filters, setFilters] = useState<DoctorFilters>({
@@ -13,12 +13,20 @@ export default function DoctorsPage() {
     specialty: "All Specialties",
     availability: "",
     sort: "rating",
+    page: 1,
+    limit: 10,
   });
 
-  const { data: doctors, isLoading, error } = useDoctors(filters);
+  const { data: response, isLoading, error } = useDoctors(filters);
+  const doctors = response?.data || [];
+  const pagination = response?.pagination;
 
   function handleFilterChange(newFilters: DoctorFilters) {
-    setFilters(newFilters);
+    setFilters({ ...newFilters, page: 1 });
+  }
+
+  function goToPage(page: number) {
+    setFilters(prev => ({ ...prev, page }));
   }
 
   return (
@@ -46,10 +54,10 @@ export default function DoctorsPage() {
             Available Doctors
           </p>
           <div className="flex items-center gap-2">
-            {!isLoading && doctors && (
+            {!isLoading && pagination && (
               <>
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-2xl font-bold text-emerald-600">{doctors.length}</span>
+                <span className="text-2xl font-bold text-emerald-600">{pagination.total}</span>
               </>
             )}
           </div>
@@ -65,18 +73,82 @@ export default function DoctorsPage() {
           <div className="flex items-center justify-between px-2">
             <h2 className="text-lg font-bold text-brand-black">Showing Result</h2>
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="font-bold text-brand-dark">{doctors?.length || 0}</span> 
-              doctors found for <span className="font-bold text-brand-dark italic">"{filters.specialty}"</span>
+              {pagination && (
+                <>
+                  <span className="font-bold text-brand-dark">{pagination.total}</span> 
+                  doctors found{filterLabel()}
+                </>
+              )}
             </div>
           </div>
 
           <DoctorList 
-            doctors={doctors || []} 
+            doctors={doctors} 
             isLoading={isLoading} 
             error={error} 
           />
+
+          {/* Pagination Controls */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 py-8">
+              <button
+                onClick={() => goToPage(1)}
+                disabled={pagination.page === 1}
+                className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                <ChevronRightLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => goToPage(pagination.page - 1)}
+                disabled={pagination.page === 1}
+                className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                  .filter(p => p === 1 || p === pagination.totalPages || Math.abs(p - pagination.page) <= 1)
+                  .map((pageNum, idx, arr) => (
+                    <span key={pageNum}>
+                      {idx > 0 && arr[idx - 1] !== pageNum - 1 && (
+                        <span className="px-2 text-gray-400">...</span>
+                      )}
+                      <button
+                        onClick={() => goToPage(pageNum)}
+                        className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                          pagination.page === pageNum 
+                            ? 'bg-brand-dark text-white' 
+                            : 'border border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    </span>
+                  ))}
+              </div>
+
+              <button
+                onClick={() => goToPage(pagination.page + 1)}
+                disabled={pagination.page === pagination.totalPages}
+                className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
+
+  function filterLabel() {
+    if (filters.specialty && filters.specialty !== 'All Specialties') {
+      return ` for "${filters.specialty}"`;
+    }
+    if (filters.search) {
+      return ` matching "${filters.search}"`;
+    }
+    return '';
+  }
 }

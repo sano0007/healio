@@ -12,6 +12,8 @@ export interface DoctorFilters {
   specialty?: string;
   availability?: string;
   sort?: string;
+  page?: string;
+  limit?: string;
 }
 
 @Controller('doctors')

@@ -6,12 +6,24 @@ export interface DoctorFilters {
   specialty?: string;
   availability?: string;
   sort?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedDoctors {
+  data: Doctor[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export function useDoctors(filters: DoctorFilters = {}) {
   return useQuery({
     queryKey: ['doctors', filters],
-    queryFn: () => api.doctors.getAll(filters) as Promise<Doctor[]>,
+    queryFn: () => api.doctors.getAll(filters) as Promise<PaginatedDoctors>,
     staleTime: 1000 * 60,
   });
 }

@@ -94,14 +94,16 @@ export const api = {
       request<PatientProfile>('/patients/me', { method: 'PATCH', body: JSON.stringify(data) }),
   },
   doctors: {
-    getAll: (filters?: { search?: string; specialty?: string; availability?: string; sort?: string }) => {
+    getAll: (filters?: { search?: string; specialty?: string; availability?: string; sort?: string; page?: number; limit?: number }) => {
       const params = new URLSearchParams();
       if (filters?.search) params.append('search', filters.search);
       if (filters?.specialty && filters.specialty !== 'All Specialties') params.append('specialty', filters.specialty);
       if (filters?.availability) params.append('availability', filters.availability);
       if (filters?.sort) params.append('sort', filters.sort);
+      if (filters?.page) params.append('page', String(filters.page));
+      if (filters?.limit) params.append('limit', String(filters.limit));
       const query = params.toString() ? `?${params.toString()}` : '';
-      return request<Doctor[]>(`/doctors${query}`);
+      return request<{ data: Doctor[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/doctors${query}`);
     },
     getById: (id: string) => request<Doctor>(`/doctors/${id}`),
     updateMe: (data: Partial<DoctorProfile>) =>

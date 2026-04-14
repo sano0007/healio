@@ -16,7 +16,14 @@ function normalisePhone(raw: string): string {
 export class DoctorsService {
   constructor(@InjectModel(Doctor.name) private doctorModel: Model<DoctorDocument>) {}
 
-  async getAll(filters: { search?: string; specialty?: string; availability?: string; sort?: string } = {}) {
+  async getAll(filters: { 
+    search?: string; 
+    specialty?: string; 
+    availability?: string; 
+    sort?: string;
+    page?: number;
+    limit?: number;
+  } = {}) {
     const query: any = { isVerified: true };
 
     if (filters.search) {
@@ -32,7 +39,24 @@ export class DoctorsService {
     if (filters.sort === 'experience') sortOption = { experience: -1 };
     if (filters.sort === 'fee') sortOption = { consultationFee: 1 };
 
-    return this.doctorModel.find(query).sort(sortOption).exec();
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const [doctors, total] = await Promise.all([
+      this.doctorModel.find(query).sort(sortOption).skip(skip).limit(limit).exec(),
+      this.doctorModel.countDocuments(query).exec(),
+    ]);
+
+    return {
+      data: doctors,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      }
+    };
   }
 
   async getAllAdmin() {
