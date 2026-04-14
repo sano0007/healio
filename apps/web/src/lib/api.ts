@@ -94,7 +94,15 @@ export const api = {
       request<PatientProfile>('/patients/me', { method: 'PATCH', body: JSON.stringify(data) }),
   },
   doctors: {
-    getAll: () => request<Doctor[]>('/doctors'),
+    getAll: (filters?: { search?: string; specialty?: string; availability?: string; sort?: string }) => {
+      const params = new URLSearchParams();
+      if (filters?.search) params.append('search', filters.search);
+      if (filters?.specialty && filters.specialty !== 'All Specialties') params.append('specialty', filters.specialty);
+      if (filters?.availability) params.append('availability', filters.availability);
+      if (filters?.sort) params.append('sort', filters.sort);
+      const query = params.toString() ? `?${params.toString()}` : '';
+      return request<Doctor[]>(`/doctors${query}`);
+    },
     getById: (id: string) => request<Doctor>(`/doctors/${id}`),
     updateMe: (data: Partial<DoctorProfile>) =>
       request<DoctorProfile>('/doctors/me', { method: 'PATCH', body: JSON.stringify(data) }),
@@ -156,12 +164,19 @@ export interface DoctorProfile {
 
 export interface Doctor {
   _id: string;
+  userId: string;
   name: string;
   email: string;
+  phone?: string;
   specialty?: string;
-  qualifications?: string;
+  qualifications?: string[];
+  experience?: number;
+  bio?: string;
   consultationFee?: number;
+  rating?: number;
+  reviewCount?: number;
   isVerified?: boolean;
+  availability?: { dayOfWeek: number; startTime: string; endTime: string }[];
 }
 
 export interface Appointment {
