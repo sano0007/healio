@@ -7,10 +7,19 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "kill-all-port": "kill $(lsof -t -i:3000,3001,9001,9002,9003,9004,9005,9006,9007) || true",
+    "dev": "bun run kill-all-port && turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
-    "clean": "turbo clean && rm -rf node_modules"
+    "clean": "turbo clean && rm -rf node_modules",
+    "docker:up": "docker compose -f infra/docker-compose.yml --env-file .env up",
+    "docker:up:build": "docker compose -f infra/docker-compose.yml --env-file .env up --build",
+    "docker:up:fresh": "docker compose -f infra/docker-compose.yml --env-file .env build --no-cache && docker compose -f infra/docker-compose.yml --env-file .env up",
+    "docker:down": "docker compose -f infra/docker-compose.yml down",
+    "docker:down:volumes": "docker compose -f infra/docker-compose.yml down -v",
+    "docker:logs": "docker compose -f infra/docker-compose.yml logs -f",
+    "k8s:apply": "kubectl apply -f infra/k8s/ --recursive",
+    "k8s:delete": "kubectl delete -f infra/k8s/ --recursive"
   },
   "devDependencies": {
     "prettier": "^3.4.2",

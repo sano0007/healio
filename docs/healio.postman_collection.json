@@ -1,0 +1,465 @@
+{
+  "info": {
+    "name": "Healio — Microservices API",
+    "description": "SE3020 Distributed Systems — Healio Healthcare Platform\nBase URL: http://localhost:3001/api\n\nQuick start:\n1. Run 'Register Patient', 'Register Doctor', 'Register Admin' (tokens auto-saved)\n2. Doctor: set availability, update profile\n3. Admin: verify the doctor\n4. Patient: book appointment, initiate payment\n5. Doctor: confirm appointment, create session\n6. Patient: join session\n\nCollection variables are auto-populated by test scripts.",
+    "_postman_id": "healio-microservices-2026",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base",           "value": "http://localhost:3001/api", "type": "string" },
+    { "key": "token",          "value": "", "type": "string", "description": "Patient JWT" },
+    { "key": "doctor_token",   "value": "", "type": "string", "description": "Doctor JWT" },
+    { "key": "admin_token",    "value": "", "type": "string", "description": "Admin JWT" },
+    { "key": "patient_id",     "value": "", "type": "string", "description": "Patient userId (from login response)" },
+    { "key": "doctor_id",      "value": "", "type": "string", "description": "Doctor userId (from login response)" },
+    { "key": "appointment_id", "value": "", "type": "string", "description": "Auto-saved on Book Appointment" },
+    { "key": "payment_id",     "value": "", "type": "string", "description": "Auto-saved on Initiate Payment" },
+    { "key": "session_id",     "value": "", "type": "string", "description": "Auto-saved on Create Session" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Register Patient",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const res = pm.response.json();",
+            "if (res.access_token) {",
+            "  pm.collectionVariables.set('token', res.access_token);",
+            "  pm.collectionVariables.set('patient_id', res.user.id);",
+            "  console.log('Patient token saved, id:', res.user.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"John Patient\",\n  \"email\": \"patient@test.com\",\n  \"password\": \"Password123\",\n  \"role\": \"patient\",\n  \"phone\": \"0771234567\"\n}" },
+            "url": { "raw": "{{base}}/auth/register", "host": ["{{base}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Register Doctor",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const res = pm.response.json();",
+            "if (res.access_token) {",
+            "  pm.collectionVariables.set('doctor_token', res.access_token);",
+            "  pm.collectionVariables.set('doctor_id', res.user.id);",
+            "  console.log('Doctor token saved, id:', res.user.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Dr. Sarah Smith\",\n  \"email\": \"doctor@test.com\",\n  \"password\": \"Password123\",\n  \"role\": \"doctor\",\n  \"phone\": \"0777654321\"\n}" },
+            "url": { "raw": "{{base}}/auth/register", "host": ["{{base}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Register Admin",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const res = pm.response.json();",
+            "if (res.access_token) {",
+            "  pm.collectionVariables.set('admin_token', res.access_token);",
+            "  console.log('Admin token saved');",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@test.com\",\n  \"password\": \"Password123\",\n  \"role\": \"admin\"\n}" },
+            "url": { "raw": "{{base}}/auth/register", "host": ["{{base}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login (Patient)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const res = pm.response.json();",
+            "if (res.access_token) {",
+            "  pm.collectionVariables.set('token', res.access_token);",
+            "  pm.collectionVariables.set('patient_id', res.user.id);",
+            "  console.log('Patient token refreshed');",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"patient@test.com\",\n  \"password\": \"Password123\"\n}" },
+            "url": { "raw": "{{base}}/auth/login", "host": ["{{base}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login (Doctor)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const res = pm.response.json();",
+            "if (res.access_token) {",
+            "  pm.collectionVariables.set('doctor_token', res.access_token);",
+            "  pm.collectionVariables.set('doctor_id', res.user.id);",
+            "  console.log('Doctor token refreshed');",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"doctor@test.com\",\n  \"password\": \"Password123\"\n}" },
+            "url": { "raw": "{{base}}/auth/login", "host": ["{{base}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login (Admin)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const res = pm.response.json();",
+            "if (res.access_token) {",
+            "  pm.collectionVariables.set('admin_token', res.access_token);",
+            "  console.log('Admin token refreshed');",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"Password123\"\n}" },
+            "url": { "raw": "{{base}}/auth/login", "host": ["{{base}}"], "path": ["auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Patients",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base}}/patients/me", "host": ["{{base}}"], "path": ["patients", "me"] }
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"0771234567\",\n  \"bloodGroup\": \"O+\",\n  \"address\": \"123 Main St, Colombo\"\n}" },
+            "url": { "raw": "{{base}}/patients/me", "host": ["{{base}}"], "path": ["patients", "me"] }
+          }
+        },
+        {
+          "name": "Upload Medical Report (Doctor only)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{doctor_token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "", "description": "PDF, image or any document — max 10 MB" }
+              ]
+            },
+            "url": {
+              "raw": "{{base}}/patients/{{patient_id}}/reports",
+              "host": ["{{base}}"],
+              "path": ["patients", "{{patient_id}}", "reports"]
+            },
+            "description": "Doctor uploads a document to a patient's medical record. File is stored on Cloudinary and the URL is saved in the patient's medicalReports array."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Doctors",
+      "item": [
+        {
+          "name": "Get All Doctors (verified only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base}}/doctors", "host": ["{{base}}"], "path": ["doctors"] },
+            "description": "Public — no auth required. Returns only isVerified: true doctors."
+          }
+        },
+        {
+          "name": "Get Doctor by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/doctors/{{doctor_id}}",
+              "host": ["{{base}}"],
+              "path": ["doctors", "{{doctor_id}}"]
+            },
+            "description": "Public — no auth required."
+          }
+        },
+        {
+          "name": "Update Doctor Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctor_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"0777654321\",\n  \"specialty\": \"Cardiology\",\n  \"qualifications\": [\"MBBS\", \"MD\"],\n  \"consultationFee\": 2500,\n  \"bio\": \"10 years experience in cardiology\"\n}" },
+            "url": { "raw": "{{base}}/doctors/me", "host": ["{{base}}"], "path": ["doctors", "me"] },
+            "description": "isVerified is silently stripped — doctors cannot self-verify."
+          }
+        },
+        {
+          "name": "Set Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctor_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"availability\": [\n    { \"day\": \"Monday\",    \"startTime\": \"09:00\", \"endTime\": \"17:00\" },\n    { \"day\": \"Wednesday\", \"startTime\": \"09:00\", \"endTime\": \"17:00\" },\n    { \"day\": \"Friday\",    \"startTime\": \"09:00\", \"endTime\": \"13:00\" }\n  ]\n}" },
+            "url": { "raw": "{{base}}/doctors/availability", "host": ["{{base}}"], "path": ["doctors", "availability"] },
+            "description": "Accepts day as string (\"Monday\") or dayOfWeek as number (0=Sun … 6=Sat). Gateway normalises to dayOfWeek before storing. Replaces the entire availability array."
+          }
+        },
+        {
+          "name": "Issue Prescription",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctor_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"appointmentId\": \"{{appointment_id}}\",\n  \"medications\": [\n    {\n      \"name\": \"Paracetamol\",\n      \"dosage\": \"500mg\",\n      \"frequency\": \"3x daily\",\n      \"duration\": \"5 days\"\n    }\n  ],\n  \"notes\": \"Take after meals\"\n}" },
+            "url": { "raw": "{{base}}/doctors/prescriptions", "host": ["{{base}}"], "path": ["doctors", "prescriptions"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Appointments",
+      "item": [
+        {
+          "name": "Book Appointment",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const res = pm.response.json();",
+            "if (res._id) {",
+            "  pm.collectionVariables.set('appointment_id', res._id);",
+            "  console.log('Appointment ID saved:', res._id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"doctorId\": \"{{doctor_id}}\",\n  \"scheduledAt\": \"2026-04-21T10:00:00.000Z\",\n  \"notes\": \"Routine checkup\"\n}" },
+            "url": { "raw": "{{base}}/appointments", "host": ["{{base}}"], "path": ["appointments"] },
+            "description": "Patient only. Gateway validates scheduledAt against doctor's availability (day + time window) and checks 30-min slot conflicts before forwarding."
+          }
+        },
+        {
+          "name": "Get My Appointments (Patient)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base}}/appointments/my", "host": ["{{base}}"], "path": ["appointments", "my"] }
+          }
+        },
+        {
+          "name": "Get My Appointments (Doctor)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{doctor_token}}" }],
+            "url": { "raw": "{{base}}/appointments/my", "host": ["{{base}}"], "path": ["appointments", "my"] },
+            "description": "Same endpoint — role-aware. Returns appointments by doctorId when called with doctor token."
+          }
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"reason\": \"Schedule conflict\"\n}" },
+            "url": {
+              "raw": "{{base}}/appointments/{{appointment_id}}/cancel",
+              "host": ["{{base}}"],
+              "path": ["appointments", "{{appointment_id}}", "cancel"]
+            }
+          }
+        },
+        {
+          "name": "Update Status (Doctor)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctor_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"confirmed\"\n}" },
+            "url": {
+              "raw": "{{base}}/appointments/{{appointment_id}}/status",
+              "host": ["{{base}}"],
+              "path": ["appointments", "{{appointment_id}}", "status"]
+            },
+            "description": "Valid status values: pending → confirmed → completed"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Payments",
+      "item": [
+        {
+          "name": "Initiate Payment",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const res = pm.response.json();",
+            "if (res.paymentId) {",
+            "  pm.collectionVariables.set('payment_id', res.paymentId);",
+            "  console.log('Payment ID saved:', res.paymentId);",
+            "  console.log('Stripe client secret:', res.clientSecret);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"appointmentId\": \"{{appointment_id}}\",\n  \"amount\": 2500,\n  \"currency\": \"usd\"\n}" },
+            "url": { "raw": "{{base}}/payments/initiate", "host": ["{{base}}"], "path": ["payments", "initiate"] },
+            "description": "Creates a Stripe PaymentIntent. Use the returned clientSecret with Stripe.js on the frontend to collect card details."
+          }
+        },
+        {
+          "name": "Get Payment",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base}}/payments/{{payment_id}}",
+              "host": ["{{base}}"],
+              "path": ["payments", "{{payment_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Telemedicine",
+      "item": [
+        {
+          "name": "Create Session (Doctor)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const res = pm.response.json();",
+            "if (res.sessionId) {",
+            "  pm.collectionVariables.set('session_id', res.sessionId);",
+            "  console.log('Session ID saved:', res.sessionId);",
+            "  console.log('Jitsi URL:', res.jitsiUrl);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctor_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"appointmentId\": \"{{appointment_id}}\"\n}" },
+            "url": { "raw": "{{base}}/sessions", "host": ["{{base}}"], "path": ["sessions"] },
+            "description": "Creates a Jitsi Meet session. Returns sessionId and jitsiUrl to embed in an iframe."
+          }
+        },
+        {
+          "name": "Join Session (Patient)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"sessionId\": \"{{session_id}}\"\n}" },
+            "url": { "raw": "{{base}}/sessions/join", "host": ["{{base}}"], "path": ["sessions", "join"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Admin",
+      "description": "All endpoints require admin JWT in Authorization header.",
+      "item": [
+        {
+          "name": "Get Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": { "raw": "{{base}}/admin/stats", "host": ["{{base}}"], "path": ["admin", "stats"] },
+            "description": "Aggregates: totalPatients, totalDoctors, verifiedDoctors, pendingVerification, appointmentsByStatus, totalRevenue, totalPayments, successfulPayments"
+          }
+        },
+        {
+          "name": "List All Patients",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": { "raw": "{{base}}/admin/patients", "host": ["{{base}}"], "path": ["admin", "patients"] }
+          }
+        },
+        {
+          "name": "List All Doctors (incl. unverified)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": { "raw": "{{base}}/admin/doctors", "host": ["{{base}}"], "path": ["admin", "doctors"] }
+          }
+        },
+        {
+          "name": "List All Appointments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": { "raw": "{{base}}/admin/appointments", "host": ["{{base}}"], "path": ["admin", "appointments"] }
+          }
+        },
+        {
+          "name": "List All Payments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": { "raw": "{{base}}/admin/payments", "host": ["{{base}}"], "path": ["admin", "payments"] }
+          }
+        },
+        {
+          "name": "Verify Doctor",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"isVerified\": true\n}" },
+            "url": {
+              "raw": "{{base}}/admin/doctors/{{doctor_id}}/verify",
+              "host": ["{{base}}"],
+              "path": ["admin", "doctors", "{{doctor_id}}", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Revoke Doctor Verification",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"isVerified\": false\n}" },
+            "url": {
+              "raw": "{{base}}/admin/doctors/{{doctor_id}}/verify",
+              "host": ["{{base}}"],
+              "path": ["admin", "doctors", "{{doctor_id}}", "verify"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

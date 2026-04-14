@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: healio
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: healio/payment-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4006
+          env:
+            - name: PORT
+              value: "4006"
+            - name: MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: MONGODB_URI_PAYMENT
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: STRIPE_SECRET_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: healio
+spec:
+  selector:
+    app: payment-service
+  ports:
+    - port: 4006
+      targetPort: 4006
+  clusterIP: None

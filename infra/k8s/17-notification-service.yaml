@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: healio
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: healio/notification-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4007
+          env:
+            - name: PORT
+              value: "4007"
+            - name: SMTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: SMTP_HOST
+            - name: SMTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: SMTP_PORT
+            - name: SMTP_FROM
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: SMTP_FROM
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: SMTP_USER
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: SMTP_PASS
+            - name: TWILIO_ACCOUNT_SID
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: TWILIO_ACCOUNT_SID
+            - name: TWILIO_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: TWILIO_AUTH_TOKEN
+            - name: TWILIO_PHONE_NUMBER
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: TWILIO_PHONE_NUMBER
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: healio
+spec:
+  selector:
+    app: notification-service
+  ports:
+    - port: 4007
+      targetPort: 4007
+  clusterIP: None

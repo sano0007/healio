@@ -1,0 +1,209 @@
+services:
+  # ─── MongoDB ───────────────────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: healio-mongodb
+    restart: unless-stopped
+    command: ["mongod", "--quiet", "--logpath", "/dev/null"]
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - healio-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── API Gateway ──────────────────────────────────────────────────────────────
+  api-gateway:
+    build:
+      context: /Users/stoxmod/WebstormProjects/healio
+      dockerfile: infra/docker/api-gateway.Dockerfile
+    container_name: healio-api-gateway
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-healio-secret}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}
+      - AUTH_SERVICE_HOST=auth-service
+      - AUTH_SERVICE_PORT=5001
+      - PATIENT_SERVICE_HOST=patient-service
+      - PATIENT_SERVICE_PORT=5002
+      - DOCTOR_SERVICE_HOST=doctor-service
+      - DOCTOR_SERVICE_PORT=5003
+      - APPOINTMENT_SERVICE_HOST=appointment-service
+      - APPOINTMENT_SERVICE_PORT=5004
+      - TELEMEDICINE_SERVICE_HOST=telemedicine-service
+      - TELEMEDICINE_SERVICE_PORT=5005
+      - PAYMENT_SERVICE_HOST=payment-service
+      - PAYMENT_SERVICE_PORT=5006
+      - NOTIFICATION_SERVICE_HOST=notification-service
+      - NOTIFICATION_SERVICE_PORT=5007
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+      patient-service:
+        condition: service_started
+      doctor-service:
+        condition: service_started
+      appointment-service:
+        condition: service_started
+      telemedicine-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
+      notification-service:
+        condition: service_started
+    networks:
+      - healio-net
+
+  # ─── Auth Service ─────────────────────────────────────────────────────────────
+  auth-service:
+    build:
+      context: /Users/stoxmod/WebstormProjects/healio
+      dockerfile: infra/docker/auth-service.Dockerfile
+    container_name: healio-auth-service
+    restart: unless-stopped
+    ports:
+      - '5001:5001'
+    environment:
+      - PORT=5001
+      - MONGO_AUTH_URI=mongodb://mongodb:27017/healio-auth
+      - JWT_SECRET=${JWT_SECRET:-healio-secret}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - healio-net
+
+  # ─── Patient Service ──────────────────────────────────────────────────────────
+  patient-service:
+    build:
+      context: /Users/stoxmod/WebstormProjects/healio
+      dockerfile: infra/docker/patient-service.Dockerfile
+    container_name: healio-patient-service
+    restart: unless-stopped
+    ports:
+      - '5002:5002'
+    environment:
+      - PORT=5002
+      - MONGO_PATIENT_URI=mongodb://mongodb:27017/healio-patients
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME:-}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY:-}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET:-}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - healio-net
+
+  # ─── Doctor Service ───────────────────────────────────────────────────────────
+  doctor-service:
+    build:
+      context: /Users/stoxmod/WebstormProjects/healio
+      dockerfile: infra/docker/doctor-service.Dockerfile
+    container_name: healio-doctor-service
+    restart: unless-stopped
+    ports:
+      - '5003:5003'
+    environment:
+      - PORT=5003
+      - MONGO_DOCTOR_URI=mongodb://mongodb:27017/healio-doctors
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - healio-net
+
+  # ─── Appointment Service ──────────────────────────────────────────────────────
+  appointment-service:
+    build:
+      context: /Users/stoxmod/WebstormProjects/healio
+      dockerfile: infra/docker/appointment-service.Dockerfile
+    container_name: healio-appointment-service
+    restart: unless-stopped
+    ports:
+      - '5004:5004'
+    environment:
+      - PORT=5004
+      - MONGO_APPOINTMENT_URI=mongodb://mongodb:27017/healio-appointments
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - healio-net
+
+  # ─── Telemedicine Service ─────────────────────────────────────────────────────
+  telemedicine-service:
+    build:
+      context: /Users/stoxmod/WebstormProjects/healio
+      dockerfile: infra/docker/telemedicine-service.Dockerfile
+    container_name: healio-telemedicine-service
+    restart: unless-stopped
+    ports:
+      - '5005:5005'
+    environment:
+      - PORT=5005
+      - VIDEO_PROVIDER=${VIDEO_PROVIDER:-jitsi}
+      - JITSI_BASE_URL=${JITSI_BASE_URL:-https://meet.jit.si}
+    networks:
+      - healio-net
+
+  # ─── Payment Service ─────────────────────────────────────────────────────────
+  payment-service:
+    build:
+      context: /Users/stoxmod/WebstormProjects/healio
+      dockerfile: infra/docker/payment-service.Dockerfile
+    container_name: healio-payment-service
+    restart: unless-stopped
+    ports:
+      - '5006:5006'
+    environment:
+      - PORT=5006
+      - MONGO_PAYMENT_URI=mongodb://mongodb:27017/healio-payments
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - healio-net
+
+  # ─── Notification Service ────────────────────────────────────────────────────
+  notification-service:
+    build:
+      context: /Users/stoxmod/WebstormProjects/healio
+      dockerfile: infra/docker/notification-service.Dockerfile
+    container_name: healio-notification-service
+    restart: unless-stopped
+    ports:
+      - '5007:5007'
+    environment:
+      - PORT=5007
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-noreply@healio.app}
+      - NOTIFY_LK_USER_ID=${NOTIFY_LK_USER_ID:-}
+      - NOTIFY_LK_API_KEY=${NOTIFY_LK_API_KEY:-}
+      - NOTIFY_LK_SENDER_ID=${NOTIFY_LK_SENDER_ID:-NotifyDEMO}
+    networks:
+      - healio-net
+
+networks:
+  healio-net:
+    driver: bridge
+
+volumes:
+  mongodb-data:

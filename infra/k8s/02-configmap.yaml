@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: healio-configmap
+  namespace: healio
+data:
+  FRONTEND_URL: "http://localhost:3000"
+  MONGODB_URI_AUTH: "mongodb://mongodb-service:27017/healio-auth"
+  MONGODB_URI_PATIENT: "mongodb://mongodb-service:27017/healio-patients"
+  MONGODB_URI_DOCTOR: "mongodb://mongodb-service:27017/healio-doctors"
+  MONGODB_URI_APPOINTMENT: "mongodb://mongodb-service:27017/healio-appointments"
+  MONGODB_URI_PAYMENT: "mongodb://mongodb-service:27017/healio-payments"
+  JITSI_BASE_URL: "https://meet.jit.si"
+  VIDEO_PROVIDER: "jitsi"
+  SMTP_HOST: "smtp.gmail.com"
+  SMTP_PORT: "587"
+  SMTP_FROM: "noreply@healio.app"
