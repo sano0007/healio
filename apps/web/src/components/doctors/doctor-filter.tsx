@@ -2,7 +2,14 @@
 
 import { Search, SlidersHorizontal, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+export interface DoctorFilters {
+  search: string;
+  specialty: string;
+  availability: string;
+  sort: string;
+}
 
 const specialties = [
   "All Specialties",
@@ -15,14 +22,45 @@ const specialties = [
   "Psychiatry",
 ];
 
-const availability = [
+const availabilityOptions = [
   { label: "Today", value: "today" },
   { label: "This Week", value: "week" },
   { label: "Next Week", value: "next-week" },
 ];
 
-export function DoctorFilter() {
+interface DoctorFilterProps {
+  onFilterChange: (filters: DoctorFilters) => void;
+}
+
+export function DoctorFilter({ onFilterChange }: DoctorFilterProps) {
+  const [search, setSearch] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("All Specialties");
+  const [selectedAvailability, setSelectedAvailability] = useState<string>("");
+  const [sort, setSort] = useState("rating");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onFilterChange({
+        search,
+        specialty: selectedSpecialty,
+        availability: selectedAvailability,
+        sort,
+      });
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search, selectedSpecialty, selectedAvailability, sort, onFilterChange]);
+
+  function handleReset() {
+    setSearch("");
+    setSelectedSpecialty("All Specialties");
+    setSelectedAvailability("");
+    setSort("rating");
+  }
+
+  function toggleAvailability(value: string) {
+    setSelectedAvailability(prev => prev === value ? "" : value);
+  }
 
   return (
     <aside className="w-full lg:w-80 space-y-8 sticky top-24 self-start h-fit">
@@ -32,6 +70,8 @@ export function DoctorFilter() {
         <input 
           type="text" 
           placeholder="Search by name or keyword..." 
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-11 pr-4 py-3 bg-white border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-dark/10 focus:border-brand-dark transition-all placeholder:text-gray-400 text-sm shadow-sm"
         />
       </div>
@@ -43,7 +83,12 @@ export function DoctorFilter() {
             <SlidersHorizontal className="w-4 h-4 text-brand-dark" />
             <h2 className="text-lg font-bold text-brand-black">Filters</h2>
           </div>
-          <button className="text-xs font-bold text-brand-dark hover:underline">Reset</button>
+          <button 
+            onClick={handleReset}
+            className="text-xs font-bold text-brand-dark hover:underline"
+          >
+            Reset
+          </button>
         </div>
 
         {/* Specialty */}
@@ -75,9 +120,14 @@ export function DoctorFilter() {
         <div className="space-y-4">
           <h3 className="text-sm font-bold text-brand-black uppercase tracking-widest">Availability</h3>
           <div className="space-y-3">
-            {availability.map((item) => (
+            {availabilityOptions.map((item) => (
               <label key={item.value} className="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-brand-dark focus:ring-brand-dark/20 cursor-pointer" />
+                <input 
+                  type="checkbox" 
+                  checked={selectedAvailability === item.value}
+                  onChange={() => toggleAvailability(item.value)}
+                  className="w-4 h-4 rounded border-gray-300 text-brand-dark focus:ring-brand-dark/20 cursor-pointer" 
+                />
                 <span className="text-xs font-medium text-gray-500 group-hover:text-brand-dark transition-colors">{item.label}</span>
               </label>
             ))}
@@ -87,11 +137,15 @@ export function DoctorFilter() {
         {/* Sorting */}
         <div className="space-y-4">
           <h3 className="text-sm font-bold text-brand-black uppercase tracking-widest">Sort By</h3>
-          <select className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-xl text-xs font-medium text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-dark/10 focus:border-brand-dark transition-all cursor-pointer">
-            <option>Most Recommended</option>
-            <option>Highest Rating</option>
-            <option>Experience: High to Low</option>
-            <option>Price: Low to High</option>
+          <select 
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-xl text-xs font-medium text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-dark/10 focus:border-brand-dark transition-all cursor-pointer"
+          >
+            <option value="rating">Most Recommended</option>
+            <option value="rating">Highest Rating</option>
+            <option value="experience">Experience: High to Low</option>
+            <option value="fee">Price: Low to High</option>
           </select>
         </div>
       </div>
