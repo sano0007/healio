@@ -9,6 +9,8 @@ export interface DoctorFilters {
   specialty: string;
   availability: string;
   sort: string;
+  page?: number;
+  limit?: number;
 }
 
 const specialties = [

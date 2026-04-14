@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { DoctorFilter, type DoctorFilters } from "@/components/doctors/doctor-filter";
 import { DoctorList } from "@/components/doctors/doctor-list";
-import { ChevronRight, Home, ChevronLeft, ChevronRightLeft } from "lucide-react";
+import { ChevronRight, Home, ChevronLeft, ChevronFirst } from "lucide-react";
 import Link from "next/link";
 import { useDoctors, type PaginatedDoctors } from "@/hooks/use-doctors";
 
@@ -96,7 +96,7 @@ export default function DoctorsPage() {
                 disabled={pagination.page === 1}
                 className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
               >
-                <ChevronRightLeft className="w-4 h-4" />
+                <ChevronFirst className="w-4 h-4" />
               </button>
               <button
                 onClick={() => goToPage(pagination.page - 1)}
