@@ -1,4 +1,4 @@
-# Healio Deployment Guide
+# Healio : AI-Enabled Smart Healthcare Appointment & Telemedicine Platform
 
 This guide covers local Docker deployment and Kubernetes deployment for the
 AI-Enabled Smart Healthcare Appointment & Telemedicine Platform.
@@ -25,8 +25,9 @@ AI-Enabled Smart Healthcare Appointment & Telemedicine Platform.
 2. Fill in the required values:
    - `JWT_SECRET` — a strong random string (used for signing JWT tokens)
    - `STRIPE_SECRET_KEY` — your Stripe sandbox/test key
+   - `STRIPE_WEBHOOK_SECRET` — your Stripe webhook signing secret
    - `SMTP_USER` / `SMTP_PASS` — your email address and app password
-   - `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_PHONE_NUMBER` — Twilio credentials
+   - `NOTIFY_LK_USER_ID` / `NOTIFY_LK_API_KEY` / `NOTIFY_LK_SENDER_ID` — notify.lk credentials for SMS
 
 ---
 
@@ -39,15 +40,14 @@ bun run docker:up
 ```
 
 This builds all 8 service containers and starts:
-- MongoDB on port 27017
 - API Gateway on port 3001
-- auth-service on port 4001
-- patient-service on port 4002
-- doctor-service on port 4003
-- appointment-service on port 4004
-- telemedicine-service on port 4005
-- payment-service on port 4006
-- notification-service on port 4007
+- auth-service on port 9001
+- patient-service on port 9002
+- doctor-service on port 9003
+- appointment-service on port 9004
+- telemedicine-service on port 9005
+- payment-service on port 9006
+- notification-service on port 9007
 
 ### Step 2 — Start the frontend (separate terminal)
 
@@ -88,9 +88,9 @@ bun run docker:down
 
 Edit `infra/k8s/01-secrets.yaml` and replace placeholder values:
 - `JWT_SECRET`
-- `STRIPE_SECRET_KEY`
+- `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`
 - `SMTP_USER` / `SMTP_PASS`
-- `TWILIO_*` credentials
+- `NOTIFY_LK_USER_ID` / `NOTIFY_LK_API_KEY` / `NOTIFY_LK_SENDER_ID`
 
 ### Step 2 — Apply manifests
 
@@ -131,15 +131,14 @@ kubectl delete -f infra/k8s/
 
 ## Service Ports Reference
 
-| Service                  | Port | Protocol |
-|--------------------------|------|----------|
-| Frontend (Next.js)        | 3000 | HTTP     |
-| API Gateway              | 3001 | HTTP/TCP |
-| auth-service             | 4001 | TCP      |
-| patient-service          | 4002 | TCP      |
-| doctor-service           | 4003 | TCP      |
-| appointment-service      | 4004 | TCP      |
-| telemedicine-service      | 4005 | TCP      |
-| payment-service          | 4006 | TCP      |
-| notification-service     | 4007 | TCP      |
-| MongoDB                  | 27017| TCP      |
+| Service | Port | Protocol |
+|---------|------|----------|
+| Frontend (Next.js) | 3000 | HTTP |
+| API Gateway | 3001 | HTTP/TCP |
+| auth-service | 9001 | TCP |
+| patient-service | 9002 | TCP |
+| doctor-service | 9003 | TCP |
+| appointment-service | 9004 | TCP |
+| telemedicine-service | 9005 | TCP |
+| payment-service | 9006 | TCP |
+| notification-service | 9007 | TCP |
