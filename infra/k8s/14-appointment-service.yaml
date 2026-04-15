@@ -18,15 +18,15 @@ spec:
           image: healio/appointment-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4004
+            - containerPort: 5004
           env:
             - name: PORT
-              value: "4004"
-            - name: MONGODB_URI
+              value: "5004"
+            - name: MONGO_APPOINTMENT_URI
               valueFrom:
                 configMapKeyRef:
                   name: healio-configmap
-                  key: MONGODB_URI_APPOINTMENT
+                  key: MONGO_APPOINTMENT_URI
 ---
 apiVersion: v1
 kind: Service
@@ -37,6 +37,6 @@ spec:
   selector:
     app: appointment-service
   ports:
-    - port: 4004
-      targetPort: 4004
+    - port: 5004
+      targetPort: 5004
   clusterIP: None

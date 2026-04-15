@@ -18,10 +18,10 @@ spec:
           image: healio/telemedicine-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4005
+            - containerPort: 5005
           env:
             - name: PORT
-              value: "4005"
+              value: "5005"
             - name: VIDEO_PROVIDER
               valueFrom:
                 configMapKeyRef:
@@ -42,6 +42,6 @@ spec:
   selector:
     app: telemedicine-service
   ports:
-    - port: 4005
-      targetPort: 4005
+    - port: 5005
+      targetPort: 5005
   clusterIP: None

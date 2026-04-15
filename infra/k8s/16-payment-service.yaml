@@ -18,20 +18,25 @@ spec:
           image: healio/payment-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4006
+            - containerPort: 5006
           env:
             - name: PORT
-              value: "4006"
-            - name: MONGODB_URI
+              value: "5006"
+            - name: MONGO_PAYMENT_URI
               valueFrom:
                 configMapKeyRef:
                   name: healio-configmap
-                  key: MONGODB_URI_PAYMENT
+                  key: MONGO_PAYMENT_URI
             - name: STRIPE_SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: healio-secrets
                   key: STRIPE_SECRET_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: STRIPE_WEBHOOK_SECRET
 ---
 apiVersion: v1
 kind: Service
@@ -42,6 +47,6 @@ spec:
   selector:
     app: payment-service
   ports:
-    - port: 4006
-      targetPort: 4006
+    - port: 5006
+      targetPort: 5006
   clusterIP: None

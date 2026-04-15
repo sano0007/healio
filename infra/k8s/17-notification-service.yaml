@@ -18,10 +18,10 @@ spec:
           image: healio/notification-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4007
+            - containerPort: 5007
           env:
             - name: PORT
-              value: "4007"
+              value: "5007"
             - name: SMTP_HOST
               valueFrom:
                 configMapKeyRef:
@@ -47,21 +47,21 @@ spec:
                 secretKeyRef:
                   name: healio-secrets
                   key: SMTP_PASS
-            - name: TWILIO_ACCOUNT_SID
+            - name: NOTIFY_LK_USER_ID
               valueFrom:
                 secretKeyRef:
                   name: healio-secrets
-                  key: TWILIO_ACCOUNT_SID
-            - name: TWILIO_AUTH_TOKEN
+                  key: NOTIFY_LK_USER_ID
+            - name: NOTIFY_LK_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: healio-secrets
-                  key: TWILIO_AUTH_TOKEN
-            - name: TWILIO_PHONE_NUMBER
+                  key: NOTIFY_LK_API_KEY
+            - name: NOTIFY_LK_SENDER_ID
               valueFrom:
-                secretKeyRef:
-                  name: healio-secrets
-                  key: TWILIO_PHONE_NUMBER
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: NOTIFY_LK_SENDER_ID
 ---
 apiVersion: v1
 kind: Service
@@ -72,6 +72,6 @@ spec:
   selector:
     app: notification-service
   ports:
-    - port: 4007
-      targetPort: 4007
+    - port: 5007
+      targetPort: 5007
   clusterIP: None

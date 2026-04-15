@@ -25,22 +25,105 @@ spec:
                 secretKeyRef:
                   name: healio-secrets
                   key: JWT_SECRET
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: STRIPE_SECRET_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: STRIPE_WEBHOOK_SECRET
             - name: FRONTEND_URL
               valueFrom:
                 configMapKeyRef:
                   name: healio-configmap
                   key: FRONTEND_URL
+            - name: NEXT_PUBLIC_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: NEXT_PUBLIC_API_URL
+            - name: AUTH_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: AUTH_SERVICE_HOST
+            - name: AUTH_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: AUTH_SERVICE_PORT
+            - name: PATIENT_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: PATIENT_SERVICE_HOST
+            - name: PATIENT_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: PATIENT_SERVICE_PORT
+            - name: DOCTOR_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: DOCTOR_SERVICE_HOST
+            - name: DOCTOR_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: DOCTOR_SERVICE_PORT
+            - name: APPOINTMENT_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: APPOINTMENT_SERVICE_HOST
+            - name: APPOINTMENT_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: APPOINTMENT_SERVICE_PORT
+            - name: TELEMEDICINE_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: TELEMEDICINE_SERVICE_HOST
+            - name: TELEMEDICINE_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: TELEMEDICINE_SERVICE_PORT
+            - name: PAYMENT_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: PAYMENT_SERVICE_HOST
+            - name: PAYMENT_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: PAYMENT_SERVICE_PORT
+            - name: NOTIFICATION_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: NOTIFICATION_SERVICE_HOST
+            - name: NOTIFICATION_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: NOTIFICATION_SERVICE_PORT
           livenessProbe:
-            httpGet:
-              path: /api
+            tcpSocket:
               port: 3001
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             periodSeconds: 10
           readinessProbe:
-            httpGet:
-              path: /api
+            tcpSocket:
               port: 3001
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 5
 ---
 apiVersion: v1

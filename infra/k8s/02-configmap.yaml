@@ -4,14 +4,38 @@ metadata:
   name: healio-configmap
   namespace: healio
 data:
+  # MongoDB URIs (matching actual env var names used by each service)
+  MONGO_AUTH_URI: "mongodb://mongodb-service:27017/healio-auth"
+  MONGO_PATIENT_URI: "mongodb://mongodb-service:27017/healio-patients"
+  MONGO_DOCTOR_URI: "mongodb://mongodb-service:27017/healio-doctors"
+  MONGO_APPOINTMENT_URI: "mongodb://mongodb-service:27017/healio-appointments"
+  MONGO_PAYMENT_URI: "mongodb://mongodb-service:27017/healio-payments"
+  # Auth
+  JWT_EXPIRES_IN: "7d"
+  # Frontend
   FRONTEND_URL: "http://localhost:3000"
-  MONGODB_URI_AUTH: "mongodb://mongodb-service:27017/healio-auth"
-  MONGODB_URI_PATIENT: "mongodb://mongodb-service:27017/healio-patients"
-  MONGODB_URI_DOCTOR: "mongodb://mongodb-service:27017/healio-doctors"
-  MONGODB_URI_APPOINTMENT: "mongodb://mongodb-service:27017/healio-appointments"
-  MONGODB_URI_PAYMENT: "mongodb://mongodb-service:27017/healio-payments"
-  JITSI_BASE_URL: "https://meet.jit.si"
-  VIDEO_PROVIDER: "jitsi"
+  NEXT_PUBLIC_API_URL: "http://localhost:3001/api"
+  # Email
   SMTP_HOST: "smtp.gmail.com"
   SMTP_PORT: "587"
   SMTP_FROM: "noreply@healio.app"
+  # SMS
+  NOTIFY_LK_SENDER_ID: "NotifyDEMO"
+  # Telemedicine
+  VIDEO_PROVIDER: "jitsi"
+  JITSI_BASE_URL: "https://meet.jit.si"
+  # Inter-service discovery (used by api-gateway)
+  AUTH_SERVICE_HOST: "auth-service"
+  AUTH_SERVICE_PORT: "5001"
+  PATIENT_SERVICE_HOST: "patient-service"
+  PATIENT_SERVICE_PORT: "5002"
+  DOCTOR_SERVICE_HOST: "doctor-service"
+  DOCTOR_SERVICE_PORT: "5003"
+  APPOINTMENT_SERVICE_HOST: "appointment-service"
+  APPOINTMENT_SERVICE_PORT: "5004"
+  TELEMEDICINE_SERVICE_HOST: "telemedicine-service"
+  TELEMEDICINE_SERVICE_PORT: "5005"
+  PAYMENT_SERVICE_HOST: "payment-service"
+  PAYMENT_SERVICE_PORT: "5006"
+  NOTIFICATION_SERVICE_HOST: "notification-service"
+  NOTIFICATION_SERVICE_PORT: "5007"
