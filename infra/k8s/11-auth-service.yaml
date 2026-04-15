@@ -18,20 +18,25 @@ spec:
           image: healio/auth-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4001
+            - containerPort: 5001
           env:
             - name: PORT
-              value: "4001"
-            - name: MONGODB_URI
+              value: "5001"
+            - name: MONGO_AUTH_URI
               valueFrom:
                 configMapKeyRef:
                   name: healio-configmap
-                  key: MONGODB_URI_AUTH
+                  key: MONGO_AUTH_URI
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: healio-secrets
                   key: JWT_SECRET
+            - name: JWT_EXPIRES_IN
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: JWT_EXPIRES_IN
 ---
 apiVersion: v1
 kind: Service
@@ -42,6 +47,6 @@ spec:
   selector:
     app: auth-service
   ports:
-    - port: 4001
-      targetPort: 4001
+    - port: 5001
+      targetPort: 5001
   clusterIP: None

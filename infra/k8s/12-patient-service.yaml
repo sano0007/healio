@@ -18,15 +18,30 @@ spec:
           image: healio/patient-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4002
+            - containerPort: 5002
           env:
             - name: PORT
-              value: "4002"
-            - name: MONGODB_URI
+              value: "5002"
+            - name: MONGO_PATIENT_URI
               valueFrom:
                 configMapKeyRef:
                   name: healio-configmap
-                  key: MONGODB_URI_PATIENT
+                  key: MONGO_PATIENT_URI
+            - name: CLOUDINARY_CLOUD_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: CLOUDINARY_CLOUD_NAME
+            - name: CLOUDINARY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: CLOUDINARY_API_KEY
+            - name: CLOUDINARY_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: CLOUDINARY_API_SECRET
 ---
 apiVersion: v1
 kind: Service
@@ -37,6 +52,6 @@ spec:
   selector:
     app: patient-service
   ports:
-    - port: 4002
-      targetPort: 4002
+    - port: 5002
+      targetPort: 5002
   clusterIP: None

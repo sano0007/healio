@@ -18,8 +18,15 @@
     "docker:down": "docker compose -f infra/docker-compose.yml down",
     "docker:down:volumes": "docker compose -f infra/docker-compose.yml down -v",
     "docker:logs": "docker compose -f infra/docker-compose.yml logs -f",
-    "k8s:apply": "kubectl apply -f infra/k8s/ --recursive",
-    "k8s:delete": "kubectl delete -f infra/k8s/ --recursive"
+    "k8s:build": "docker compose -f infra/docker-compose.yml --env-file .env build",
+    "k8s:gen-secrets": "bash infra/scripts/gen-k8s-secrets.sh",
+    "k8s:up": "kubectl apply -f infra/k8s/",
+    "k8s:down": "kubectl delete namespace healio --ignore-not-found",
+    "k8s:apply": "kubectl apply -f infra/k8s/",
+    "k8s:delete": "kubectl delete -f infra/k8s/",
+    "k8s:restart": "kubectl rollout restart deployment -n healio",
+    "k8s:status": "kubectl get pods -n healio",
+    "k8s:logs": "kubectl logs -n healio -l app"
   },
   "devDependencies": {
     "prettier": "^3.4.2",

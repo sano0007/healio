@@ -22,6 +22,7 @@ services:
     build:
       context: /Users/stoxmod/WebstormProjects/healio
       dockerfile: infra/docker/api-gateway.Dockerfile
+    image: healio/api-gateway:latest
     container_name: healio-api-gateway
     restart: unless-stopped
     ports:
@@ -71,6 +72,7 @@ services:
     build:
       context: /Users/stoxmod/WebstormProjects/healio
       dockerfile: infra/docker/auth-service.Dockerfile
+    image: healio/auth-service:latest
     container_name: healio-auth-service
     restart: unless-stopped
     ports:
@@ -91,6 +93,7 @@ services:
     build:
       context: /Users/stoxmod/WebstormProjects/healio
       dockerfile: infra/docker/patient-service.Dockerfile
+    image: healio/patient-service:latest
     container_name: healio-patient-service
     restart: unless-stopped
     ports:
@@ -112,6 +115,7 @@ services:
     build:
       context: /Users/stoxmod/WebstormProjects/healio
       dockerfile: infra/docker/doctor-service.Dockerfile
+    image: healio/doctor-service:latest
     container_name: healio-doctor-service
     restart: unless-stopped
     ports:
@@ -130,6 +134,7 @@ services:
     build:
       context: /Users/stoxmod/WebstormProjects/healio
       dockerfile: infra/docker/appointment-service.Dockerfile
+    image: healio/appointment-service:latest
     container_name: healio-appointment-service
     restart: unless-stopped
     ports:
@@ -148,6 +153,7 @@ services:
     build:
       context: /Users/stoxmod/WebstormProjects/healio
       dockerfile: infra/docker/telemedicine-service.Dockerfile
+    image: healio/telemedicine-service:latest
     container_name: healio-telemedicine-service
     restart: unless-stopped
     ports:
@@ -164,6 +170,7 @@ services:
     build:
       context: /Users/stoxmod/WebstormProjects/healio
       dockerfile: infra/docker/payment-service.Dockerfile
+    image: healio/payment-service:latest
     container_name: healio-payment-service
     restart: unless-stopped
     ports:
@@ -184,6 +191,7 @@ services:
     build:
       context: /Users/stoxmod/WebstormProjects/healio
       dockerfile: infra/docker/notification-service.Dockerfile
+    image: healio/notification-service:latest
     container_name: healio-notification-service
     restart: unless-stopped
     ports:
