@@ -172,9 +172,24 @@ export const api = {
   },
   sessions: {
     create: (appointmentId: string) =>
-      request<{ sessionId: string; jitsiUrl: string }>('/sessions', { method: 'POST', body: JSON.stringify({ appointmentId }) }),
+      request<{
+        sessionId: string;
+        roomName: string;
+        token?: string;
+        roomSid?: string;
+        twilioRoomSid?: string;
+      }>('/sessions', { method: 'POST', body: JSON.stringify({ appointmentId }) }),
     join: (sessionId: string) =>
-      request<{ jitsiUrl: string }>('/sessions/join', { method: 'POST', body: JSON.stringify({ sessionId }) }),
+      request<{
+        sessionId: string;
+        roomName: string;
+        roomSid?: string;
+        token?: string;
+        twilioRoomSid?: string;
+        status: string;
+      }>('/sessions/join', { method: 'POST', body: JSON.stringify({ sessionId }) }),
+    end: (sessionId: string) =>
+      request<{ sessionId: string; status: string }>(`/sessions/${sessionId}/end`, { method: 'PATCH' }),
   },
 };
 
