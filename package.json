@@ -26,7 +26,8 @@
     "k8s:delete": "kubectl delete -f infra/k8s/",
     "k8s:restart": "kubectl rollout restart deployment -n healio",
     "k8s:status": "kubectl get pods -n healio",
-    "k8s:logs": "kubectl logs -n healio -l app"
+    "k8s:logs": "kubectl logs -n healio -l app",
+    "k8s:mongodb": "kubectl port-forward -n healio svc/mongodb-service 27017:27017"
   },
   "devDependencies": {
     "prettier": "^3.4.2",
