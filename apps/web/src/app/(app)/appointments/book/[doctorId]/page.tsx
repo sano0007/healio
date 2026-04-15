@@ -13,6 +13,15 @@ import { useDoctor } from "@/hooks/use-doctors";
 import { useBookAppointment } from "@/hooks/use-appointments";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface BookingData {
+  patientName?: string;
+  patientEmail?: string;
+  patientPhone?: string;
+  reason?: string;
+  selectedDate?: string;
+  selectedTime?: string;
+}
+
 export default function AppointmentBookingPage() {
   const params = useParams();
   const router = useRouter();
@@ -22,7 +31,7 @@ export default function AppointmentBookingPage() {
   const bookAppointment = useBookAppointment();
 
   const [step, setStep] = useState(1);
-  const [bookingData, setBookingData] = useState<any>({});
+  const [bookingData, setBookingData] = useState<BookingData>({});
   const [bookedAppointment, setBookedAppointment] = useState<any>(null);
 
   useEffect(() => {
@@ -40,7 +49,27 @@ export default function AppointmentBookingPage() {
 
   const handlePaymentComplete = async () => {
     try {
-      const scheduledAt = new Date().toISOString();
+      const selectedDateStr = bookingData.selectedDate;
+      const selectedTimeStr = bookingData.selectedTime;
+      
+      let scheduledAt: string;
+      
+      if (selectedDateStr && selectedTimeStr) {
+        const dateParts = selectedDateStr.split('/').map(Number);
+        const timeParts = selectedTimeStr.split(':').map(Number);
+        const isPM = selectedTimeStr.toLowerCase().includes('pm') && timeParts[0] !== 12;
+        
+        scheduledAt = new Date(
+          dateParts[2],
+          dateParts[0] - 1,
+          dateParts[1],
+          timeParts[0] + (isPM ? 12 : 0),
+          timeParts[1]
+        ).toISOString();
+      } else {
+        scheduledAt = new Date().toISOString();
+      }
+      
       const result = await bookAppointment.mutateAsync({
         doctorId,
         scheduledAt,
@@ -80,6 +109,17 @@ export default function AppointmentBookingPage() {
     );
   }
 
+  const formatDisplayDate = (date: string | undefined): string => {
+    if (!date) return new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const dateParts = date.split('/').map(Number);
+    return new Date(dateParts[2], dateParts[0] - 1, dateParts[1]).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  const formatDisplayTime = (time: string | undefined) => {
+    if (!time) return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    return time;
+  };
+
   const doctorDisplay = {
     name: doctor.name,
     specialization: doctor.specialty || "General Physician",
@@ -88,8 +128,8 @@ export default function AppointmentBookingPage() {
   };
 
   const details = {
-    date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-    time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+    date: formatDisplayDate(bookingData.selectedDate),
+    time: formatDisplayTime(bookingData.selectedTime),
     type: "video" as const,
   };
 

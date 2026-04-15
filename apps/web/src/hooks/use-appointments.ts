@@ -47,6 +47,19 @@ export function useBookAppointment() {
 
   return useMutation({
     mutationFn: async (data: BookAppointmentInput) => {
+      if (!data.doctorId) {
+        throw new Error('Doctor ID is required');
+      }
+      
+      if (!data.scheduledAt) {
+        throw new Error('Scheduled date and time is required');
+      }
+      
+      const scheduledDate = new Date(data.scheduledAt);
+      if (scheduledDate < new Date()) {
+        throw new Error('Cannot book appointments in the past');
+      }
+      
       const result = await api.appointments.book(data);
       return result;
     },

@@ -39,7 +39,6 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
 
   const [isMuted, setIsMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
-  const [isAudioOff, setIsAudioOff] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
@@ -161,8 +160,8 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
         onToggleMute={() => setIsMuted(!isMuted)}
         isCameraOff={isCameraOff}
         onToggleCamera={() => setIsCameraOff(!isCameraOff)}
-        isAudioOff={isAudioOff}
-        onToggleAudio={() => setIsAudioOff(!isAudioOff)}
+        isAudioOff={false}
+        onToggleAudio={() => {}}
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onEndCall={handleEndCall}
