@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doctor-service
+  namespace: healio
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: doctor-service
+  template:
+    metadata:
+      labels:
+        app: doctor-service
+    spec:
+      containers:
+        - name: doctor-service
+          image: healio/doctor-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5003
+          env:
+            - name: PORT
+              value: "5003"
+            - name: MONGO_DOCTOR_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: MONGO_DOCTOR_URI
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doctor-service
+  namespace: healio
+spec:
+  selector:
+    app: doctor-service
+  ports:
+    - port: 5003
+      targetPort: 5003
+  clusterIP: None

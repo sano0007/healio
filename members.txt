@@ -1,0 +1,8 @@
+Name                    | Registration No. | Student ID
+--------------------------------------------------------
+[Member 1 Name]         | [REG-XXXXX]      | [STU-XXXXX]
+[Member 2 Name]          | [REG-XXXXX]      | [STU-XXXXX]
+[Member 3 Name]          | [REG-XXXXX]      | [STU-XXXXX]
+[Member 4 Name]         | [REG-XXXXX]      | [STU-XXXXX]
+
+Group ID: [YourGroupID]

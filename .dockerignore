@@ -1,0 +1,5 @@
+.git/
+**/*.log
+**/.turbo/
+**/dist/
+**/node_modules/
