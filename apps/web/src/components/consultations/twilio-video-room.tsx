@@ -11,17 +11,27 @@ interface TwilioVideoRoomProps {
   onError?: (error: Error) => void;
 }
 
+interface LocalParticipantDisplay {
+  identity: string;
+  videoTrack?: LocalVideoTrack;
+}
+
 interface ParticipantVideoProps {
-  participant: RemoteParticipant;
+  participant: RemoteParticipant | LocalParticipantDisplay;
   isLocal?: boolean;
 }
 
 function ParticipantVideo({ participant, isLocal }: ParticipantVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+
+  const isRemote = 'sid' in participant;
 
   useEffect(() => {
+    if (!isRemote) return;
+
+    const remoteParticipant = participant as RemoteParticipant;
+    
     const videoTrackSubscribed = (track: RemoteVideoTrack) => {
       if (videoRef.current && track.attach) {
         videoRef.current.srcObject = track.attach().srcObject;
@@ -36,10 +46,10 @@ function ParticipantVideo({ participant, isLocal }: ParticipantVideoProps) {
       }
     };
 
-    participant.on("trackSubscribed", videoTrackSubscribed);
-    participant.on("trackSubscribed", audioTrackSubscribed);
+    remoteParticipant.on("trackSubscribed", videoTrackSubscribed);
+    remoteParticipant.on("trackSubscribed", audioTrackSubscribed);
 
-    const tracks = Array.from(participant.tracks.values());
+    const tracks = Array.from(remoteParticipant.tracks.values());
     tracks.forEach((publication) => {
       if (publication.isSubscribed && publication.track) {
         if (publication.track.kind === "video") {
@@ -51,9 +61,25 @@ function ParticipantVideo({ participant, isLocal }: ParticipantVideoProps) {
     });
 
     return () => {
-      participant.removeAllListeners();
+      remoteParticipant.removeAllListeners();
     };
-  }, [participant]);
+  }, [participant, isRemote]);
+
+  useEffect(() => {
+    if (!isLocal) return;
+    
+    const localParticipant = participant as LocalParticipantDisplay;
+    if (localParticipant.videoTrack && videoRef.current) {
+      const track = localParticipant.videoTrack;
+      if (track.attach) {
+        const mediaEl = track.attach() as HTMLVideoElement;
+        mediaEl.autoplay = true;
+        mediaEl.playsInline = true;
+      }
+    }
+  }, [participant, isLocal]);
+
+  const identity = isLocal ? "You" : isRemote ? (participant as RemoteParticipant).identity : "Unknown";
 
   return (
     <div className="relative w-full h-full bg-gray-900 rounded-lg overflow-hidden">
@@ -66,7 +92,7 @@ function ParticipantVideo({ participant, isLocal }: ParticipantVideoProps) {
       />
       <div className="absolute bottom-4 left-4 bg-black/50 px-3 py-1 rounded-full">
         <span className="text-white text-sm">
-          {isLocal ? "You" : participant.identity}
+          {identity}
         </span>
       </div>
       {!isVideoEnabled && (
@@ -152,11 +178,12 @@ export function TwilioVideoRoom({
         });
 
         setIsConnecting(false);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Failed to connect to video room";
         console.error("Failed to connect to room:", error);
-        setConnectionError(error.message || "Failed to connect to video room");
+        setConnectionError(message);
         setIsConnecting(false);
-        onError?.(error);
+        onError?.(new Error(message));
       }
     };
 
@@ -223,22 +250,18 @@ export function TwilioVideoRoom({
     );
   }
 
+  const localParticipantDisplay: LocalParticipantDisplay = {
+    identity: "You",
+    videoTrack: localTracks.find((t) => t.kind === "video") as LocalVideoTrack | undefined,
+  };
+
   return (
     <div className="w-full h-full relative">
       {remoteParticipants.length > 0 ? (
         <div className="grid grid-cols-2 gap-2 h-full">
           <ParticipantVideo
             key="local"
-            participant={
-              new Proxy(
-                { identity: "You" },
-                {
-                  get() {
-                    return () => localTracks.find((t) => t.kind === "video");
-                  },
-                }
-              ) as unknown as RemoteParticipant
-            }
+            participant={localParticipantDisplay}
             isLocal
           />
           {remoteParticipants.map((participant) => (
@@ -248,16 +271,7 @@ export function TwilioVideoRoom({
       ) : (
         <ParticipantVideo
           key="local"
-          participant={
-            new Proxy(
-              { identity: "You" },
-              {
-                get() {
-                  return () => localTracks.find((t) => t.kind === "video");
-                },
-              }
-            ) as unknown as RemoteParticipant
-          }
+          participant={localParticipantDisplay}
           isLocal
         />
       )}

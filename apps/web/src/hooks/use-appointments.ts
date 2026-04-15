@@ -11,16 +11,24 @@ export function useAppointments() {
     queryFn: async () => {
       const appointments = await api.appointments.getMy();
       
-      const enrichedAppointments: AppointmentWithDoctor[] = await Promise.all(
-        appointments.map(async (apt) => {
+      const uniqueDoctorIds = [...new Set(appointments.map(apt => apt.doctorId))];
+      
+      const doctorResults = await Promise.all(
+        uniqueDoctorIds.map(async (doctorId) => {
           try {
-            const doctor = await api.doctors.getById(apt.doctorId);
-            return { ...apt, doctor };
+            return { doctorId, doctor: await api.doctors.getById(doctorId) };
           } catch {
-            return { ...apt, doctor: undefined };
+            return { doctorId, doctor: undefined };
           }
         })
       );
+
+      const doctorMap = new Map(doctorResults.map(r => [r.doctorId, r.doctor]));
+
+      const enrichedAppointments: AppointmentWithDoctor[] = appointments.map(apt => ({
+        ...apt,
+        doctor: doctorMap.get(apt.doctorId),
+      }));
 
       return enrichedAppointments;
     },
