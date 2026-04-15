@@ -129,10 +129,44 @@ export const api = {
   },
   admin: {
     getStats: () => request<AdminStats>('/admin/stats'),
-    getPatients: () => request<PatientProfile[]>('/admin/patients'),
-    getDoctors: () => request<Doctor[]>('/admin/doctors'),
-    getAppointments: () => request<Appointment[]>('/admin/appointments'),
-    getPayments: () => request<Payment[]>('/admin/payments'),
+    getPatients: (filters?: { search?: string; page?: number; limit?: number }) => {
+      const params = new URLSearchParams();
+      if (filters?.search) params.append('search', filters.search);
+      if (filters?.page) params.append('page', String(filters.page));
+      if (filters?.limit) params.append('limit', String(filters.limit));
+      const query = params.toString() ? `?${params.toString()}` : '';
+      return request<PatientProfile[]>(`/admin/patients${query}`);
+    },
+    getDoctors: (filters?: { search?: string; specialty?: string; isVerified?: boolean; page?: number; limit?: number }) => {
+      const params = new URLSearchParams();
+      if (filters?.search) params.append('search', filters.search);
+      if (filters?.specialty) params.append('specialty', filters.specialty);
+      if (filters?.isVerified !== undefined) params.append('isVerified', String(filters.isVerified));
+      if (filters?.page) params.append('page', String(filters.page));
+      if (filters?.limit) params.append('limit', String(filters.limit));
+      const query = params.toString() ? `?${params.toString()}` : '';
+      return request<Doctor[]>(`/admin/doctors${query}`);
+    },
+    getAppointments: (filters?: { status?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) => {
+      const params = new URLSearchParams();
+      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+      if (filters?.startDate) params.append('startDate', filters.startDate);
+      if (filters?.endDate) params.append('endDate', filters.endDate);
+      if (filters?.page) params.append('page', String(filters.page));
+      if (filters?.limit) params.append('limit', String(filters.limit));
+      const query = params.toString() ? `?${params.toString()}` : '';
+      return request<Appointment[]>(`/admin/appointments${query}`);
+    },
+    getPayments: (filters?: { status?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) => {
+      const params = new URLSearchParams();
+      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+      if (filters?.startDate) params.append('startDate', filters.startDate);
+      if (filters?.endDate) params.append('endDate', filters.endDate);
+      if (filters?.page) params.append('page', String(filters.page));
+      if (filters?.limit) params.append('limit', String(filters.limit));
+      const query = params.toString() ? `?${params.toString()}` : '';
+      return request<Payment[]>(`/admin/payments${query}`);
+    },
     verifyDoctor: (userId: string, isVerified: boolean) =>
       request<Doctor>(`/admin/doctors/${userId}/verify`, { method: 'PATCH', body: JSON.stringify({ isVerified }) }),
   },

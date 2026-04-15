@@ -1,38 +1,71 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/auth';
-import { api, Payment } from '@/lib/api';
+import { useState } from 'react';
+import { usePayments, useExportToCSV } from '@/hooks/use-admin';
+import { Download, DollarSign, Clock, CheckCircle, XCircle } from 'lucide-react';
 
-const STATUS_STYLES: Record<string, string> = {
-  pending: 'bg-yellow-50 text-yellow-700',
-  success: 'bg-green-50 text-green-700',
-  failed: 'bg-red-50 text-red-500',
-  refunded: 'bg-gray-100 text-gray-500',
-};
+const STATUS_OPTIONS = ['all', 'pending', 'success', 'failed', 'refunded'];
 
 export default function AdminPaymentsPage() {
-  const { isAuthenticated } = useAuth();
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState('all');
+  
+  const { data: payments, isLoading, refetch } = usePayments({ 
+    status: status === 'all' ? undefined : status
+  });
+  
+  const exportCSV = useExportToCSV<{
+    _id: string; appointmentId: string; amount: number; currency: string; status: string
+  }>(payments || [], `healio_payments_${new Date().toISOString().split('T')[0]}.csv`, [
+    { key: '_id', header: 'Payment ID' },
+    { key: 'appointmentId', header: 'Appointment ID' },
+    { key: 'amount', header: 'Amount' },
+    { key: 'currency', header: 'Currency' },
+    { key: 'status', header: 'Status' },
+  ]);
 
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    api.admin.getPayments().then(setPayments).finally(() => setLoading(false));
-  }, [isAuthenticated]);
+  const STATUS_STYLES: Record<string, string> = {
+    pending: 'bg-yellow-50 text-yellow-700',
+    success: 'bg-green-50 text-green-700',
+    failed: 'bg-red-50 text-red-500',
+    refunded: 'bg-gray-100 text-gray-500',
+  };
 
-  const revenue = payments.filter(p => p.status === 'success').reduce((s, p) => s + p.amount, 0);
+  const revenue = payments?.filter(p => p.status === 'success').reduce((s, p) => s + p.amount, 0) || 0;
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>;
+  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>;
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-gray-900">${revenue.toLocaleString()}</div>
-          <div className="text-xs text-gray-400">total revenue</div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => exportCSV()}
+            disabled={!payments?.length}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 disabled:opacity-50"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </button>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-gray-900">${revenue.toLocaleString()}</div>
+            <div className="text-xs text-gray-400">total revenue</div>
+          </div>
         </div>
+      </div>
+
+      <div className="flex gap-2 mb-5">
+        {STATUS_OPTIONS.map(s => (
+          <button
+            key={s}
+            onClick={() => setStatus(s)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors capitalize ${
+              status === s ? 'bg-teal-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-teal-400'
+            }`}
+          >
+            {s}
+          </button>
+        ))}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -47,7 +80,7 @@ export default function AdminPaymentsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {payments.map(payment => (
+            {payments?.map(payment => (
               <tr key={payment._id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-5 py-3 font-mono text-xs text-gray-500">{payment._id}</td>
                 <td className="px-5 py-3 font-mono text-xs text-gray-500">{payment.appointmentId}</td>
@@ -60,8 +93,8 @@ export default function AdminPaymentsPage() {
                 </td>
               </tr>
             ))}
-            {payments.length === 0 && (
-              <tr><td colSpan={5} className="px-5 py-10 text-center text-gray-400">No payments yet.</td></tr>
+            {(!payments || payments.length === 0) && (
+              <tr><td colSpan={5} className="px-5 py-10 text-center text-gray-400">No payments found.</td></tr>
             )}
           </tbody>
         </table>
