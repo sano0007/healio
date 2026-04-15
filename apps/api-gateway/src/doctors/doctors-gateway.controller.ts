@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Patch, Post, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
@@ -7,13 +7,22 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 
+export interface DoctorFilters {
+  search?: string;
+  specialty?: string;
+  availability?: string;
+  sort?: string;
+  page?: string;
+  limit?: string;
+}
+
 @Controller('doctors')
 export class DoctorsGatewayController {
   constructor(@Inject('DOCTOR_SERVICE') private doctorClient: ClientProxy) {}
 
   @Get()
-  getAll() {
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET_ALL, {}));
+  getAll(@Query() filters: DoctorFilters) {
+    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET_ALL, filters));
   }
 
   @Get(':id')

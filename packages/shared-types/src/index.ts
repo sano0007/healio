@@ -56,6 +56,7 @@ export const MSG = {
   AUTH_REGISTER: 'auth.register',
   AUTH_LOGIN: 'auth.login',
   AUTH_VALIDATE: 'auth.validate',
+  AUTH_REFRESH: 'auth.refresh',
 
   // Patient Service
   PATIENT_CREATE: 'patient.create',
@@ -113,6 +114,10 @@ export interface RegisterDto {
 export interface LoginDto {
   email: string;
   password: string;
+}
+
+export interface RefreshTokenDto {
+  refreshToken: string;
 }
 
 export interface BookAppointmentDto {

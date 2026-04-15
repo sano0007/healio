@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Patch, Body, UseGuards, Request, Param } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
@@ -11,13 +11,28 @@ export class TelemedicineGatewayController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  createSession(@Request() req: { user: { userId: string } }, @Body() body: { appointmentId: string }) {
-    return firstValueFrom(this.teleClient.send(MSG.TELE_CREATE_SESSION, { appointmentId: body.appointmentId, hostId: req.user.userId }));
+  async createSession(@Request() req: { user: { userId: string } }, @Body() body: { appointmentId: string }) {
+    const result = await firstValueFrom(this.teleClient.send(MSG.TELE_CREATE_SESSION, { 
+      appointmentId: body.appointmentId, 
+      hostId: req.user.userId 
+    }));
+    return result;
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('join')
-  joinSession(@Request() req: { user: { userId: string } }, @Body() body: { sessionId: string }) {
-    return firstValueFrom(this.teleClient.send(MSG.TELE_JOIN_SESSION, { sessionId: body.sessionId, userId: req.user.userId }));
+  async joinSession(@Request() req: { user: { userId: string } }, @Body() body: { sessionId: string }) {
+    const result = await firstValueFrom(this.teleClient.send(MSG.TELE_JOIN_SESSION, { 
+      sessionId: body.sessionId, 
+      userId: req.user.userId 
+    }));
+    return result;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':sessionId/end')
+  async endSession(@Param('sessionId') sessionId: string) {
+    const result = await firstValueFrom(this.teleClient.send(MSG.TELE_END_SESSION, { sessionId }));
+    return result;
   }
 }

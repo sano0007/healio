@@ -8,17 +8,17 @@ export class SessionsController {
   constructor(private sessionsService: SessionsService) {}
 
   @MessagePattern(MSG.TELE_CREATE_SESSION)
-  createSession(@Payload() data: { appointmentId: string; hostId: string }) {
+  async createSession(@Payload() data: { appointmentId: string; hostId: string }) {
     return this.sessionsService.createSession(data);
   }
 
   @MessagePattern(MSG.TELE_JOIN_SESSION)
-  joinSession(@Payload() data: { sessionId: string; userId: string }) {
+  async joinSession(@Payload() data: { sessionId: string; userId: string }) {
     return this.sessionsService.joinSession(data);
   }
 
   @MessagePattern(MSG.TELE_END_SESSION)
-  endSession(@Payload() data: { sessionId: string }) {
+  async endSession(@Payload() data: { sessionId: string }) {
     return this.sessionsService.endSession(data.sessionId);
   }
 }

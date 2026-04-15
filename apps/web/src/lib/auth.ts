@@ -1,5 +1,6 @@
 const TOKEN_KEY = 'healio_token';
 const USER_KEY = 'healio_user';
+const REFRESH_TOKEN_KEY = 'healio_refresh_token';
 
 export interface StoredUser {
   id: string;
@@ -8,9 +9,19 @@ export interface StoredUser {
   role: string;
 }
 
-export function saveAuth(token: string, user: StoredUser) {
+export function saveAuth(token: string, user: StoredUser, refreshToken?: string) {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  }
+}
+
+export function setAuthTokens(token: string, refreshToken?: string) {
+  localStorage.setItem(TOKEN_KEY, token);
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  }
 }
 
 export function getToken(): string | null {
@@ -32,8 +43,14 @@ export function getUser(): StoredUser | null {
 export function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
 export function isLoggedIn(): boolean {
   return !!getToken();
+}
+
+export function getRefreshToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
 }
