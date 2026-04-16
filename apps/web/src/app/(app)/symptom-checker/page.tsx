@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SymptomInput } from "@/components/symptom-checker/symptom-input";
 import { DiagnosticEngine } from "@/components/symptom-checker/diagnostic-engine";
 import { TriageResults } from "@/components/symptom-checker/triage-results";
+import type { SymptomCheckResult } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Activity, ShieldCheck, Info } from "lucide-react";
 
@@ -12,19 +13,22 @@ type CheckerState = "input" | "analyzing" | "results";
 export default function SymptomCheckerPage() {
   const [state, setState] = useState<CheckerState>("input");
   const [userSymptoms, setUserSymptoms] = useState("");
+  const [results, setResults] = useState<SymptomCheckResult | null>(null);
 
   const handleAnalyze = (symptoms: string) => {
     setUserSymptoms(symptoms);
     setState("analyzing");
   };
 
-  const handleAnalysisComplete = () => {
+  const handleAnalysisComplete = (data: SymptomCheckResult) => {
+    setResults(data);
     setState("results");
   };
 
   const handleReset = () => {
     setState("input");
     setUserSymptoms("");
+    setResults(null);
   };
 
   return (
@@ -86,7 +90,7 @@ export default function SymptomCheckerPage() {
               exit={{ opacity: 0, scale: 1.1 }}
               transition={{ duration: 0.6 }}
             >
-              <DiagnosticEngine onComplete={handleAnalysisComplete} />
+              <DiagnosticEngine symptoms={userSymptoms} onComplete={handleAnalysisComplete} onReset={handleReset} />
             </motion.div>
           )}
 
@@ -98,7 +102,7 @@ export default function SymptomCheckerPage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <TriageResults onReset={handleReset} />
+              {results && <TriageResults results={results} onReset={handleReset} />}
             </motion.div>
           )}
         </AnimatePresence>
