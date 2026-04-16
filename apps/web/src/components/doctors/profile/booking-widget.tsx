@@ -1,10 +1,10 @@
 "use client";
 
-import { Video, User, Calendar as CalendarIcon, Clock, ChevronRight, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { motion } from "framer-motion";
+import {useRouter} from "next/navigation";
+import {ChevronRight, Clock, Info, User, Video} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {cn} from "@/lib/utils";
+import {useState} from "react";
 
 const timeSlots = {
   morning: ["09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM"],
@@ -23,6 +23,7 @@ const next7Days = [...Array(7)].map((_, i) => {
 });
 
 export function BookingWidget({ fee, doctorId }: { fee: number; doctorId?: string }) {
+    const router = useRouter();
   const [type, setType] = useState<"in-person" | "video">("video");
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTime, setSelectedTime] = useState("");
@@ -115,7 +116,9 @@ export function BookingWidget({ fee, doctorId }: { fee: number; doctorId?: strin
           <div className="text-xl font-bold text-brand-black">${fee}</div>
         </div>
 
-        <Button variant="dark" className="w-full h-14 rounded-2xl text-sm font-bold gap-2 shadow-xl shadow-brand-dark/10 hover:scale-[1.02] active:scale-95 transition-all">
+          <Button variant="dark"
+                  className="w-full h-14 rounded-2xl text-sm font-bold gap-2 shadow-xl shadow-brand-dark/10 hover:scale-[1.02] active:scale-95 transition-all"
+                  onClick={() => router.push(`/appointments/book/${doctorId}`)}>
           Book Appointment
           <ChevronRight className="w-4 h-4" />
         </Button>

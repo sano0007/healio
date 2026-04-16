@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api, Appointment, Doctor } from '@/lib/api';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {api, Appointment, Doctor} from '@/lib/api';
 
 export interface AppointmentWithDoctor extends Appointment {
   doctor?: Doctor;
@@ -54,9 +54,19 @@ export function useBookAppointment() {
       if (!data.scheduledAt) {
         throw new Error('Scheduled date and time is required');
       }
-      
-      const scheduledDate = new Date(data.scheduledAt);
-      if (scheduledDate < new Date()) {
+
+      const [datePart, timePart] = data.scheduledAt.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute, second] = timePart.split(':').map(Number);
+      const scheduledDate = new Date(year, month - 1, day, hour, minute, second);
+      const now = new Date();
+      if (
+          scheduledDate.getFullYear() < now.getFullYear() ||
+          (scheduledDate.getFullYear() === now.getFullYear() && scheduledDate.getMonth() < now.getMonth()) ||
+          (scheduledDate.getFullYear() === now.getFullYear() && scheduledDate.getMonth() === now.getMonth() && scheduledDate.getDate() < now.getDate()) ||
+          (scheduledDate.getFullYear() === now.getFullYear() && scheduledDate.getMonth() === now.getMonth() && scheduledDate.getDate() === now.getDate() && scheduledDate.getHours() < now.getHours()) ||
+          (scheduledDate.getFullYear() === now.getFullYear() && scheduledDate.getMonth() === now.getMonth() && scheduledDate.getDate() === now.getDate() && scheduledDate.getHours() === now.getHours() && scheduledDate.getMinutes() < now.getMinutes())
+      ) {
         throw new Error('Cannot book appointments in the past');
       }
       

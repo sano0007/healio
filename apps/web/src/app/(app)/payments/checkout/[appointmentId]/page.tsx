@@ -1,55 +1,38 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
-import { OrderSummary } from "@/components/payments/order-summary";
-import { CheckoutForm } from "@/components/payments/checkout-form";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Home, ShieldCheck, Lock, CheckCircle2, ArrowRight } from "lucide-react";
+import {use, useState} from "react";
+import {OrderSummary} from "@/components/payments/order-summary";
+import {CheckoutForm} from "@/components/payments/checkout-form";
+import {AnimatePresence, motion} from "framer-motion";
+import {ArrowRight, CheckCircle2, ChevronRight, Lock, ShieldCheck} from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import {useRouter} from "next/navigation";
+import {Button} from "@/components/ui/button";
+import {Skeleton} from "@/components/ui/skeleton";
+import {useAppointments} from "@/hooks/use-appointments";
 
 type CheckoutStatus = "idle" | "processing" | "success" | "error";
-
-const mockAppointment = {
-  id: "HL-98231-A",
-  doctor: {
-    name: "Dr. Sarah Johnson",
-    specialization: "Senior Cardiologist",
-    image: "/images/doctor-1.png",
-    fee: 150,
-  },
-  schedule: {
-    date: "Tuesday, July 7, 2026",
-    time: "09:30 AM",
-  }
-};
 
 export default function CheckoutPage({ params }: { params: Promise<{ appointmentId: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const [status, setStatus] = useState<CheckoutStatus>("idle");
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
+    const {data: appointments, isLoading} = useAppointments();
+
+    const appointment = appointments?.find(a => a._id === resolvedParams.appointmentId);
 
   const handlePay = () => {
     setStatus("processing");
-    // Simulate payment processing delay
     setTimeout(() => {
       setStatus("success");
-      // Redirect after success
       setTimeout(() => {
         router.push("/appointments");
       }, 3000);
     }, 2800);
   };
 
-  if (isLoading) {
+    if (isLoading || !appointment) {
     return (
       <div className="max-w-7xl mx-auto py-8 lg:py-12 space-y-12 animate-pulse px-4">
         <Skeleton className="h-24 w-1/3 rounded-2xl" />
@@ -75,7 +58,10 @@ export default function CheckoutPage({ params }: { params: Promise<{ appointment
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
            <div className="space-y-1">
               <h1 className="text-3xl font-black text-brand-black tracking-tighter">Secure Checkout</h1>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-none">Appointment Ref: <span className="text-brand-dark font-black">{mockAppointment.id}</span></p>
+               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-none">Appointment
+                   Ref: <span
+                       className="text-brand-dark font-black">{appointment?._id ?? resolvedParams.appointmentId}</span>
+               </p>
            </div>
            <div className="flex items-center gap-3 bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 shadow-sm">
               <div className="p-2 bg-emerald-500 rounded-lg text-white">
@@ -120,7 +106,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ appointment
                  <div className="space-y-2">
                     <h2 className="text-2xl font-black text-brand-black tracking-tight">Payment Completed</h2>
                     <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest px-4 leading-relaxed">
-                       Your consultation with **{mockAppointment.doctor.name}** is successfully confirmed.
+                        Your consultation with **{appointment?.doctor?.name ?? 'Doctor'}** is successfully confirmed.
                     </p>
                  </div>
 
@@ -152,10 +138,10 @@ export default function CheckoutPage({ params }: { params: Promise<{ appointment
            </div>
            
            <div className="py-10">
-              <CheckoutForm 
-                status={status} 
-                onPay={handlePay} 
-                total={mockAppointment.doctor.fee + 10 + 5} 
+               <CheckoutForm
+                   status={status}
+                   onPay={handlePay}
+                   total={(appointment?.doctor?.consultationFee ?? 0) + 10 + 5}
               />
            </div>
 
@@ -179,9 +165,26 @@ export default function CheckoutPage({ params }: { params: Promise<{ appointment
                  <span className="w-8 h-8 rounded-full bg-brand-light brightness-150 text-brand-dark text-[10px] font-black flex items-center justify-center shadow-lg shadow-brand-light/20">02</span>
                  <p className="text-[11px] font-black text-brand-black uppercase tracking-widest">Order Review</p>
               </div>
-              <OrderSummary 
-                doctor={mockAppointment.doctor} 
-                schedule={mockAppointment.schedule} 
+               <OrderSummary
+                   doctor={{
+                       name: appointment?.doctor?.name ?? 'Doctor',
+                       specialization: appointment?.doctor?.specialty ?? 'Specialist',
+                       image: "/images/doctor-placeholder.png",
+                       fee: appointment?.doctor?.consultationFee ?? 0,
+                   }}
+                   schedule={{
+                       date: appointment ? new Date(appointment.scheduledAt).toLocaleDateString('en-US', {
+                           weekday: 'long',
+                           year: 'numeric',
+                           month: 'long',
+                           day: 'numeric'
+                       }) : '',
+                       time: appointment ? new Date(appointment.scheduledAt).toLocaleTimeString('en-US', {
+                           hour: 'numeric',
+                           minute: '2-digit',
+                           hour12: true
+                       }) : '',
+                   }}
               />
            </div>
         </div>

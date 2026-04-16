@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { AppointmentTabs } from "./appointment-tabs";
-import { AppointmentCard, Appointment } from "./appointment-card";
-import { AppointmentEmptyState } from "./appointment-empty-state";
-import { AnimatePresence } from "framer-motion";
-import { Search, Filter } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { AppointmentWithDoctor } from "@/hooks/use-appointments";
+import {useState} from "react";
+import {AppointmentTabs} from "./appointment-tabs";
+import {Appointment, AppointmentCard} from "./appointment-card";
+import {AppointmentEmptyState} from "./appointment-empty-state";
+import {AnimatePresence} from "framer-motion";
+import {Filter, Search} from "lucide-react";
+import {Input} from "@/components/ui/input";
+import {AppointmentWithDoctor} from "@/hooks/use-appointments";
 
 interface AppointmentListProps {
   appointments: AppointmentWithDoctor[];
@@ -41,8 +41,8 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
   }));
 
   const filteredAppointments = transformedAppointments.filter((app) => {
-    const matchesTab = 
-      (activeTab === "upcoming" && (app.status === "confirmed" || app.status === "rescheduled")) ||
+    const matchesTab =
+        (activeTab === "upcoming" && (app.status === "confirmed" || app.status === "rescheduled" || app.status === "pending")) ||
       (activeTab === "completed" && app.status === "completed") ||
       (activeTab === "canceled" && app.status === "canceled");
     

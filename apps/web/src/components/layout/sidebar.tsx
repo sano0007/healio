@@ -5,7 +5,9 @@ import {usePathname, useRouter} from "next/navigation";
 import {
   Bell,
   Calendar,
+  CalendarCheck,
   ClipboardList,
+  Clock,
   LayoutDashboard,
   LogOut,
   Pill,
@@ -16,13 +18,20 @@ import {
 import {cn} from "@/lib/utils";
 import {useAuth} from "@/contexts/auth";
 
-const navigation = [
+const patientNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Find Doctors", href: "/doctors", icon: Search },
   { name: "Appointments", href: "/appointments", icon: Calendar },
   { name: "Medical Records", href: "/records", icon: ClipboardList },
   { name: "Prescriptions", href: "/prescriptions", icon: Pill },
   { name: "AI Symptom Checker", href: "/symptom-checker", icon: Stethoscope },
+];
+
+const doctorNavigation = [
+  {name: "Dashboard", href: "/doctor/dashboard", icon: LayoutDashboard},
+  {name: "My Appointments", href: "/doctor/appointments", icon: CalendarCheck},
+  {name: "Availability", href: "/doctor/availability", icon: Clock},
+  {name: "Issue Prescriptions", href: "/doctor/prescriptions", icon: Pill},
 ];
 
 const secondaryNavigation = [
@@ -34,6 +43,9 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const {user, logout} = useAuth();
+
+  const isDoctor = user?.role === "doctor";
+  const navigation = isDoctor ? doctorNavigation : patientNavigation;
 
   async function handleLogout() {
     logout();
