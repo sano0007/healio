@@ -106,6 +106,7 @@ export const api = {
       return request<{ data: Doctor[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/doctors${query}`);
     },
     getById: (id: string) => request<Doctor>(`/doctors/${id}`),
+    getMe: () => request<Doctor>('/doctors/me'),
     updateMe: (data: Partial<DoctorProfile>) =>
       request<DoctorProfile>('/doctors/me', { method: 'PATCH', body: JSON.stringify(data) }),
     setAvailability: (availability: AvailabilitySlot[]) =>
@@ -258,7 +259,7 @@ export interface Payment {
 }
 
 export interface AvailabilitySlot {
-  day: string;
+  dayOfWeek: number;
   startTime: string;
   endTime: string;
 }
