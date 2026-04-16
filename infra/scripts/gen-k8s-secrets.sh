@@ -44,6 +44,7 @@ stringData:
   SMTP_PASS: "$(get_val SMTP_PASS)"
   NOTIFY_LK_USER_ID: "$(get_val NOTIFY_LK_USER_ID)"
   NOTIFY_LK_API_KEY: "$(get_val NOTIFY_LK_API_KEY)"
+  GROQ_API_KEY: "$(get_val GROQ_API_KEY)"
 EOF
 
 echo "Generated $OUT_FILE"
