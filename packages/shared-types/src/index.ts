@@ -99,6 +99,9 @@ export const MSG = {
 
   // Notification Service
   NOTIFY_SEND: 'notify.send',
+
+  // AI Service
+  AI_SYMPTOM_CHECK: 'ai.symptom_check',
 } as const;
 
 // ─── DTOs ─────────────────────────────────────────────────────────────────────
@@ -143,4 +146,19 @@ export interface InitiatePaymentDto {
   successUrl: string;
   cancelUrl: string;
   doctorName?: string;
+}
+
+// ─── AI Symptom Checker ───────────────────────────────────────────────────────
+
+export interface SymptomCheckCondition {
+  name: string;
+  probability: number;        // 0–100
+  description: string;
+  specialist: string;         // e.g. "Neurologist", "General Physician"
+}
+
+export interface SymptomCheckResult {
+  severity: 'Low' | 'Moderate' | 'High' | 'Emergency';
+  conditions: SymptomCheckCondition[];   // max 3, ranked by probability desc
+  recommendedActions: string[];          // 3–5 immediate action steps
 }

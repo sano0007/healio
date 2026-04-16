@@ -115,6 +115,21 @@ spec:
                 configMapKeyRef:
                   name: healio-configmap
                   key: NOTIFICATION_SERVICE_PORT
+            - name: AI_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: AI_SERVICE_HOST
+            - name: AI_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: healio-configmap
+                  key: AI_SERVICE_PORT
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: healio-secrets
+                  key: GROQ_API_KEY
           livenessProbe:
             tcpSocket:
               port: 3001
