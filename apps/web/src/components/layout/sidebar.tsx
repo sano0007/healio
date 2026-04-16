@@ -1,19 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Search, 
-  Calendar, 
-  ClipboardList, 
-  Pill, 
-  Stethoscope, 
-  Bell, 
+import {usePathname, useRouter} from "next/navigation";
+import {
+  Bell,
+  Calendar,
+  ClipboardList,
+  LayoutDashboard,
+  LogOut,
+  Pill,
+  Search,
   Settings,
-  LogOut
+  Stethoscope
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {cn} from "@/lib/utils";
+import {useAuth} from "@/contexts/auth";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -31,6 +32,13 @@ const secondaryNavigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const {user, logout} = useAuth();
+
+  async function handleLogout() {
+    logout();
+    router.push("/login");
+  }
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-gray-100 w-64 lg:w-72">
@@ -53,8 +61,8 @@ export function Sidebar() {
               href={item.href}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
-                isActive 
-                  ? "bg-brand-dark text-white shadow-md shadow-brand-dark/10" 
+                  isActive
+                      ? "bg-brand-dark text-white shadow-md shadow-brand-dark/10"
                   : "text-gray-500 hover:bg-gray-50 hover:text-brand-dark"
               )}
             >
@@ -77,8 +85,8 @@ export function Sidebar() {
                 href={item.href}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
-                  isActive 
-                    ? "bg-brand-dark text-white shadow-md" 
+                    isActive
+                        ? "bg-brand-dark text-white shadow-md"
                     : "text-gray-500 hover:bg-gray-50 hover:text-brand-dark"
                 )}
               >
@@ -95,7 +103,10 @@ export function Sidebar() {
 
       {/* Logout */}
       <div className="p-4 border-t border-gray-100">
-        <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 w-full transition-all group">
+        <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 w-full transition-all group"
+        >
           <LogOut className="w-5 h-5 text-red-400 group-hover:text-red-500" />
           Logout
         </button>
