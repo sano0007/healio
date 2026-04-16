@@ -1,22 +1,22 @@
 "use client";
 
-import { ChevronLeft, Video, Calendar, MoreVertical, ShieldCheck, Share2, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {Calendar, ChevronLeft, Download, MoreVertical, Share2, ShieldCheck, Video} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {cn} from "@/lib/utils";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 interface DetailHeaderProps {
-  status: "confirmed" | "completed" | "canceled" | "rescheduled";
+  status: "pending" | "awaiting_payment" | "confirmed" | "cancelled" | "completed";
   type: "video" | "in-person";
   appointmentId: string;
 }
 
-const statusConfig = {
+const statusConfig: Record<string, { label: string; color: string }> = {
   confirmed: { label: "Confirmed", color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
   completed: { label: "Completed", color: "bg-blue-50 text-blue-600 border-blue-100" },
-  canceled: { label: "Canceled", color: "bg-rose-50 text-rose-600 border-rose-100" },
-  rescheduled: { label: "Rescheduled", color: "bg-amber-50 text-amber-600 border-amber-100" },
+  cancelled: {label: "Cancelled", color: "bg-rose-50 text-rose-600 border-rose-100"},
+  pending: {label: "Pending", color: "bg-amber-50 text-amber-600 border-amber-100"},
+  awaiting_payment: {label: "Awaiting Payment", color: "bg-orange-50 text-orange-600 border-orange-100"},
 };
 
 export function AppointmentDetailHeader({ status, type, appointmentId }: DetailHeaderProps) {

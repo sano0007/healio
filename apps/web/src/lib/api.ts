@@ -118,6 +118,7 @@ export const api = {
     book: (data: { doctorId: string; scheduledAt: string; notes?: string }) =>
       request<Appointment>('/appointments', { method: 'POST', body: JSON.stringify(data) }),
     getMy: () => request<Appointment[]>('/appointments/my'),
+    getById: (id: string) => request<Appointment>(`/appointments/${id}`),
     cancel: (id: string, reason: string) =>
       request(`/appointments/${id}/cancel`, { method: 'PATCH', body: JSON.stringify({ reason }) }),
     updateStatus: (id: string, status: string) =>
@@ -246,8 +247,11 @@ export interface Appointment {
   doctorId: string;
   patientId: string;
   scheduledAt: string;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  status: 'pending' | 'awaiting_payment' | 'confirmed' | 'cancelled' | 'completed';
   notes?: string;
+  type?: 'video' | 'in-person';
+  prescriptions?: { name: string; dosage: string; frequency: string; duration: string }[];
+  paymentStatus?: string;
 }
 
 export interface Payment {

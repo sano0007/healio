@@ -27,7 +27,7 @@ export default function DoctorAppointmentsPage() {
         const diff = Math.floor((aptDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
         if (activeTab === "today") return diff === 0;
-        if (activeTab === "upcoming") return diff > 0 && (a.status === "pending" || a.status === "confirmed");
+        if (activeTab === "upcoming") return diff > 0 && (a.status === "pending" || a.status === "confirmed" || a.status === "awaiting_payment");
         if (activeTab === "pending") return a.status === "pending";
         if (activeTab === "past") return diff < 0 || a.status === "completed" || a.status === "cancelled";
         return true;
@@ -43,7 +43,7 @@ export default function DoctorAppointmentsPage() {
             const d = new Date(a.scheduledAt);
             const aptDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
             const diff = Math.floor((aptDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            return diff > 0 && (a.status === "pending" || a.status === "confirmed");
+            return diff > 0 && (a.status === "pending" || a.status === "confirmed" || a.status === "awaiting_payment");
         }).length ?? 0,
         pending: appointments?.filter(a => a.status === "pending").length ?? 0,
         past: appointments?.filter(a => {

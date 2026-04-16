@@ -36,15 +36,15 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
     date: formatDate(apt.scheduledAt),
     time: formatTime(apt.scheduledAt),
     type: "video" as const,
-    status: apt.status as "confirmed" | "completed" | "canceled" | "rescheduled",
+    status: apt.status as "confirmed" | "completed" | "cancelled" | "awaiting_payment",
     fee: apt.doctor?.consultationFee || 0,
   }));
 
   const filteredAppointments = transformedAppointments.filter((app) => {
     const matchesTab =
-        (activeTab === "upcoming" && (app.status === "confirmed" || app.status === "rescheduled" || app.status === "pending")) ||
+        (activeTab === "upcoming" && (app.status === "confirmed" || app.status === "pending" || app.status === "awaiting_payment")) ||
       (activeTab === "completed" && app.status === "completed") ||
-      (activeTab === "canceled" && app.status === "canceled");
+        (activeTab === "canceled" && app.status === "cancelled");
     
     const matchesSearch = 
       app.doctorName.toLowerCase().includes(searchQuery.toLowerCase()) ||

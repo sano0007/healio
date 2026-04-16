@@ -1,62 +1,119 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
-import { AppointmentDetailHeader } from "@/components/appointments/detail/detail-header";
-import { InfoGrid } from "@/components/appointments/detail/info-grid";
-import { ClinicalOutcome } from "@/components/appointments/detail/clinical-outcome";
-import { DocumentList } from "@/components/appointments/detail/document-list";
-import { Skeleton } from "@/components/ui/skeleton";
-import { motion } from "framer-motion";
+import {use, useEffect, useState} from "react";
+import {api} from "@/lib/api";
+import {AppointmentDetailHeader} from "@/components/appointments/detail/detail-header";
+import {InfoGrid} from "@/components/appointments/detail/info-grid";
+import {ClinicalOutcome} from "@/components/appointments/detail/clinical-outcome";
+import {DocumentList} from "@/components/appointments/detail/document-list";
+import {Skeleton} from "@/components/ui/skeleton";
 
-const mockAppointmentDetail = {
-  id: "HL-98231-A",
-  status: "completed" as const,
-  type: "video" as const,
+interface AppointmentDetail {
+  id: string;
+  status: "pending" | "awaiting_payment" | "confirmed" | "cancelled" | "completed";
+  type: "video" | "in-person";
   doctor: {
-    name: "Dr. Sarah Johnson",
-    specialization: "Senior Cardiologist",
-    image: "/images/doctor-1.png",
-    fee: 150,
-  },
+    name: string;
+    specialization: string;
+    image: string;
+    fee: number;
+  };
   patient: {
-    name: "John Doe",
-    relationship: "Self",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 000-1234",
-  },
+    name: string;
+    relationship: string;
+    email: string;
+    phone: string;
+  };
   schedule: {
-    date: "Tuesday, July 7, 2026",
-    time: "09:30 AM",
-    duration: "30 mins",
-    type: "video",
-  },
+    date: string;
+    time: string;
+    duration: string;
+    type: string;
+  };
   billing: {
-    fee: 150,
-    tax: 5,
-    method: "Mastercard x-4242",
-  },
-  medical: {
-    diagnosis: "Mild Hypertension & Sinus Tachycardia",
-    notes: "Patient reported occasional heart palpitations during exercise. Physical exam via video shows no immediate distress. Blood pressure readings from home monitor (145/90) suggest mild stage 1 hypertension. Recommended lifestyle changes and follow-up in 2 weeks with a stress test if symptoms persist.",
-    prescriptions: [
-      { name: "Amlodipine Besylate", dosage: "5mg", frequency: "Once daily (Morning)", duration: "30 Days" },
-      { name: "Magnesium Citrate", dosage: "250mg", frequency: "Once daily (Night)", duration: "15 Days" }
-    ],
-  },
-  documents: [
-    { name: "ECG_Report_June_2026.pdf", size: "1.2 MB", type: "pdf" as const },
-    { name: "Blood_Test_Vitals.pdf", size: "850 KB", type: "pdf" as const }
-  ]
-};
+    fee: number;
+    tax: number;
+    method: string;
+  };
+  medical?: {
+    diagnosis: string;
+    notes: string;
+    prescriptions: { name: string; dosage: string; frequency: string; duration: string }[];
+  };
+  documents: { name: string; size: string; type: "pdf" | "jpg" | "png" }[];
+}
 
 export default function AppointmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
+  const appointmentId = resolvedParams.id;
+
+  const [appointment, setAppointment] = useState<AppointmentDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    const fetchAppointment = async () => {
+      try {
+        setIsLoading(true);
+        const apt = await api.appointments.getById(appointmentId);
+
+        const [doctorInfo, patientInfo] = await Promise.all([
+          api.doctors.getById(apt.doctorId).catch(() => null),
+          api.patients.getMe().catch(() => null),
+        ]);
+
+        const scheduledDate = new Date(apt.scheduledAt);
+        const formattedDate = scheduledDate.toLocaleDateString('en-US', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        });
+        const formattedTime = scheduledDate.toLocaleTimeString('en-US', {
+          hour: 'numeric', minute: '2-digit', hour12: true,
+        });
+
+        setAppointment({
+          id: apt._id,
+          status: apt.status as AppointmentDetail["status"],
+          type: apt.type || "video",
+          doctor: {
+            name: doctorInfo?.name || "Doctor",
+            specialization: doctorInfo?.specialty || "General Physician",
+            image: "/images/doctor-placeholder.png",
+            fee: doctorInfo?.consultationFee || 0,
+          },
+          patient: {
+            name: patientInfo?.name || "Patient",
+            relationship: "Self",
+            email: patientInfo?.email || "",
+            phone: patientInfo?.phone || "",
+          },
+          schedule: {
+            date: formattedDate,
+            time: formattedTime,
+            duration: "30 mins",
+            type: apt.type || "video",
+          },
+          billing: {
+            fee: doctorInfo?.consultationFee || 0,
+            tax: 0,
+            method: apt.paymentStatus || "Pending",
+          },
+          medical: apt.prescriptions ? {
+            diagnosis: apt.notes || "No diagnosis recorded",
+            notes: apt.notes || "",
+            prescriptions: apt.prescriptions,
+          } : undefined,
+          documents: [],
+        });
+      } catch (err) {
+        setError("Failed to load appointment details.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAppointment();
+  }, [appointmentId]);
 
   if (isLoading) {
     return (
@@ -68,40 +125,50 @@ export default function AppointmentDetailPage({ params }: { params: Promise<{ id
     );
   }
 
+  if (error || !appointment) {
+    return (
+        <div className="max-w-7xl mx-auto py-8 lg:py-12 px-4 text-center">
+          <p className="text-red-500">{error || "Appointment not found."}</p>
+        </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto py-8 lg:py-12 px-4 space-y-16">
       {/* 1. Header with Status & Breadcrumbs */}
-      <AppointmentDetailHeader 
-        status={mockAppointmentDetail.status} 
-        type={mockAppointmentDetail.type}
-        appointmentId={mockAppointmentDetail.id}
+      <AppointmentDetailHeader
+          status={appointment.status}
+          type={appointment.type}
+          appointmentId={appointment.id}
       />
 
       {/* 2. Core Info Grid (Patient, Schedule, Billing) */}
-      <InfoGrid 
-        doctor={mockAppointmentDetail.doctor}
-        patient={mockAppointmentDetail.patient}
-        schedule={mockAppointmentDetail.schedule}
-        billing={mockAppointmentDetail.billing}
+      <InfoGrid
+          doctor={appointment.doctor}
+          patient={appointment.patient}
+          schedule={appointment.schedule}
+          billing={appointment.billing}
       />
 
       {/* 3. Clinical Outcomes (Only for completed) */}
-      {mockAppointmentDetail.status === "completed" && (
+      {appointment.status === "completed" && appointment.medical && (
         <section className="space-y-10">
           <div className="h-px bg-gray-100" />
-          <ClinicalOutcome 
-            diagnosis={mockAppointmentDetail.medical.diagnosis}
-            notes={mockAppointmentDetail.medical.notes}
-            prescriptions={mockAppointmentDetail.medical.prescriptions}
+          <ClinicalOutcome
+              diagnosis={appointment.medical.diagnosis}
+              notes={appointment.medical.notes}
+              prescriptions={appointment.medical.prescriptions}
           />
         </section>
       )}
 
       {/* 4. Documents & Attachments */}
-      <section className="space-y-10">
-        <div className="h-px bg-gray-100" />
-        <DocumentList documents={mockAppointmentDetail.documents} />
-      </section>
+      {appointment.documents.length > 0 && (
+          <section className="space-y-10">
+            <div className="h-px bg-gray-100"/>
+            <DocumentList documents={appointment.documents}/>
+          </section>
+      )}
 
       {/* 5. Footer Help Overlay */}
       <div className="pt-10 flex flex-col md:flex-row items-center justify-between border-t border-gray-50 gap-6">
