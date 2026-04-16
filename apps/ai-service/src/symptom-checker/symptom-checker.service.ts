@@ -31,13 +31,13 @@ export class SymptomCheckerService {
 
   constructor(private config: ConfigService) {
     this.client = new OpenAI({
-      apiKey: this.config.get<string>('GROQ_API_KEY'),
+      apiKey: this.config.getOrThrow<string>('GROQ_API_KEY'),
       baseURL: 'https://api.groq.com/openai/v1',
     });
   }
 
-  async checkSymptoms(symptoms: string): Promise<SymptomCheckResult> {
-    this.logger.log(`Analyzing symptoms (${symptoms.length} chars)`);
+  async checkSymptoms(symptoms: string, patientId: string): Promise<SymptomCheckResult> {
+    this.logger.log(`Analyzing symptoms for patient ${patientId} (${symptoms.length} chars)`);
 
     let raw: string;
     try {
