@@ -1,50 +1,50 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { PrescriptionHeader } from "@/components/prescriptions/prescription-header";
-import { MedicationRoutine } from "@/components/prescriptions/medication-routine";
-import { ActiveMedCard } from "@/components/prescriptions/active-medication-card";
-import { PrescriptionHistory } from "@/components/prescriptions/prescription-history";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { motion, AnimatePresence } from "framer-motion";
+import {useEffect, useState} from "react";
+import {PrescriptionHeader} from "@/components/prescriptions/prescription-header";
+import {MedicationRoutine} from "@/components/prescriptions/medication-routine";
+import {ActiveMedCard} from "@/components/prescriptions/active-medication-card";
+import {PrescriptionHistory} from "@/components/prescriptions/prescription-history";
+import {Button} from "@/components/ui/button";
+import {Skeleton} from "@/components/ui/skeleton";
+import {AnimatePresence, motion} from "framer-motion";
 
 const activeMeds = [
-  { 
-    id: "1", 
-    name: "Metformin", 
-    dosage: "500 mg", 
-    frequency: "1 - 0 - 1", 
-    duration: "90 Days", 
-    daysRemaining: 64, 
-    totalDays: 90, 
-    nextDose: "08:00 PM", 
-    instruction: "After meal", 
-    type: "chronic" as const 
+    {
+        id: "1",
+        name: "Metformin",
+        dosage: "500 mg",
+        frequency: "1 - 0 - 1",
+        duration: "90 Days",
+        daysRemaining: 64,
+        totalDays: 90,
+        nextDose: "08:00 PM",
+        instruction: "After meal",
+        type: "chronic" as const
   },
-  { 
-    id: "2", 
-    name: "Lisinopril", 
-    dosage: "10 mg", 
-    frequency: "1 - 0 - 0", 
-    duration: "30 Days", 
-    daysRemaining: 12, 
-    totalDays: 30, 
-    nextDose: "Tomorrow, 08:00 AM", 
-    instruction: "With water", 
-    type: "chronic" as const 
+    {
+        id: "2",
+        name: "Lisinopril",
+        dosage: "10 mg",
+        frequency: "1 - 0 - 0",
+        duration: "30 Days",
+        daysRemaining: 12,
+        totalDays: 30,
+        nextDose: "Tomorrow, 08:00 AM",
+        instruction: "With water",
+        type: "chronic" as const
   },
-  { 
-    id: "3", 
-    name: "Amoxicillin", 
-    dosage: "500 mg", 
-    frequency: "1 - 1 - 1", 
-    duration: "10 Days", 
-    daysRemaining: 2, 
-    totalDays: 10, 
-    nextDose: "01:00 PM", 
-    instruction: "Complete course", 
-    type: "acute" as const 
+    {
+        id: "3",
+        name: "Amoxicillin",
+        dosage: "500 mg",
+        frequency: "1 - 1 - 1",
+        duration: "10 Days",
+        daysRemaining: 2,
+        totalDays: 10,
+        nextDose: "01:00 PM",
+        instruction: "Complete course",
+        type: "acute" as const
   },
 ];
 
