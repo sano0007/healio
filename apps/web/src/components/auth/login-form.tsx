@@ -1,14 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import {useState} from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import {useRouter} from "next/navigation";
+import {Eye, EyeOff} from "lucide-react";
+import {useAuth} from "@/contexts/auth";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Checkbox} from "@/components/ui/checkbox";
 
 export function LoginForm() {
+  const {login} = useAuth();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      const user = await login(email, password);
+      const redirectPath = user.role === "doctor" ? "/doctor/dashboard" : user.role === "admin" ? "/admin" : "/dashboard";
+      router.push(redirectPath);
+    } catch (err) {
+      setError("Invalid email or password. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -21,31 +47,35 @@ export function LoginForm() {
         </p>
       </div>
 
-      <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+      {error && (
+          <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium">
+            {error}
+          </div>
+      )}
+
+      <form className="space-y-5" onSubmit={handleSubmit}>
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-gray-700 ml-1">Email Address</label>
-          <Input 
-            type="email" 
+          <Input
+              name="email"
+              type="email"
             placeholder="example@healio.com"
             required
+              autoComplete="email"
           />
         </div>
 
         <div className="space-y-1.5">
           <div className="flex justify-between items-center px-1">
             <label className="text-sm font-medium text-gray-700">Password</label>
-            <Link 
-              href="/auth/forgot-password" 
-              className="text-xs font-medium text-brand-dark hover:underline"
-            >
-              Forgot Password?
-            </Link>
           </div>
           <div className="relative">
-            <Input 
-              type={showPassword ? "text" : "password"} 
+            <Input
+                name="password"
+                type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               required
+                autoComplete="current-password"
             />
             <button
               type="button"
@@ -64,8 +94,21 @@ export function LoginForm() {
           </label>
         </div>
 
-        <Button variant="dark" size="lg" className="w-full mt-4 rounded-xl h-12 shadow-md">
-          Sign In
+        <Button
+            type="submit"
+            variant="dark"
+            size="lg"
+            className="w-full mt-4 rounded-xl h-12 shadow-md"
+            disabled={isLoading}
+        >
+          {isLoading ? (
+              <span className="flex items-center gap-2">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/>
+              Signing in...
+            </span>
+          ) : (
+              "Sign In"
+          )}
         </Button>
 
         <div className="relative my-8">
