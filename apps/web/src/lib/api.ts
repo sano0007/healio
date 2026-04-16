@@ -127,6 +127,16 @@ export const api = {
       request<{ paymentId: string; clientSecret: string }>('/payments/initiate', { method: 'POST', body: JSON.stringify(data) }),
     get: (id: string) => request<Payment>(`/payments/${id}`),
   },
+  records: {
+    getAll: () => request<MedicalRecord[]>('/records'),
+    upload: (data: FormData) =>
+        request<MedicalRecord>('/records', {method: 'POST', body: data}),
+    delete: (id: string) =>
+        request<void>(`/records/${id}`, {method: 'DELETE'}),
+  },
+  prescriptions: {
+    getMy: () => request<Prescription[]>('/prescriptions'),
+  },
   admin: {
     getStats: () => request<AdminStats>('/admin/stats'),
     getPatients: (filters?: { search?: string; page?: number; limit?: number }) => {
@@ -268,6 +278,41 @@ export interface AdminStats {
 export interface PrescriptionDto {
   patientId: string;
   appointmentId: string;
+  medications: { name: string; dosage: string; frequency: string; duration: string }[];
+  notes?: string;
+}
+
+export interface Notification {
+  _id: string;
+  userId: string;
+  type: 'appointment' | 'payment' | 'consultation' | 'prescription' | 'verification';
+  title: string;
+  description: string;
+  timestamp: string;
+  isRead: boolean;
+  link: string;
+}
+
+export interface MedicalRecord {
+  _id: string;
+  patientId: string;
+  title: string;
+  type: 'lab' | 'imaging' | 'prescription' | 'note' | 'other';
+  date: string;
+  doctorName: string;
+  status: 'verified' | 'pending';
+  size: string;
+  url?: string;
+}
+
+export interface Prescription {
+  _id: string;
+  patientId: string;
+  doctorId: string;
+  doctorName: string;
+  specialty?: string;
+  issuedAt: string;
+  diagnosis?: string;
   medications: { name: string; dosage: string; frequency: string; duration: string }[];
   notes?: string;
 }
