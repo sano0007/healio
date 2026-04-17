@@ -1,19 +1,32 @@
 "use client";
 
-import { FileText, Image as ImageIcon, Pill, Microscope, MoreVertical, Download, Eye, Calendar, User, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import {
+  Calendar,
+  Download,
+  Eye,
+  FileText,
+  Image as ImageIcon,
+  Microscope,
+  MoreVertical,
+  Pill,
+  ShieldCheck,
+  User
+} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {cn} from "@/lib/utils";
+import {motion} from "framer-motion";
 
 export type RecordType = "lab" | "imaging" | "prescription" | "note";
 
 interface RecordCardProps {
+  id: string;
   title: string;
   type: RecordType;
   date: string;
   doctor: string;
   status: "verified" | "pending";
   size: string;
+  url?: string;
 }
 
 const typeConfig = {
@@ -23,7 +36,7 @@ const typeConfig = {
   note: { icon: <FileText />, label: "Clinical Note", color: "text-amber-600 bg-amber-50 border-amber-100" },
 };
 
-export function RecordCard({ title, type, date, doctor, status, size }: RecordCardProps) {
+export function RecordCard({title, type, date, doctor, status, size, url}: RecordCardProps) {
   const config = typeConfig[type];
 
   return (
@@ -84,13 +97,34 @@ export function RecordCard({ title, type, date, doctor, status, size }: RecordCa
       <div className="pt-4 flex items-center justify-between">
         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{size}</span>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-8 rounded-xl px-3 text-[10px] font-bold gap-1.5 border-gray-100 hover:bg-gray-50">
-            <Eye className="w-3.5 h-3.5" />
-            Preview
-          </Button>
-          <Button variant="dark" size="sm" className="h-8 w-8 rounded-xl p-0 flex items-center justify-center">
-            <Download className="w-3.5 h-3.5" />
-          </Button>
+          {url ? (
+              <>
+                <Button variant="outline" size="sm"
+                        className="h-8 rounded-xl px-3 text-[10px] font-bold gap-1.5 border-gray-100 hover:bg-gray-50">
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5"/>
+                    Preview
+                  </a>
+                </Button>
+                <Button variant="dark" size="sm" className="h-8 w-8 rounded-xl p-0 flex items-center justify-center">
+                  <a href={url} download={title} className="flex items-center justify-center w-full h-full">
+                    <Download className="w-3.5 h-3.5"/>
+                  </a>
+                </Button>
+              </>
+          ) : (
+              <>
+                <Button variant="outline" size="sm" disabled
+                        className="h-8 rounded-xl px-3 text-[10px] font-bold gap-1.5 border-gray-100">
+                  <Eye className="w-3.5 h-3.5"/>
+                  Preview
+                </Button>
+                <Button variant="dark" size="sm" disabled
+                        className="h-8 w-8 rounded-xl p-0 flex items-center justify-center">
+                  <Download className="w-3.5 h-3.5"/>
+                </Button>
+              </>
+          )}
         </div>
       </div>
     </motion.div>

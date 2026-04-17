@@ -23,13 +23,17 @@ export function clearAuthTokens() {
 }
 
 export function getAccessToken(): string | null {
-  return authToken;
+  const lsToken = typeof window !== 'undefined' ? localStorage.getItem('healio_token') : null;
+  return authToken || lsToken;
 }
 
 export function getUserIdFromToken(): string | null {
-    if (!authToken) return null;
+  const token = authToken || (typeof window !== 'undefined' ? localStorage.getItem('healio_token') : null);
+  if (!token) return null;
     try {
-        const payload = JSON.parse(atob(authToken.split('.')[1]));
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const payload = JSON.parse(atob(parts[1]));
         return payload.sub || null;
     } catch {
         return null;
