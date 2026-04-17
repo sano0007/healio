@@ -66,7 +66,10 @@ export class DoctorsService {
   async getById(userId: string) {
     let doctor = await this.doctorModel.findOne({userId}).exec();
     if (!doctor) {
-      doctor = await this.doctorModel.create({userId, name: '', email: '', availability: []});
+      doctor = await this.doctorModel.create({userId, name: '', email: '', availability: [], status: 'online'});
+    }
+    if (!doctor.status) {
+      doctor.status = 'online';
     }
     return doctor;
   }
@@ -110,5 +113,19 @@ export class DoctorsService {
     if (data.phone) data.phone = normalisePhone(data.phone);
     const doctor = new this.doctorModel(data);
     return doctor.save();
+  }
+
+  async updateStatus(userId: string, status: string) {
+    const validStatuses = ["online", "busy", "offline"];
+    if (!validStatuses.includes(status)) {
+      throw new RpcException('Invalid status. Must be online, busy, or offline');
+    }
+    const doctor = await this.doctorModel.findOneAndUpdate(
+      { userId },
+      { status },
+      { new: true },
+    ).exec();
+    if (!doctor) throw new RpcException('Doctor profile not found');
+    return doctor;
   }
 }
