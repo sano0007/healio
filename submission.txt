@@ -1,7 +1,3 @@
-GitHub Repository: https://github.com/<your-org>/healio
+GitHub Repository: https://github.com/sano0007/healio
 
-YouTube Presentation Demo: https://youtu.be/<video-id>
-
----
-Group ID: [YourGroupID]
-Assignment: SE3020 – Distributed Systems – Assignment 1
+YouTube Presentation Demo: https://youtu.be/...

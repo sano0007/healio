@@ -23,8 +23,8 @@ export class AppointmentsController {
   }
 
   @MessagePattern(MSG.APPOINTMENT_UPDATE_STATUS)
-  updateStatus(@Payload() data: { appointmentId: string; status: AppointmentStatus; paymentStatus?: string }) {
-    return this.appointmentsService.updateStatus(data.appointmentId, data.status, data.paymentStatus);
+  updateStatus(@Payload() data: { appointmentId: string; status: AppointmentStatus; paymentStatus?: string; sessionId?: string; roomName?: string }) {
+    return this.appointmentsService.updateStatus(data.appointmentId, data.status, data.paymentStatus, data.sessionId, data.roomName);
   }
 
   @MessagePattern(MSG.APPOINTMENT_GET)

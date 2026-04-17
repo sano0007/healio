@@ -1,26 +1,13 @@
 "use client";
 
+import type { SymptomCheckResult } from '@/lib/api';
 import { motion } from "framer-motion";
-import { AlertCircle, ChevronRight, UserCircle, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, Info } from "lucide-react";
+import { AlertCircle, ChevronRight, UserCircle, MapPin, Clock, ArrowRight, ShieldCheck, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-const mockResults = {
-  severity: "Moderate", // Low, Moderate, High, Emergency
-  conditions: [
-    { name: "Tension Headache", probability: 82, description: "A common type of headache caused by stress, fatigue, or muscle tension.", specialist: "General Physician" },
-    { name: "Dehydration", probability: 64, description: "Insufficient fluid intake leading to fatigue and cognitive fog.", specialist: "General Physician" },
-    { name: "Ocular Migraine", probability: 41, description: "Temporary visual disturbances followed by persistent throbbing pain.", specialist: "Neurologist" },
-  ],
-  recommendedActions: [
-    "Increase fluid intake immediately.",
-    "Rest in a quiet, dark room for 30 minutes.",
-    "Monitor temperature for next 12 hours.",
-  ]
-};
-
-export function TriageResults({ onReset }: { onReset: () => void }) {
+export function TriageResults({ results, onReset }: { results: SymptomCheckResult; onReset: () => void }) {
   const getSeverityStyle = (severity: string) => {
     switch (severity) {
       case "Emergency": return "bg-rose-50 border-rose-100 text-rose-600";
@@ -37,10 +24,10 @@ export function TriageResults({ onReset }: { onReset: () => void }) {
       className="space-y-10"
     >
       {/* 1. Severity Banner */}
-      <div className={cn("p-8 rounded-[3rem] border flex items-center justify-between gap-8 relative overflow-hidden", getSeverityStyle(mockResults.severity))}>
+      <div className={cn("p-8 rounded-[3rem] border flex items-center justify-between gap-8 relative overflow-hidden", getSeverityStyle(results.severity))}>
          <div className="space-y-2 relative z-10">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">Triage Severity Assessment</p>
-            <h2 className="text-3xl font-black tracking-tight">{mockResults.severity} Risk Level</h2>
+            <h2 className="text-3xl font-black tracking-tight">{results.severity} Risk Level</h2>
          </div>
          <div className="relative z-10 px-6 py-2 bg-white/40 rounded-2xl border border-white/60 text-[11px] font-bold uppercase tracking-widest backdrop-blur-md">
             Follow Actions Below
@@ -64,7 +51,7 @@ export function TriageResults({ onReset }: { onReset: () => void }) {
            </div>
            
            <div className="space-y-4">
-              {mockResults.conditions.map((condition, i) => (
+              {results.conditions.map((condition, i) => (
                 <motion.div
                   key={condition.name}
                   initial={{ opacity: 0, x: -20 }}
@@ -109,7 +96,7 @@ export function TriageResults({ onReset }: { onReset: () => void }) {
               </div>
 
               <div className="space-y-6 relative z-10">
-                 {mockResults.recommendedActions.map((action, i) => (
+                 {results.recommendedActions.map((action, i) => (
                    <div key={i} className="flex gap-4">
                       <div className="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-[10px] font-black shrink-0">
                          0{i + 1}
@@ -119,23 +106,17 @@ export function TriageResults({ onReset }: { onReset: () => void }) {
                  ))}
               </div>
 
-              <Button variant="outline" className="w-full h-12 rounded-2xl bg-white/10 border-white/20 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-brand-black relative z-10 transition-colors">
-                 Download Full Report
-              </Button>
 
               <div className="absolute -left-20 -bottom-20 w-60 h-60 rounded-full bg-brand-light/10 blur-3xl" />
            </div>
 
-           <div className="p-8 rounded-[3rem] border border-gray-100 bg-gray-50 flex flex-col items-center text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-white border border-gray-100 flex items-center justify-center text-brand-dark shadow-sm">
-                 <Calendar className="w-8 h-8" />
-              </div>
-              <div className="space-y-2">
-                 <p className="text-lg font-bold text-brand-black tracking-tight">Need a Clinical Consultation?</p>
-                 <p className="text-xs text-gray-400 font-medium">Book a 15-min virtual triage with a certified physician now.</p>
-              </div>
-              <Button onClick={onReset} variant="outline" className="h-10 rounded-xl px-6 text-[10px] font-black uppercase tracking-widest border-gray-100 hover:border-brand-light/30">
-                 Reset Analysis
+           <div className="flex justify-center pt-2">
+              <Button
+                onClick={onReset}
+                variant="outline"
+                className="h-12 px-10 rounded-2xl border-2 border-brand-dark/20 text-brand-dark text-xs font-black uppercase tracking-widest hover:bg-brand-dark hover:text-white hover:border-brand-dark transition-all duration-300 shadow-sm hover:shadow-lg"
+              >
+                Start New Analysis
               </Button>
            </div>
         </div>

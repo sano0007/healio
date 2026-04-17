@@ -13,6 +13,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       { name: 'TELEMEDICINE_SERVICE', imports: [ConfigModule], inject: [ConfigService], useFactory: (c: ConfigService) => ({ transport: Transport.TCP, options: { host: c.get('TELEMEDICINE_SERVICE_HOST', 'localhost'), port: c.get<number>('TELEMEDICINE_SERVICE_PORT', 5005) } }) },
       { name: 'PAYMENT_SERVICE',      imports: [ConfigModule], inject: [ConfigService], useFactory: (c: ConfigService) => ({ transport: Transport.TCP, options: { host: c.get('PAYMENT_SERVICE_HOST', 'localhost'),      port: c.get<number>('PAYMENT_SERVICE_PORT', 5006) } }) },
       { name: 'NOTIFICATION_SERVICE', imports: [ConfigModule], inject: [ConfigService], useFactory: (c: ConfigService) => ({ transport: Transport.TCP, options: { host: c.get('NOTIFICATION_SERVICE_HOST', 'localhost'), port: c.get<number>('NOTIFICATION_SERVICE_PORT', 5007) } }) },
+      { name: 'AI_SERVICE', imports: [ConfigModule], inject: [ConfigService], useFactory: (c: ConfigService) => ({ transport: Transport.TCP, options: { host: c.get('AI_SERVICE_HOST', 'localhost'), port: c.get<number>('AI_SERVICE_PORT', 5008) } }) },
     ]),
   ],
   exports: [ClientsModule],
