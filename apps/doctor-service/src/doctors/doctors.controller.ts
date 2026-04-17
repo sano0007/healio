@@ -41,4 +41,9 @@ export class DoctorsController {
   setAvailability(@Payload() data: { userId: string; availability: unknown[] }) {
     return this.doctorsService.setAvailability(data.userId, data.availability);
   }
+
+  @MessagePattern(MSG.DOCTOR_UPDATE_STATUS)
+  updateStatus(@Payload() data: { userId: string; status: string }) {
+    return this.doctorsService.updateStatus(data.userId, data.status);
+  }
 }

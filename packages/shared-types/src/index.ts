@@ -76,6 +76,8 @@ export const MSG = {
   DOCTOR_GET_ALL_ADMIN: 'doctor.get_all_admin',
   DOCTOR_ISSUE_PRESCRIPTION: 'doctor.issue_prescription',
   DOCTOR_GET_PRESCRIPTIONS: 'doctor.get_prescriptions',
+  DOCTOR_GET_PRESCRIPTION_BY_ID: 'doctor.get_prescription_by_id',
+  DOCTOR_UPDATE_STATUS: 'doctor.update_status',
 
   // Appointment Service
   APPOINTMENT_GET_ALL: 'appointment.get_all',

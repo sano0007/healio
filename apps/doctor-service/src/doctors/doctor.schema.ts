@@ -50,6 +50,9 @@ export class Doctor {
   @Prop({ default: false })
   isVerified: boolean;
 
+  @Prop({ default: "online" })
+  status: string;
+
   @Prop({ type: [AvailabilitySlotSchema], default: [] })
   availability: { dayOfWeek: number; startTime: string; endTime: string }[];
 }

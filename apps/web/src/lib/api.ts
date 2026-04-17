@@ -119,6 +119,8 @@ export const api = {
     getMe: () => request<Doctor>('/doctors/me'),
     updateMe: (data: Partial<DoctorProfile>) =>
       request<DoctorProfile>('/doctors/me', { method: 'PATCH', body: JSON.stringify(data) }),
+    updateStatus: (status: string) =>
+      request<DoctorProfile>('/doctors/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
     setAvailability: (availability: AvailabilitySlot[]) =>
       request<DoctorProfile>('/doctors/availability', { method: 'POST', body: JSON.stringify({ availability }) }),
     issuePrescription: (data: PrescriptionDto) =>
@@ -146,8 +148,9 @@ export const api = {
     delete: (id: string) =>
         request<void>(`/records/${id}`, {method: 'DELETE'}),
   },
-  prescriptions: {
-      getMy: () => request<Prescription[]>('/doctors/prescriptions'),
+prescriptions: {
+    getMy: () => request<Prescription[]>('/doctors/prescriptions'),
+    getById: (id: string) => request<Prescription>(`/doctors/prescriptions/${id}`),
   },
   admin: {
     getStats: () => request<AdminStats>('/admin/stats'),
@@ -270,6 +273,7 @@ export interface Doctor {
   rating?: number;
   reviewCount?: number;
   isVerified?: boolean;
+  status?: string;
   image?: string;
   availability?: { dayOfWeek: number; startTime: string; endTime: string }[];
 }
@@ -347,6 +351,7 @@ export interface Prescription {
   _id: string;
   patientId: string;
   doctorId: string;
+  appointmentId?: string;
   doctorName: string;
   specialty?: string;
   issuedAt: string;
