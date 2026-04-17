@@ -2,6 +2,7 @@
 
 import { Search, SlidersHorizontal, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export interface DoctorFilters {
@@ -90,7 +91,7 @@ export function DoctorFilter({ onFilterChange }: DoctorFilterProps) {
             className="text-xs font-bold text-brand-dark hover:underline"
           >
             Reset
-          </button>
+          </Link>
         </div>
 
         {/* Specialty */}
@@ -113,7 +114,7 @@ export function DoctorFilter({ onFilterChange }: DoctorFilterProps) {
               >
                 {spec}
                 {selectedSpecialty === spec && <Check className="w-3 h-3" />}
-              </button>
+              </Link>
             ))}
           </div>
         </div>
@@ -159,9 +160,9 @@ export function DoctorFilter({ onFilterChange }: DoctorFilterProps) {
           <p className="text-xs text-brand-dark/70 leading-relaxed mb-6">
             Describe your symptoms to our AI-powered assistant for a direct referral.
           </p>
-          <button className="w-full py-3 bg-brand-dark text-white text-xs font-bold rounded-xl shadow-lg shadow-brand-dark/10 hover:bg-brand-black transition-all group-hover:scale-[1.02]">
+          <Link href="/symptom-checker" className="block w-full py-3 bg-brand-dark text-white text-xs font-bold rounded-xl shadow-lg shadow-brand-dark/10 hover:bg-brand-black transition-all group-hover:scale-[1.02] text-center">
             Ask Healio AI
-          </button>
+          </Link>
         </div>
         <div className="absolute top-0 right-0 w-32 h-32 bg-brand-dark/5 rounded-full blur-2xl -mr-16 -mt-16 group-hover:bg-brand-dark/10 transition-colors" />
       </div>
