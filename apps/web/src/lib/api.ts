@@ -147,7 +147,7 @@ export const api = {
         request<void>(`/records/${id}`, {method: 'DELETE'}),
   },
   prescriptions: {
-    getMy: () => request<Prescription[]>('/prescriptions'),
+      getMy: () => request<Prescription[]>('/doctors/prescriptions'),
   },
   admin: {
     getStats: () => request<AdminStats>('/admin/stats'),
