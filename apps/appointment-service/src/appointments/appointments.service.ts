@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { RpcException } from '@nestjs/microservices';
-import { Appointment, AppointmentDocument } from './appointment.schema';
-import { BookAppointmentDto } from '@healio/shared-types';
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from '@nestjs/mongoose';
+import {Model} from 'mongoose';
+import {RpcException} from '@nestjs/microservices';
+import {Appointment, AppointmentDocument} from './appointment.schema';
+import {BookAppointmentDto} from '@healio/shared-types';
 
 @Injectable()
 export class AppointmentsService {
@@ -30,11 +30,12 @@ export class AppointmentsService {
     return appt;
   }
 
-  async updateStatus(appointmentId: string, status: string, paymentStatus?: string, sessionId?: string, roomName?: string) {
+    async updateStatus(appointmentId: string, status: string, paymentStatus?: string, sessionId?: string, roomName?: string, checkoutUrl?: string) {
     const update: Record<string, string> = { status };
     if (paymentStatus) update.paymentStatus = paymentStatus;
     if (sessionId) update.sessionId = sessionId;
     if (roomName) update.roomName = roomName;
+        if (checkoutUrl) update.checkoutUrl = checkoutUrl;
     const appt = await this.appointmentModel.findByIdAndUpdate(appointmentId, update, { new: true }).exec();
     if (!appt) throw new RpcException('Appointment not found');
     return appt;

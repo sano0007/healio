@@ -274,6 +274,7 @@ export interface Doctor {
   reviewCount?: number;
   isVerified?: boolean;
   status?: string;
+  image?: string;
   availability?: { dayOfWeek: number; startTime: string; endTime: string }[];
 }
 
@@ -287,6 +288,7 @@ export interface Appointment {
   type?: 'video' | 'in-person';
   prescriptions?: { name: string; dosage: string; frequency: string; duration: string }[];
   paymentStatus?: string;
+  checkoutUrl?: string;
 }
 
 export interface Payment {

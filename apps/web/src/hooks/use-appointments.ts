@@ -6,14 +6,15 @@ export interface AppointmentWithDoctor extends Appointment {
 }
 
 export function useAppointments() {
-  return useQuery({
+    return useQuery<AppointmentWithDoctor[]>({
     queryKey: ['appointments'],
     queryFn: async () => {
-      const appointments = await api.appointments.getMy();
-      
+        const result = await api.appointments.getMy();
+        const appointments: Appointment[] = Array.isArray(result) ? result : [];
+
       const uniqueDoctorIds = [...new Set(appointments.map(apt => apt.doctorId))];
-      
-      const doctorResults = await Promise.all(
+
+        const doctorResults = await Promise.all(
         uniqueDoctorIds.map(async (doctorId) => {
           try {
             return { doctorId, doctor: await api.doctors.getById(doctorId) };
@@ -50,8 +51,8 @@ export function useBookAppointment() {
       if (!data.doctorId) {
         throw new Error('Doctor ID is required');
       }
-      
-      if (!data.scheduledAt) {
+
+        if (!data.scheduledAt) {
         throw new Error('Scheduled date and time is required');
       }
 
@@ -69,8 +70,8 @@ export function useBookAppointment() {
       ) {
         throw new Error('Cannot book appointments in the past');
       }
-      
-      const result = await api.appointments.book(data);
+
+        const result = await api.appointments.book(data);
       return result;
     },
     onSuccess: () => {

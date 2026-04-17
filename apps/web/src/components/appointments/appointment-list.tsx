@@ -32,7 +32,7 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
     doctorId: apt.doctorId,
     doctorName: apt.doctor?.name || "Unknown Doctor",
     doctorSpecialty: apt.doctor?.specialty || "General Physician",
-    doctorImage: "/images/doctor-placeholder.png",
+      doctorImage: "/images/doctor-1.png",
     date: formatDate(apt.scheduledAt),
     time: formatTime(apt.scheduledAt),
     type: "video" as const,

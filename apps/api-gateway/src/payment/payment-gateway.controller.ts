@@ -1,14 +1,23 @@
-import { Controller, Post, Get, Body, Param, UseGuards, Request, Req, Headers, HttpCode, BadRequestException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { Inject } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
-import { MSG, NotificationType } from '@healio/shared-types';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  Inject,
+  Param,
+  Post,
+  Req,
+  UseGuards
+} from '@nestjs/common';
+import {ClientProxy} from '@nestjs/microservices';
+import {ConfigService} from '@nestjs/config';
+import {firstValueFrom} from 'rxjs';
+import {MSG, NotificationType} from '@healio/shared-types';
+import {JwtAuthGuard} from '../common/guards/jwt-auth.guard';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const StripeLib = require('stripe');
-import type { RawBodyRequest } from '@nestjs/common';
-import type { Request as ExpressRequest } from 'express';
 
 @Controller('payments')
 export class PaymentGatewayController {
@@ -23,14 +32,15 @@ export class PaymentGatewayController {
     @Inject('TELEMEDICINE_SERVICE') private teleClient: ClientProxy,
     private config: ConfigService,
   ) {
-    this.stripe = new StripeLib(this.config.get('STRIPE_SECRET_KEY', ''));
+    const stripeKey = this.config.get('STRIPE_SECRET_KEY', '');
+    this.stripe = stripeKey ? new StripeLib(stripeKey) : null;
   }
 
   // ─── Stripe Webhook (no JWT — called by Stripe) ───────────────────────────
   @Post('webhook')
   @HttpCode(200)
   async stripeWebhook(
-    @Req() req: RawBodyRequest<ExpressRequest>,
+      @Req() req: { body: Buffer; headers: { 'stripe-signature'?: string } },
     @Headers('stripe-signature') sig: string,
   ) {
     const webhookSecret = this.config.get<string>('STRIPE_WEBHOOK_SECRET');
@@ -39,11 +49,15 @@ export class PaymentGatewayController {
       throw new BadRequestException('Stripe webhook secret not configured');
     }
 
+    if (!this.stripe) {
+      throw new BadRequestException('Stripe not configured');
+    }
+
     let event: any;
     try {
-      event = this.stripe.webhooks.constructEvent(req.rawBody!, sig, webhookSecret);
-    } catch {
-      throw new BadRequestException('Invalid Stripe webhook signature');
+      event = await this.stripe.webhooks.constructEventAsync(req.body, sig, webhookSecret);
+    } catch (err: any) {
+      throw new BadRequestException(`Invalid Stripe webhook signature: ${err?.message}`);
     }
 
     if (event.type === 'checkout.session.completed') {

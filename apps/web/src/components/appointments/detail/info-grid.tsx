@@ -1,17 +1,19 @@
 "use client";
 
-import { User, Calendar, Clock, MapPin, CreditCard, Copy, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Avatar } from "@/components/ui/avatar";
+import {Calendar, CheckCircle2, Copy, CreditCard, ExternalLink, MapPin, User} from "lucide-react";
+import {Avatar} from "@/components/ui/avatar";
+import {Button} from "@/components/ui/button";
 
 interface InfoGridProps {
   doctor: any;
   patient: any;
   schedule: any;
   billing: any;
+  paymentUrl?: string;
+  appointmentStatus?: string;
 }
 
-export function InfoGrid({ doctor, patient, schedule, billing }: InfoGridProps) {
+export function InfoGrid({doctor, patient, schedule, billing, paymentUrl, appointmentStatus}: InfoGridProps) {
   return (
     <div className="grid lg:grid-cols-3 gap-8">
       {/* 1. Primary Info Column */}
@@ -20,7 +22,8 @@ export function InfoGrid({ doctor, patient, schedule, billing }: InfoGridProps) 
         <div className="grid md:grid-cols-2 gap-6">
           <DetailCard icon={<User />} title="Consultation with">
             <div className="flex items-center gap-4 mt-4">
-              <Avatar src={doctor.image} className="w-12 h-12 border-2 border-white shadow-sm" />
+              <Avatar src={doctor.image || "/images/doctor-1.png"}
+                      className="w-12 h-12 border-2 border-white shadow-sm"/>
               <div>
                 <p className="text-sm font-bold text-brand-black leading-none mb-1">{doctor.name}</p>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{doctor.specialty}</p>
@@ -80,19 +83,55 @@ export function InfoGrid({ doctor, patient, schedule, billing }: InfoGridProps) 
               <span className="font-bold text-brand-black">${billing.tax.toFixed(2)}</span>
             </div>
             <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-              <span className="text-xs font-bold text-brand-black">Total Amount Paid</span>
+              <span className="text-xs font-bold text-brand-black">Total Amount</span>
               <span className="text-lg font-bold text-brand-black">${(billing.fee + billing.tax).toFixed(2)}</span>
             </div>
-            
-            <div className="mt-6 p-4 rounded-xl border border-emerald-100 bg-emerald-50/50 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white shrink-0">
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-[11px] font-bold text-brand-black leading-none mb-1">Payment Successful</p>
-                <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Via Mastercard x-4242</p>
-              </div>
-            </div>
+
+            {appointmentStatus === "awaiting_payment" && paymentUrl ? (
+                <div className="mt-4 p-4 rounded-xl border-2 border-orange-200 bg-orange-50/50 flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <div
+                        className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white shrink-0">
+                      <CreditCard className="w-4 h-4"/>
+                    </div>
+                    <p className="text-[11px] font-bold text-brand-black leading-none">Payment Required</p>
+                  </div>
+                  <p className="text-[10px] text-gray-500">Complete your payment to confirm the appointment.</p>
+                  <a
+                      href={paymentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full"
+                  >
+                    <Button variant="dark"
+                            className="w-full h-11 rounded-xl text-xs font-black uppercase tracking-widest gap-2 shadow-lg shadow-brand-dark/10">
+                      <ExternalLink className="w-4 h-4"/>
+                      Pay Now — ${billing.fee.toFixed(2)}
+                    </Button>
+                  </a>
+                </div>
+            ) : appointmentStatus === "confirmed" || appointmentStatus === "completed" ? (
+                <div className="mt-6 p-4 rounded-xl border border-emerald-100 bg-emerald-50/50 flex items-center gap-3">
+                  <div
+                      className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white shrink-0">
+                    <CheckCircle2 className="w-4 h-4"/>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold text-brand-black leading-none mb-1">Payment Successful</p>
+                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Via Stripe</p>
+                  </div>
+                </div>
+            ) : (
+                <div className="mt-6 p-4 rounded-xl border border-gray-100 bg-gray-50/50 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gray-400 flex items-center justify-center text-white shrink-0">
+                    <CreditCard className="w-4 h-4"/>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold text-brand-black leading-none mb-1">Awaiting Payment</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pending</p>
+                  </div>
+                </div>
+            )}
           </div>
         </DetailCard>
       </div>

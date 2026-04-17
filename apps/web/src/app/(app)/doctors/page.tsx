@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { DoctorFilter, type DoctorFilters } from "@/components/doctors/doctor-filter";
-import { DoctorList } from "@/components/doctors/doctor-list";
-import { ChevronRight, Home, ChevronLeft, ChevronFirst } from "lucide-react";
+import {useState} from "react";
+import {type DoctorFilters} from "@/components/doctors/doctor-filter";
+import {DoctorList} from "@/components/doctors/doctor-list";
+import {ChevronFirst, ChevronLeft, ChevronRight, Home} from "lucide-react";
 import Link from "next/link";
-import { useDoctors, type PaginatedDoctors } from "@/hooks/use-doctors";
+import {useDoctors} from "@/hooks/use-doctors";
 
 export default function DoctorsPage() {
   const [filters, setFilters] = useState<DoctorFilters>({
@@ -65,8 +65,6 @@ export default function DoctorsPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-10">
-        {/* Left Side: Filter Sidebar */}
-        <DoctorFilter onFilterChange={handleFilterChange} />
 
         {/* Right Side: Results Grid */}
         <div className="flex-1 space-y-6">

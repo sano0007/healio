@@ -1,12 +1,22 @@
-import { Controller, Post, Get, Patch, Body, Param, UseGuards, Request, BadRequestException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { Inject } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
-import { MSG, UserRole, AppointmentStatus, NotificationType } from '@healio/shared-types';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Post,
+  Request,
+  UseGuards
+} from '@nestjs/common';
+import {ClientProxy} from '@nestjs/microservices';
+import {ConfigService} from '@nestjs/config';
+import {firstValueFrom} from 'rxjs';
+import {AppointmentStatus, MSG, NotificationType, UserRole} from '@healio/shared-types';
+import {JwtAuthGuard} from '../common/guards/jwt-auth.guard';
+import {RolesGuard} from '../common/guards/roles.guard';
+import {Roles} from '../common/decorators/roles.decorator';
 
 @Controller('appointments')
 export class AppointmentsGatewayController {
@@ -122,6 +132,12 @@ export class AppointmentsGatewayController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  getAppointment(@Param('id') id: string) {
+    return firstValueFrom(this.apptClient.send(MSG.APPOINTMENT_GET, {appointmentId: id}));
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/cancel')
   async cancel(@Param('id') id: string, @Body() body: { reason?: string }) {
     const appointment = await firstValueFrom(
@@ -152,58 +168,68 @@ export class AppointmentsGatewayController {
   }
 
   private async handleDoctorApproval(appointmentId: string) {
-    // Fetch appointment to get patientId, doctorId, scheduledAt
     const appointment = await firstValueFrom(
       this.apptClient.send(MSG.APPOINTMENT_GET, { appointmentId }),
     );
 
     const [patient, doctor] = await Promise.all([
       firstValueFrom(this.patientClient.send(MSG.PATIENT_GET, { userId: appointment.patientId })).catch(() => null),
-      firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET, { userId: appointment.doctorId })).catch(() => null),
+      appointment?.doctorId
+          ? firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET, {userId: appointment.doctorId})).catch(() => null)
+          : Promise.resolve(null),
     ]);
 
     const amount = doctor?.consultationFee ?? 0;
-    if (!amount || amount <= 0) {
-      throw new BadRequestException('Doctor has not set a consultation fee. Update your profile before approving appointments.');
-    }
-    const currency = 'usd';
 
     const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:3000');
     const successUrl = `${frontendUrl}/appointments?payment=success&appointmentId=${appointmentId}`;
     const cancelUrl  = `${frontendUrl}/appointments?payment=cancelled`;
 
-    // Create Stripe Checkout Session
-    const { paymentId, checkoutUrl } = await firstValueFrom(
-      this.paymentClient.send(MSG.PAYMENT_INITIATE, {
-        appointmentId,
-        patientId: appointment.patientId,
-        amount,
-        currency,
-        doctorName: doctor?.name,
-        successUrl,
-        cancelUrl,
-      }),
-    );
+    let paymentUrl: string | undefined;
+    let stripeError: string | undefined;
 
-    const paymentUrl = checkoutUrl;
+    // Attempt to create a Stripe Checkout Session; skip if Stripe is not configured
+    try {
+      const result = await firstValueFrom(
+          this.paymentClient.send(MSG.PAYMENT_INITIATE, {
+            appointmentId,
+            patientId: appointment.patientId,
+            amount,
+            currency: 'usd',
+            doctorName: doctor?.name,
+            successUrl,
+            cancelUrl,
+          }),
+      );
+      paymentUrl = result.checkoutUrl;
+      console.log('[handleDoctorApproval] Stripe result:', JSON.stringify(result));
+    } catch (err) {
+      stripeError = err?.message ?? String(err);
+      console.warn('[handleDoctorApproval] Stripe payment initiation failed:', stripeError);
+    }
 
-    // Set appointment to awaiting_payment
+    if (stripeError) {
+      throw new BadRequestException(`Payment could not be initiated: ${stripeError}`);
+    }
+
+    // Set appointment to awaiting_payment and store checkout URL
     const updated = await firstValueFrom(
       this.apptClient.send(MSG.APPOINTMENT_UPDATE_STATUS, {
         appointmentId,
         status: AppointmentStatus.AWAITING_PAYMENT,
+        checkoutUrl: paymentUrl,
       }),
     );
 
-    // Send payment URL to patient via SMS + email (fire-and-forget)
-    if (patient?.email) {
+    // Notify patient if payment URL was created
+    if (paymentUrl && patient?.email) {
       const payload = {
         appointmentId,
         scheduledAt: appointment.scheduledAt,
         doctorName: doctor?.name ?? 'Doctor',
         patientName: patient.name ?? 'Patient',
         amount,
-        currency: currency.toUpperCase(),
+        currency: 'USD',
         paymentUrl,
       };
       this.notificationClient.emit(MSG.NOTIFY_SEND, {
@@ -215,7 +241,7 @@ export class AppointmentsGatewayController {
       });
     }
 
-    return { ...updated.toObject?.() ?? updated, paymentUrl, paymentId };
+    return {...updated.toObject?.() ?? updated, paymentUrl};
   }
 
   private async emitStatusNotification(

@@ -1,5 +1,6 @@
 "use client";
 
+import {useRouter} from "next/navigation";
 import {Calendar, Clock, FileText, MoreVertical, RefreshCcw, Star, User, Video, XCircle} from "lucide-react";
 import {Avatar} from "@/components/ui/avatar";
 import {Button} from "@/components/ui/button";
@@ -32,13 +33,15 @@ const statusConfig = {
 };
 
 export function AppointmentCard({ appointment }: AppointmentCardProps) {
+  const router = useRouter();
   const config = statusConfig[appointment.status];
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-[2rem] p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
+      className="bg-white rounded-[2rem] p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-md transition-all group relative overflow-hidden cursor-pointer"
+      onClick={() => router.push(`/appointments/${appointment.id}`)}
     >
       <div className="flex flex-col md:flex-row gap-6 md:items-center">
         {/* 1. Doctor Info */}
