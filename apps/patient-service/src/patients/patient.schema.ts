@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
+import {Document, Schema as MongooseSchema} from 'mongoose';
 
 export type PatientDocument = Patient & Document;
 
@@ -18,10 +18,10 @@ export class Patient {
   @Prop({ required: true, unique: true })
   userId: string;
 
-  @Prop({ required: true })
+  @Prop()
   name: string;
 
-  @Prop({ required: true })
+  @Prop()
   email: string;
 
   @Prop()

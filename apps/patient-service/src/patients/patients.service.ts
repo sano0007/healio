@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { RpcException } from '@nestjs/microservices';
-import { Patient, PatientDocument } from './patient.schema';
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from '@nestjs/mongoose';
+import {Model} from 'mongoose';
+import {RpcException} from '@nestjs/microservices';
+import {Patient, PatientDocument} from './patient.schema';
 
 function normalisePhone(raw: string): string {
   const digits = raw.replace(/\D/g, '');
@@ -17,31 +17,42 @@ export class PatientsService {
   constructor(@InjectModel(Patient.name) private patientModel: Model<PatientDocument>) {}
 
   async getProfile(userId: string) {
-    const patient = await this.patientModel.findOne({ userId }).exec();
-    if (!patient) throw new RpcException('Patient profile not found');
+    let patient = await this.patientModel.findOne({userId}).exec();
+    if (!patient) {
+      patient = await this.patientModel.create({userId, name: '', email: '', medicalReports: []});
+    }
     return patient;
   }
 
   async updateProfile(userId: string, updates: Partial<Patient>) {
     if (updates.phone) updates.phone = normalisePhone(updates.phone);
-    const patient = await this.patientModel.findOneAndUpdate({ userId }, updates, { new: true }).exec();
+    let patient = await this.patientModel.findOne({userId}).exec();
+    if (!patient) {
+      patient = await this.patientModel.create({userId, name: '', email: '', medicalReports: []});
+    }
+    patient = await this.patientModel.findOneAndUpdate({userId}, updates, {new: true}).exec();
     if (!patient) throw new RpcException('Patient profile not found');
     return patient;
   }
 
   async uploadReport(userId: string, report: { filename: string; originalName: string; url: string }) {
-    const patient = await this.patientModel.findOneAndUpdate(
+    let patient = await this.patientModel.findOne({userId}).exec();
+    if (!patient) {
+      patient = await this.patientModel.create({userId, name: '', email: '', medicalReports: []});
+    }
+    patient = await this.patientModel.findOneAndUpdate(
       { userId },
       { $push: { medicalReports: { ...report, uploadedAt: new Date() } } },
       { new: true },
     ).exec();
-    if (!patient) throw new RpcException('Patient profile not found');
     return patient;
   }
 
   async getHistory(userId: string) {
-    const patient = await this.patientModel.findOne({ userId }, { medicalReports: 1 }).exec();
-    if (!patient) throw new RpcException('Patient profile not found');
+    let patient = await this.patientModel.findOne({userId}).exec();
+    if (!patient) {
+      patient = await this.patientModel.create({userId, name: '', email: '', medicalReports: []});
+    }
     return patient.medicalReports;
   }
 

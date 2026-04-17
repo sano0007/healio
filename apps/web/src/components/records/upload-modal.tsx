@@ -1,44 +1,145 @@
 "use client";
 
-import { CloudUpload, X, FileText, CheckCircle2, ShieldCheck, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import {AlertCircle, CheckCircle2, CloudUpload, FileText, ShieldCheck, X} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {cn} from "@/lib/utils";
+import {AnimatePresence, motion} from "framer-motion";
+import {useRef, useState} from "react";
+import {useQueryClient} from "@tanstack/react-query";
+import {getAccessToken, getUserIdFromToken} from "@/lib/api";
 
 interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+interface FileItem {
+  id: string;
+  file: File;
+  name: string;
+  size: string;
+  progress: number;
+  status: "pending" | "uploading" | "complete" | "error";
+}
+
 export function UploadModal({ isOpen, onClose }: UploadModalProps) {
-  const [files, setFiles] = useState<Array<{ name: string, size: string, progress: number, status: "uploading" | "complete" }>>([]);
+  const [files, setFiles] = useState<FileItem[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const queryClient = useQueryClient();
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSimulateUpload = () => {
-    const newFile = { name: "Blood_Test_Dec_2026.pdf", size: "1.2 MB", progress: 0, status: "uploading" as const };
-    setFiles([...files, newFile]);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files;
+    if (!selected?.length) return;
 
-    // Simulate progress
-    let p = 0;
-    const interval = setInterval(() => {
-      p += 10;
-      setFiles(prev => prev.map(f => f.name === newFile.name ? { ...f, progress: p, status: p >= 100 ? "complete" : "uploading" } : f));
-      if (p >= 100) clearInterval(interval);
-    }, 200);
+    const newFiles: FileItem[] = Array.from(selected).map(f => ({
+      id: Math.random().toString(36).slice(2),
+      file: f,
+      name: f.name,
+      size: formatSize(f.size),
+      progress: 0,
+      status: "pending" as const,
+    }));
+
+    setFiles(prev => [...prev, ...newFiles]);
+    // Reset input so same file can be selected again
+    if (inputRef.current) inputRef.current.value = "";
   };
+
+  const handleSave = async () => {
+    console.log('[Upload] handleSave called, files:', files.length, 'isUploading:', isUploading);
+    if (!files.length || isUploading) {
+      console.log('[Upload] early return');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const token = getAccessToken();
+      const userId = getUserIdFromToken();
+      console.log('[Upload] token:', token ? 'present' : 'MISSING', 'userId:', userId);
+      if (!userId) throw new Error('Not authenticated');
+
+      for (const fileItem of files.filter(f => f.status === "pending")) {
+        await uploadSingleFile(fileItem, userId, token);
+      }
+    } catch (err) {
+      console.error('[Upload] handleSave error:', err);
+    } finally {
+      setIsUploading(false);
+      queryClient.invalidateQueries({queryKey: ['records']});
+    }
+  };
+
+  const uploadSingleFile = async (fileItem: FileItem, _patientId: string, token: string | null) => {
+    try {
+      console.log('[Upload] Starting:', fileItem.name);
+      setFiles(prev => prev.map(f => f.id === fileItem.id ? {...f, status: "uploading" as const} : f));
+
+      const formData = new FormData();
+      formData.append('file', fileItem.file);
+
+      const url = `http://localhost:3001/api/patients/me/reports`;
+      console.log('[Upload] POST to:', url, 'token present:', !!token);
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: token ? {Authorization: `Bearer ${token}`} : {},
+        body: formData,
+      });
+
+      console.log('[Upload] Response status:', res.status);
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('[Upload] Failed:', text);
+        throw new Error('Upload failed');
+      }
+
+      // Animate progress to 100
+      for (let p = 10; p <= 100; p += 20) {
+        await new Promise(r => setTimeout(r, 80));
+        setFiles(prev => prev.map(f => f.id === fileItem.id ? {...f, progress: p} : f));
+      }
+
+      setFiles(prev => prev.map(f => f.id === fileItem.id ? {...f, progress: 100, status: "complete" as const} : f));
+      console.log('[Upload] Complete:', fileItem.name);
+    } catch (err) {
+      console.error('[Upload] Error:', err);
+      setFiles(prev => prev.map(f => f.id === fileItem.id ? {...f, status: "error" as const} : f));
+    }
+  };
+
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  };
+
+  const removeFile = (id: string) => {
+    setFiles(prev => prev.filter(f => f.id !== id));
+  };
+
+  const handleClose = () => {
+    setFiles([]);
+    setIsUploading(false);
+    onClose();
+  };
+
+  const pendingCount = files.filter(f => f.status === "pending").length;
+  const completeCount = files.filter(f => f.status === "complete").length;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute inset-0 bg-brand-black/40 backdrop-blur-sm"
           />
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -50,30 +151,39 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                 <h2 className="text-xl font-bold text-brand-black tracking-tight">Upload Medical Records</h2>
                 <p className="text-xs text-gray-400 font-medium mt-1">Files are encrypted and stored securely.</p>
               </div>
-              <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl hover:bg-gray-50">
+              <Button variant="ghost" size="icon" onClick={handleClose} className="rounded-xl hover:bg-gray-50">
                 <X className="w-5 h-5 text-gray-400" />
               </Button>
             </div>
 
             {/* 2. Drag & Drop Zone */}
             <div className="p-8 space-y-6">
-              <div 
-                onClick={handleSimulateUpload}
+              <label
                 className="group border-2 border-dashed border-gray-200 rounded-[2rem] p-10 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-brand-light/30 hover:bg-brand-light/5 transition-all text-center"
               >
+                <input
+                    ref={inputRef}
+                    type="file"
+                    multiple
+                    accept=".pdf,.png,.jpg,.jpeg"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                />
                 <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-brand-dark group-hover:bg-brand-light/20 transition-colors">
                   <CloudUpload className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-bold text-brand-black">Drag & drop files here</p>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Supports PDF, PNG, JPG (Max 20MB)</p>
+                  <p className="text-sm font-bold text-brand-black">Click to select files</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Supports PDF, PNG, JPG
+                    (Max 10MB)</p>
                 </div>
-              </div>
+              </label>
 
               {/* 3. File List Overlay */}
               <div className="space-y-3">
-                {files.map((file, i) => (
-                  <div key={i} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-4">
+                {files.map((file) => (
+                    <div key={file.id}
+                         className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-brand-dark border border-gray-100">
                       <FileText className="w-5 h-5" />
                     </div>
@@ -83,17 +193,25 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{file.size}</span>
                       </div>
                       <div className="w-full h-1.5 bg-white rounded-full overflow-hidden border border-gray-100">
-                        <motion.div 
+                        <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${file.progress}%` }}
-                          className="h-full bg-brand-dark rounded-full"
+                          className={cn("h-full rounded-full", file.status === "error" ? "bg-red-500" : file.status === "complete" ? "bg-emerald-500" : "bg-brand-dark")}
                         />
                       </div>
                     </div>
                     {file.status === "complete" ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    ) : file.status === "error" ? (
+                        <X className="w-5 h-5 text-red-500"/>
                     ) : (
-                      <div className="text-[10px] font-bold text-brand-dark animate-pulse">{file.progress}%</div>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase">{file.status}</span>
+                    )}
+                      {file.status === "pending" && !isUploading && (
+                          <button onClick={() => removeFile(file.id)}
+                                  className="text-gray-400 hover:text-red-500 transition-colors">
+                            <X className="w-4 h-4"/>
+                          </button>
                     )}
                   </div>
                 ))}
@@ -114,11 +232,17 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">End-to-End Encrypted</span>
               </div>
               <div className="flex items-center gap-3">
-                <Button variant="outline" onClick={onClose} className="rounded-xl h-12 px-6 text-xs font-bold border-gray-100 bg-white">
-                  Cancel
+                <Button variant="outline" onClick={handleClose}
+                        className="rounded-xl h-12 px-6 text-xs font-bold border-gray-100 bg-white">
+                  {completeCount > 0 ? "Done" : "Cancel"}
                 </Button>
-                <Button variant="dark" disabled={files.some(f => f.status === "uploading")} className="rounded-xl h-12 px-8 text-xs font-bold shadow-xl shadow-brand-dark/10">
-                  Save All Records
+                <Button
+                    variant="dark"
+                    onClick={handleSave}
+                    disabled={pendingCount === 0 || isUploading}
+                    className="rounded-xl h-12 px-8 text-xs font-bold shadow-xl shadow-brand-dark/10"
+                >
+                  {isUploading ? `Uploading ${completeCount}/${files.length}...` : `Save ${pendingCount} Record${pendingCount !== 1 ? 's' : ''}`}
                 </Button>
               </div>
             </div>

@@ -26,6 +26,16 @@ export function getAccessToken(): string | null {
   return authToken;
 }
 
+export function getUserIdFromToken(): string | null {
+    if (!authToken) return null;
+    try {
+        const payload = JSON.parse(atob(authToken.split('.')[1]));
+        return payload.sub || null;
+    } catch {
+        return null;
+    }
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -232,6 +242,7 @@ export interface PatientProfile {
   phone?: string;
   bloodGroup?: string;
   address?: string;
+    medicalReports?: { filename: string; originalName: string; url: string; uploadedAt: string }[];
 }
 
 export interface DoctorProfile {
