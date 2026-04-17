@@ -22,7 +22,8 @@ export function InfoGrid({doctor, patient, schedule, billing, paymentUrl, appoin
         <div className="grid md:grid-cols-2 gap-6">
           <DetailCard icon={<User />} title="Consultation with">
             <div className="flex items-center gap-4 mt-4">
-              <Avatar src={doctor.image} className="w-12 h-12 border-2 border-white shadow-sm" />
+              <Avatar src={doctor.image || "/images/doctor-1.png"}
+                      className="w-12 h-12 border-2 border-white shadow-sm"/>
               <div>
                 <p className="text-sm font-bold text-brand-black leading-none mb-1">{doctor.name}</p>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{doctor.specialty}</p>

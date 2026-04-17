@@ -1,10 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Calendar, Clock, User, Tag, Info, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import {Calendar, Clock, Info, ShieldCheck} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {useState} from "react";
 
 interface OrderSummaryProps {
   doctor: {
@@ -31,7 +30,8 @@ export function OrderSummary({ doctor, schedule }: OrderSummaryProps) {
       <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm space-y-8">
         <div className="flex items-center gap-6">
            <div className="w-16 h-16 rounded-2xl bg-brand-light/10 flex items-center justify-center text-brand-dark border border-brand-light/20 overflow-hidden">
-              <img src={doctor.image} alt={doctor.name} className="w-full h-full object-cover" />
+               <img src={doctor.image || "/images/doctor-1.png"} alt={doctor.name}
+                    className="w-full h-full object-cover"/>
            </div>
            <div className="space-y-1">
               <h3 className="text-lg font-bold text-brand-black">{doctor.name}</h3>

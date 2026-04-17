@@ -149,7 +149,7 @@ export default function AppointmentBookingPage() {
   const doctorDisplay = {
     name: doctor.name,
     specialization: doctor.specialty || "General Physician",
-    image: "/images/doctor-placeholder.png",
+    image: "/images/doctor-1.png",
     fee: doctor.consultationFee || 0,
   };
 

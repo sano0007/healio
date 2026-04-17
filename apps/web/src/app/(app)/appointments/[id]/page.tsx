@@ -78,7 +78,7 @@ export default function AppointmentDetailPage({ params }: { params: Promise<{ id
           doctor: {
             name: doctorInfo?.name || "Doctor",
             specialization: doctorInfo?.specialty || "General Physician",
-            image: "/images/doctor-placeholder.png",
+            image: "/images/doctor-1.png",
             fee: doctorInfo?.consultationFee || 0,
           },
           patient: {

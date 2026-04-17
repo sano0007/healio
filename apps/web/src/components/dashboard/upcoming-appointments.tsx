@@ -1,10 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Video, Calendar, Clock, ChevronRight } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {motion} from "framer-motion";
+import {Calendar, ChevronRight, Clock, Video} from "lucide-react";
+import {Avatar} from "@/components/ui/avatar";
+import {Button} from "@/components/ui/button";
 import Link from "next/link";
 
 const appointments = [
@@ -54,7 +53,8 @@ export function UpcomingAppointments() {
             className="group flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 bg-white rounded-3xl border border-gray-100 hover:border-brand-dark/20 hover:shadow-lg transition-all"
           >
             <div className="flex items-center gap-4 flex-1">
-              <Avatar src={appt.doctor.image} className="w-14 h-14 border-2 border-brand-light/20" />
+                <Avatar src={appt.doctor?.image || "/images/doctor-1.png"}
+                        className="w-14 h-14 border-2 border-brand-light/20"/>
               <div>
                 <h3 className="font-bold text-brand-black group-hover:text-brand-dark transition-colors">{appt.doctor.name}</h3>
                 <p className="text-xs text-gray-400 font-medium">{appt.doctor.specialty} • {appt.type}</p>

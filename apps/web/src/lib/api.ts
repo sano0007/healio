@@ -270,6 +270,7 @@ export interface Doctor {
   rating?: number;
   reviewCount?: number;
   isVerified?: boolean;
+  image?: string;
   availability?: { dayOfWeek: number; startTime: string; endTime: string }[];
 }
 
