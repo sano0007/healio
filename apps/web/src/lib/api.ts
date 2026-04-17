@@ -191,7 +191,27 @@ export const api = {
     end: (sessionId: string) =>
       request<{ sessionId: string; status: string }>(`/sessions/${sessionId}/end`, { method: 'PATCH' }),
   },
+  ai: {
+    checkSymptoms: (symptoms: string) =>
+      request<SymptomCheckResult>('/ai/symptom-check', {
+        method: 'POST',
+        body: JSON.stringify({ symptoms }),
+      }),
+  },
 };
+
+export interface SymptomCheckCondition {
+  name: string;
+  probability: number;
+  description: string;
+  specialist: string;
+}
+
+export interface SymptomCheckResult {
+  severity: 'Low' | 'Moderate' | 'High' | 'Emergency';
+  conditions: SymptomCheckCondition[];
+  recommendedActions: string[];
+}
 
 export interface PatientProfile {
   _id: string;

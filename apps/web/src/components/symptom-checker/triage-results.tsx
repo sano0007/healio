@@ -1,26 +1,13 @@
 "use client";
 
+import type { SymptomCheckResult } from '@/lib/api';
 import { motion } from "framer-motion";
 import { AlertCircle, ChevronRight, UserCircle, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-const mockResults = {
-  severity: "Moderate", // Low, Moderate, High, Emergency
-  conditions: [
-    { name: "Tension Headache", probability: 82, description: "A common type of headache caused by stress, fatigue, or muscle tension.", specialist: "General Physician" },
-    { name: "Dehydration", probability: 64, description: "Insufficient fluid intake leading to fatigue and cognitive fog.", specialist: "General Physician" },
-    { name: "Ocular Migraine", probability: 41, description: "Temporary visual disturbances followed by persistent throbbing pain.", specialist: "Neurologist" },
-  ],
-  recommendedActions: [
-    "Increase fluid intake immediately.",
-    "Rest in a quiet, dark room for 30 minutes.",
-    "Monitor temperature for next 12 hours.",
-  ]
-};
-
-export function TriageResults({ onReset }: { onReset: () => void }) {
+export function TriageResults({ results, onReset }: { results: SymptomCheckResult; onReset: () => void }) {
   const getSeverityStyle = (severity: string) => {
     switch (severity) {
       case "Emergency": return "bg-rose-50 border-rose-100 text-rose-600";
@@ -37,10 +24,10 @@ export function TriageResults({ onReset }: { onReset: () => void }) {
       className="space-y-10"
     >
       {/* 1. Severity Banner */}
-      <div className={cn("p-8 rounded-[3rem] border flex items-center justify-between gap-8 relative overflow-hidden", getSeverityStyle(mockResults.severity))}>
+      <div className={cn("p-8 rounded-[3rem] border flex items-center justify-between gap-8 relative overflow-hidden", getSeverityStyle(results.severity))}>
          <div className="space-y-2 relative z-10">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">Triage Severity Assessment</p>
-            <h2 className="text-3xl font-black tracking-tight">{mockResults.severity} Risk Level</h2>
+            <h2 className="text-3xl font-black tracking-tight">{results.severity} Risk Level</h2>
          </div>
          <div className="relative z-10 px-6 py-2 bg-white/40 rounded-2xl border border-white/60 text-[11px] font-bold uppercase tracking-widest backdrop-blur-md">
             Follow Actions Below
@@ -64,7 +51,7 @@ export function TriageResults({ onReset }: { onReset: () => void }) {
            </div>
            
            <div className="space-y-4">
-              {mockResults.conditions.map((condition, i) => (
+              {results.conditions.map((condition, i) => (
                 <motion.div
                   key={condition.name}
                   initial={{ opacity: 0, x: -20 }}
@@ -109,7 +96,7 @@ export function TriageResults({ onReset }: { onReset: () => void }) {
               </div>
 
               <div className="space-y-6 relative z-10">
-                 {mockResults.recommendedActions.map((action, i) => (
+                 {results.recommendedActions.map((action, i) => (
                    <div key={i} className="flex gap-4">
                       <div className="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-[10px] font-black shrink-0">
                          0{i + 1}
