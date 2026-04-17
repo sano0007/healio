@@ -66,7 +66,10 @@ export class DoctorsService {
   async getById(userId: string) {
     let doctor = await this.doctorModel.findOne({userId}).exec();
     if (!doctor) {
-      doctor = await this.doctorModel.create({userId, name: '', email: '', availability: []});
+      doctor = await this.doctorModel.create({userId, name: '', email: '', availability: [], status: 'online'});
+    }
+    if (!doctor.status) {
+      doctor.status = 'online';
     }
     return doctor;
   }
