@@ -47,8 +47,8 @@ export class AppointmentsGatewayController {
     ).catch(() => null);
 
     if (doctor && doctor.availability?.length) {
-      const dayOfWeek = requested.getUTCDay(); // 0 = Sunday
-      const requestedMinutes = requested.getUTCHours() * 60 + requested.getUTCMinutes();
+      const dayOfWeek = requested.getDay(); // Local day of week
+      const requestedMinutes = requested.getHours() * 60 + requested.getMinutes(); // Local time in minutes
 
       const slot = doctor.availability.find((s: { dayOfWeek: number; startTime: string; endTime: string; slotDurationMins?: number }) => {
         if (s.dayOfWeek !== dayOfWeek) return false;

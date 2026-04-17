@@ -61,13 +61,9 @@ export function useBookAppointment() {
       const [hour, minute, second] = timePart.split(':').map(Number);
       const scheduledDate = new Date(year, month - 1, day, hour, minute, second);
       const now = new Date();
-      if (
-          scheduledDate.getFullYear() < now.getFullYear() ||
-          (scheduledDate.getFullYear() === now.getFullYear() && scheduledDate.getMonth() < now.getMonth()) ||
-          (scheduledDate.getFullYear() === now.getFullYear() && scheduledDate.getMonth() === now.getMonth() && scheduledDate.getDate() < now.getDate()) ||
-          (scheduledDate.getFullYear() === now.getFullYear() && scheduledDate.getMonth() === now.getMonth() && scheduledDate.getDate() === now.getDate() && scheduledDate.getHours() < now.getHours()) ||
-          (scheduledDate.getFullYear() === now.getFullYear() && scheduledDate.getMonth() === now.getMonth() && scheduledDate.getDate() === now.getDate() && scheduledDate.getHours() === now.getHours() && scheduledDate.getMinutes() < now.getMinutes())
-      ) {
+      const minBookingTime = new Date(now.getTime() + 5 * 60 * 1000); // Allow booking 5 mins from now
+      
+      if (scheduledDate < minBookingTime) {
         throw new Error('Cannot book appointments in the past');
       }
 
