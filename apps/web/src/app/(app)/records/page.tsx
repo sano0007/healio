@@ -1,39 +1,25 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {RecordsHeader} from "@/components/records/records-header";
 import {RecordsFilter} from "@/components/records/records-filter";
-import {RecordCard, RecordType} from "@/components/records/record-card";
+import {RecordCard} from "@/components/records/record-card";
 import {UploadModal} from "@/components/records/upload-modal";
 import {Skeleton} from "@/components/ui/skeleton";
 import {AnimatePresence, motion} from "framer-motion";
 import {LayoutGrid} from "lucide-react";
-
-const mockRecords = [
-  { id: "1", title: "Complete Blood Count (CBC)", type: "lab" as RecordType, date: "July 12, 2026", doctor: "Dr. Sarah Johnson", status: "verified" as const, size: "1.2 MB" },
-  { id: "2", title: "Chest X-Ray PA View", type: "imaging" as RecordType, date: "July 10, 2026", doctor: "Dr. Michael Chen", status: "verified" as const, size: "8.5 MB" },
-  { id: "3", title: "Lipid Profile Panel", type: "lab" as RecordType, date: "July 08, 2026", doctor: "City Lab Specialists", status: "verified" as const, size: "950 KB" },
-  { id: "4", title: "Amoxicillin Digital Prescription", type: "prescription" as RecordType, date: "July 07, 2026", doctor: "Dr. Sarah Johnson", status: "verified" as const, size: "450 KB" },
-  { id: "5", title: "Echocardiogram (ECG) Report", type: "imaging" as RecordType, date: "June 28, 2026", doctor: "Dr. Michael Chen", status: "verified" as const, size: "12.4 MB" },
-  { id: "6", title: "Post-Consultation Summary", type: "note" as RecordType, date: "June 25, 2026", doctor: "Dr. Emily Davis", status: "pending" as const, size: "320 KB" },
-  { id: "7", title: "Metformin Dosage Schedule", type: "prescription" as RecordType, date: "June 20, 2026", doctor: "Dr. Sarah Johnson", status: "verified" as const, size: "280 KB" },
-  { id: "8", title: "Urine Routine Analysis", type: "lab" as RecordType, date: "June 15, 2026", doctor: "City Lab Specialists", status: "verified" as const, size: "1.1 MB" },
-];
+import {useRecords} from "@/hooks/use-records";
 
 export default function MedicalRecordsPage() {
-  const [isLoading, setIsLoading] = useState(true);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+    const {data: records, isLoading} = useRecords();
 
-  const filteredRecords = mockRecords.filter(record => {
+    const filteredRecords = (records ?? []).filter(record => {
     const matchesCategory = activeCategory === "all" || record.type === activeCategory;
-      const matchesSearch = record.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        const matchesSearch = record.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          record.doctor.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -89,7 +75,8 @@ export default function MedicalRecordsPage() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-brand-black">No records found</h3>
-                <p className="text-xs text-gray-400 font-medium">Try adjusting your filters or search terms.</p>
+                  <p className="text-xs text-gray-400 font-medium">Try adjusting your filters or upload your first
+                      medical record.</p>
               </div>
             </motion.div>
           )}
