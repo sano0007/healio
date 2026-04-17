@@ -17,7 +17,7 @@ const commonSymptoms = [
     id: "fever",
     label: "High Fever",
     icon: <Thermometer className="w-3.5 h-3.5" />,
-    preset: "I've had a high fever since yesterday evening — my temperature is around 39°C (102°F). I feel hot and sweaty, have chills, and my body aches all over. I've been feeling very weak.",
+    preset: "I've had a high fever since yesterday evening, my temperature is around 39°C (102°F). I feel hot and sweaty, have chills, and my body aches all over. I've been feeling very weak.",
   },
   {
     id: "fatigue",
