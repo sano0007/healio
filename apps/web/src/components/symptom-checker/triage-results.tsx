@@ -2,7 +2,7 @@
 
 import type { SymptomCheckResult } from '@/lib/api';
 import { motion } from "framer-motion";
-import { AlertCircle, ChevronRight, UserCircle, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, Info } from "lucide-react";
+import { AlertCircle, ChevronRight, UserCircle, MapPin, Clock, ArrowRight, ShieldCheck, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -106,23 +106,17 @@ export function TriageResults({ results, onReset }: { results: SymptomCheckResul
                  ))}
               </div>
 
-              <Button variant="outline" className="w-full h-12 rounded-2xl bg-white/10 border-white/20 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-brand-black relative z-10 transition-colors">
-                 Download Full Report
-              </Button>
 
               <div className="absolute -left-20 -bottom-20 w-60 h-60 rounded-full bg-brand-light/10 blur-3xl" />
            </div>
 
-           <div className="p-8 rounded-[3rem] border border-gray-100 bg-gray-50 flex flex-col items-center text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-white border border-gray-100 flex items-center justify-center text-brand-dark shadow-sm">
-                 <Calendar className="w-8 h-8" />
-              </div>
-              <div className="space-y-2">
-                 <p className="text-lg font-bold text-brand-black tracking-tight">Need a Clinical Consultation?</p>
-                 <p className="text-xs text-gray-400 font-medium">Book a 15-min virtual triage with a certified physician now.</p>
-              </div>
-              <Button onClick={onReset} variant="outline" className="h-10 rounded-xl px-6 text-[10px] font-black uppercase tracking-widest border-gray-100 hover:border-brand-light/30">
-                 Reset Analysis
+           <div className="flex justify-center pt-2">
+              <Button
+                onClick={onReset}
+                variant="outline"
+                className="h-12 px-10 rounded-2xl border-2 border-brand-dark/20 text-brand-dark text-xs font-black uppercase tracking-widest hover:bg-brand-dark hover:text-white hover:border-brand-dark transition-all duration-300 shadow-sm hover:shadow-lg"
+              >
+                Start New Analysis
               </Button>
            </div>
         </div>

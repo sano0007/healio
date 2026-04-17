@@ -115,7 +115,7 @@ export function DiagnosticEngine({ symptoms, onComplete, onReset }: DiagnosticEn
       <div className="w-full max-w-md space-y-8 text-center px-6">
         <div className="space-y-3">
           <h3 className="text-xl font-bold text-brand-black tracking-tight">Clinical Diagnosis Engine</h3>
-          <p className="text-sm font-medium text-gray-400 italic">Processing natural language inputs with HealioMed-7B Model...</p>
+          <p className="text-sm font-medium text-gray-400 italic">Processing natural language inputs with Healio AI...</p>
         </div>
 
         <div className="space-y-6">
@@ -148,20 +148,7 @@ export function DiagnosticEngine({ symptoms, onComplete, onReset }: DiagnosticEn
         </div>
       </div>
 
-      <div className="pt-10 flex items-center gap-6">
-        <TriageStat label="Data Points" value="1.2M+" />
-        <TriageStat label="Confidence" value="98.2%" />
-        <TriageStat label="Model" value="H-Med v4" />
-      </div>
     </div>
   );
 }
 
-function TriageStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="text-center px-6 border-r last:border-none border-gray-100">
-      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">{label}</p>
-      <p className="text-sm font-black text-brand-black">{value}</p>
-    </div>
-  );
-}

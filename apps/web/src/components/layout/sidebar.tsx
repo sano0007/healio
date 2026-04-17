@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import {cn} from "@/lib/utils";
 import {useAuth} from "@/contexts/auth";
+import {useState} from "react";
 
 const patientNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -46,6 +47,8 @@ export function Sidebar() {
 
   const isDoctor = user?.role === "doctor";
   const navigation = isDoctor ? doctorNavigation : patientNavigation;
+
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   async function handleLogout() {
     logout();
@@ -116,13 +119,43 @@ export function Sidebar() {
       {/* Logout */}
       <div className="p-4 border-t border-gray-100">
         <button
-            onClick={handleLogout}
+            onClick={() => setShowLogoutModal(true)}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 w-full transition-all group"
         >
           <LogOut className="w-5 h-5 text-red-400 group-hover:text-red-500" />
           Logout
         </button>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowLogoutModal(false)} />
+          <div className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm mx-4 space-y-6">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center">
+                <LogOut className="w-7 h-7 text-red-500" />
+              </div>
+              <h3 className="text-lg font-bold text-brand-black">Sign out?</h3>
+              <p className="text-sm text-gray-400 font-medium">You will be returned to the login screen.</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 h-11 rounded-2xl border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 h-11 rounded-2xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
