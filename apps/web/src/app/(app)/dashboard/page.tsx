@@ -2,10 +2,8 @@
 
 import {useAuth} from "@/contexts/auth";
 import {WelcomeBanner} from "@/components/dashboard/welcome-banner";
-import {QuickActions} from "@/components/dashboard/quick-actions";
 import {UpcomingAppointments} from "@/components/dashboard/upcoming-appointments";
 import {HealthStats} from "@/components/dashboard/health-stats";
-import {RecentActivity} from "@/components/dashboard/recent-activity";
 import {RecentPrescriptions} from "@/components/dashboard/recent-prescriptions";
 import {motion} from "framer-motion";
 
@@ -29,13 +27,6 @@ export default function DashboardPage() {
       <div className="grid lg:grid-cols-3 gap-10">
         {/* Left Column (2/3 width) - Activity & Appointments */}
         <div className="lg:col-span-2 space-y-12">
-          {/* Quick Actions (Cards - Section 3.1.2) */}
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-brand-black px-2">How can we help today?</h2>
-            </div>
-            <QuickActions />
-          </section>
 
           {/* Upcoming Appointments (Section 3.1.3) */}
           <section>
@@ -50,10 +41,8 @@ export default function DashboardPage() {
 
         {/* Right Column (1/3 width) - Activity Feed */}
         <div className="space-y-8">
-          {/* Notifications Feed (Section 3.1.6) */}
-          <RecentActivity />
-          
-          {/* Static Help Card / AI Recommendation */}
+
+        {/* Static Help Card / AI Recommendation */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
