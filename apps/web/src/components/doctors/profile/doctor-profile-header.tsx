@@ -1,9 +1,8 @@
 "use client";
 
-import { Star, MapPin, CheckCircle2, Share2, Heart } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import {CheckCircle2, Heart, MapPin, Share2} from "lucide-react";
+import {Avatar} from "@/components/ui/avatar";
+import {Button} from "@/components/ui/button";
 
 export interface DoctorProfileHeaderProps {
   name: string;
@@ -61,19 +60,6 @@ export function DoctorProfileHeader({
           </div>
 
           <div className="flex flex-wrap items-center gap-6 text-sm">
-            {/* Rating */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 rounded-xl">
-              <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`w-3.5 h-3.5 ${i < Math.floor(rating) ? "text-amber-500 fill-amber-500" : "text-gray-200"}`} 
-                  />
-                ))}
-              </div>
-              <span className="font-bold text-amber-700">{rating}</span>
-              <span className="text-amber-700/60 font-medium">({reviews} Reviews)</span>
-            </div>
 
             {/* Location */}
             <div className="flex items-center gap-2 text-gray-500 font-medium">

@@ -1,8 +1,7 @@
 "use client";
 
-import { Plus, ShieldCheck, Download, Inbox, Activity } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {Plus, ShieldCheck} from "lucide-react";
+import {Button} from "@/components/ui/button";
 
 export function RecordsHeader({ onUploadClick }: { onUploadClick: () => void }) {
   return (
@@ -21,18 +20,9 @@ export function RecordsHeader({ onUploadClick }: { onUploadClick: () => void }) 
       </div>
 
       <div className="flex items-center gap-6">
-        {/* Quick Stats Overlay (Desktop Only) */}
-        <div className="hidden lg:flex items-center gap-6 pr-8 border-r border-gray-100">
-          <Stat icon={<Inbox className="text-brand-dark" />} label="Total Files" value="24" />
-          <Stat icon={<Activity className="text-blue-500" />} label="Avg. Response" value="1.2s" />
-        </div>
 
         <div className="flex items-center gap-3">
-           <Button variant="outline" className="rounded-2xl h-12 px-6 text-xs font-bold gap-2 border-gray-100 hover:bg-gray-50">
-             <Download className="w-4 h-4" />
-             Export All
-           </Button>
-           <Button 
+            <Button
             variant="dark" 
             onClick={onUploadClick}
             className="rounded-2xl h-12 px-8 text-xs font-bold gap-2 shadow-xl shadow-brand-dark/10"

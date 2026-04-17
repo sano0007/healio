@@ -57,7 +57,10 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
       setIsUploading(true);
       const token = getAccessToken();
       const userId = getUserIdFromToken();
-      console.log('[Upload] token:', token ? 'present' : 'MISSING', 'userId:', userId);
+      console.log('[Upload] handleSave');
+      console.log('[Upload] - getAccessToken():', token ? `${token.substring(0, 20)}...` : 'null');
+      console.log('[Upload] - getUserIdFromToken():', userId);
+      console.log('[Upload] - files to upload:', files.filter(f => f.status === "pending").length);
       if (!userId) throw new Error('Not authenticated');
 
       for (const fileItem of files.filter(f => f.status === "pending")) {
@@ -65,6 +68,7 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
       }
     } catch (err) {
       console.error('[Upload] handleSave error:', err);
+      alert(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsUploading(false);
       queryClient.invalidateQueries({queryKey: ['records']});
@@ -79,18 +83,24 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
       const formData = new FormData();
       formData.append('file', fileItem.file);
 
-      const url = `http://localhost:3001/api/patients/me/reports`;
-      console.log('[Upload] POST to:', url, 'token present:', !!token);
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+      const url = `${API_BASE}/patients/me/reports`;
+      const authHeader = token ? `Bearer ${token}` : null;
+      console.log('[Upload] POST to:', url);
+      console.log('[Upload] authHeader:', authHeader ? `${authHeader.substring(0, 25)}...` : 'MISSING');
+      console.log('[Upload] getAccessToken():', token ? `${token.substring(0, 20)}...` : 'null');
+      console.log('[Upload] localStorage healio_token:', localStorage.getItem('healio_token') ? `${localStorage.getItem('healio_token')!.substring(0, 20)}...` : 'null');
 
       const res = await fetch(url, {
         method: 'POST',
-        headers: token ? {Authorization: `Bearer ${token}`} : {},
+        headers: authHeader ? {Authorization: authHeader} : {},
         body: formData,
       });
 
-      console.log('[Upload] Response status:', res.status);
+      console.log('[Upload] Response status:', res.status, 'ok:', res.ok, 'type:', res.type);
+      const text = await res.text();
+      console.log('[Upload] Response body:', text.substring(0, 300));
       if (!res.ok) {
-        const text = await res.text();
         console.error('[Upload] Failed:', text);
         throw new Error('Upload failed');
       }

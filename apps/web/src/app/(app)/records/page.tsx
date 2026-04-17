@@ -2,7 +2,6 @@
 
 import {useState} from "react";
 import {RecordsHeader} from "@/components/records/records-header";
-import {RecordsFilter} from "@/components/records/records-filter";
 import {RecordCard} from "@/components/records/record-card";
 import {UploadModal} from "@/components/records/upload-modal";
 import {Skeleton} from "@/components/ui/skeleton";
@@ -30,12 +29,12 @@ export default function MedicalRecordsPage() {
       <RecordsHeader onUploadClick={() => setIsUploadModalOpen(true)} />
 
       {/* 2. Interactive Filtering Bar */}
-        <RecordsFilter
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+        {/*  <RecordsFilter*/}
+        {/*  activeCategory={activeCategory}*/}
+        {/*  onCategoryChange={setActiveCategory}*/}
+        {/*  searchQuery={searchQuery}*/}
+        {/*  onSearchChange={setSearchQuery}*/}
+        {/*/>*/}
 
       {/* 3. Record Grid or Empty State */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
