@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {motion} from "framer-motion";
 import {Calendar, Camera, Mail, MapPin, Phone, User} from "lucide-react";
 import {useAuth} from "@/contexts/auth";
@@ -15,17 +15,17 @@ export function ProfileTab() {
   const updatePatient = useUpdatePatient();
 
   const [form, setForm] = useState({
-    name: patient?.name || user?.name || "",
-    email: patient?.email || user?.email || "",
-    phone: patient?.phone || "",
-    address: patient?.address || "",
-    bloodGroup: patient?.bloodGroup || "",
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: "",
+    address: "",
+    bloodGroup: "",
   });
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
     if (patient) {
       setForm({
         name: patient.name || user?.name || "",
@@ -35,7 +35,7 @@ export function ProfileTab() {
         bloodGroup: patient.bloodGroup || "",
       });
     }
-  });
+  }, [patient, user]);
 
   function updateField(key: string, value: string) {
     setForm(prev => ({...prev, [key]: value}));

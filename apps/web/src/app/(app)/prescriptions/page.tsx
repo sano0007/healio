@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import {usePrescriptions} from "@/hooks/use-prescriptions";
 import {PrescriptionHeader} from "@/components/prescriptions/prescription-header";
 import {MedicationRoutine} from "@/components/prescriptions/medication-routine";
 import {ActiveMedCard} from "@/components/prescriptions/active-medication-card";
@@ -9,52 +9,21 @@ import {Button} from "@/components/ui/button";
 import {Skeleton} from "@/components/ui/skeleton";
 import {AnimatePresence, motion} from "framer-motion";
 
-const activeMeds = [
-    {
-        id: "1",
-        name: "Metformin",
-        dosage: "500 mg",
-        frequency: "1 - 0 - 1",
-        duration: "90 Days",
-        daysRemaining: 64,
-        totalDays: 90,
-        nextDose: "08:00 PM",
-        instruction: "After meal",
-        type: "chronic" as const
-  },
-    {
-        id: "2",
-        name: "Lisinopril",
-        dosage: "10 mg",
-        frequency: "1 - 0 - 0",
-        duration: "30 Days",
-        daysRemaining: 12,
-        totalDays: 30,
-        nextDose: "Tomorrow, 08:00 AM",
-        instruction: "With water",
-        type: "chronic" as const
-  },
-    {
-        id: "3",
-        name: "Amoxicillin",
-        dosage: "500 mg",
-        frequency: "1 - 1 - 1",
-        duration: "10 Days",
-        daysRemaining: 2,
-        totalDays: 10,
-        nextDose: "01:00 PM",
-        instruction: "Complete course",
-        type: "acute" as const
-  },
-];
-
 export default function PrescriptionsPage() {
-  const [isLoading, setIsLoading] = useState(true);
+    const {data: prescriptions, isLoading} = usePrescriptions();
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+    const activeMeds = Array.isArray(prescriptions) ? prescriptions.map((rx) => ({
+        id: rx._id,
+        name: rx.medications[0]?.name ?? "",
+        dosage: rx.medications[0]?.dosage ?? "",
+        frequency: rx.medications[0]?.frequency ?? "",
+        duration: rx.medications[0]?.duration ?? "",
+        daysRemaining: 0,
+        totalDays: 0,
+        nextDose: "—",
+        instruction: rx.notes ?? "As prescribed",
+        type: "chronic" as const,
+    })) : [];
 
   return (
     <div className="max-w-7xl mx-auto py-8 lg:py-12 px-4 space-y-12 mb-20">
@@ -114,7 +83,7 @@ export default function PrescriptionsPage() {
            <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
            <h2 className="text-xl font-bold text-brand-black tracking-tight uppercase tracking-widest text-[11px] leading-none">Clinical History Archive</h2>
         </div>
-        <PrescriptionHistory />
+          <PrescriptionHistory prescriptions={Array.isArray(prescriptions) ? prescriptions : []} isLoading={isLoading}/>
       </section>
 
       {/* 5. Health Compliance Overlay */}
