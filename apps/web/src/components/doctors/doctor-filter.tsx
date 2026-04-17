@@ -91,7 +91,7 @@ export function DoctorFilter({ onFilterChange }: DoctorFilterProps) {
             className="text-xs font-bold text-brand-dark hover:underline"
           >
             Reset
-          </Link>
+          </button>
         </div>
 
         {/* Specialty */}
@@ -114,7 +114,7 @@ export function DoctorFilter({ onFilterChange }: DoctorFilterProps) {
               >
                 {spec}
                 {selectedSpecialty === spec && <Check className="w-3 h-3" />}
-              </Link>
+              </button>
             ))}
           </div>
         </div>
