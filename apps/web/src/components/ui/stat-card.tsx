@@ -1,7 +1,7 @@
-import * as React from "react"
-import { LucideIcon, TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { cn } from "@/lib/utils"
-import { Card } from "@/components/ui/card"
+import * as React from 'react';
+import { LucideIcon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 
 export interface StatCardProps {
   title: string;
@@ -10,22 +10,34 @@ export interface StatCardProps {
   icon?: LucideIcon;
   trend?: {
     value: string;
-    type: "positive" | "negative" | "neutral";
+    type: 'positive' | 'negative' | 'neutral';
   };
   className?: string;
 }
 
-export function StatCard({ title, value, unit, icon: Icon, trend, className }: StatCardProps) {
+export function StatCard({
+  title,
+  value,
+  unit,
+  icon: Icon,
+  trend,
+  className,
+}: StatCardProps) {
   const trendColors = {
-    positive: "text-emerald-500 bg-emerald-50",
-    negative: "text-red-500 bg-red-50",
-    neutral: "text-gray-500 bg-gray-50",
+    positive: 'text-emerald-500 bg-emerald-50',
+    negative: 'text-red-500 bg-red-50',
+    neutral: 'text-gray-500 bg-gray-50',
   };
 
-  const TrendIcon = trend?.type === "positive" ? TrendingUp : trend?.type === "negative" ? TrendingDown : Minus;
+  const TrendIcon =
+    trend?.type === 'positive'
+      ? TrendingUp
+      : trend?.type === 'negative'
+        ? TrendingDown
+        : Minus;
 
   return (
-    <Card className={cn("p-6 hover:shadow-md transition-shadow", className)}>
+    <Card className={cn('p-6 hover:shadow-md transition-shadow', className)}>
       <div className="flex justify-between items-start mb-4">
         <p className="text-sm font-medium text-gray-500">{title}</p>
         {Icon && (
@@ -37,12 +49,19 @@ export function StatCard({ title, value, unit, icon: Icon, trend, className }: S
 
       <div className="flex items-baseline gap-1">
         <h3 className="text-2xl font-bold text-brand-black">{value}</h3>
-        {unit && <span className="text-sm font-medium text-gray-400">{unit}</span>}
+        {unit && (
+          <span className="text-sm font-medium text-gray-400">{unit}</span>
+        )}
       </div>
 
       {trend && (
         <div className="flex items-center gap-2 mt-4">
-          <div className={cn("flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold", trendColors[trend.type])}>
+          <div
+            className={cn(
+              'flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold',
+              trendColors[trend.type],
+            )}
+          >
             <TrendIcon className="w-3 h-3" />
             {trend.value}
           </div>

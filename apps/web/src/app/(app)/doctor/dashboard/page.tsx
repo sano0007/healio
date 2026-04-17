@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { WelcomeBanner } from "@/components/doctor/dashboard/welcome-banner";
-import { StatGrid } from "@/components/doctor/dashboard/stat-grid";
-import { TodaySchedule } from "@/components/doctor/dashboard/today-schedule";
-import { PendingRequests } from "@/components/doctor/dashboard/pending-requests";
+import { WelcomeBanner } from '@/components/doctor/dashboard/welcome-banner';
+import { StatGrid } from '@/components/doctor/dashboard/stat-grid';
+import { TodaySchedule } from '@/components/doctor/dashboard/today-schedule';
+import { PendingRequests } from '@/components/doctor/dashboard/pending-requests';
 
 export default function DoctorDashboardPage() {
   return (
@@ -14,17 +14,17 @@ export default function DoctorDashboardPage() {
       {/* 2. Global Clinician Statistics */}
       <StatGrid />
 
-{/* 3. Operational Grid (Schedule + Management) */}
+      {/* 3. Operational Grid (Schedule + Management) */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-12">
-         {/* Main Activity Column (2/3) */}
-         <div className="xl:col-span-2 space-y-12">
-            <TodaySchedule />
-         </div>
+        {/* Main Activity Column (2/3) */}
+        <div className="xl:col-span-2 space-y-12">
+          <TodaySchedule />
+        </div>
 
-  {/* Side Control Column (1/3) */}
-    <div className="space-y-12">
-       <PendingRequests />
-    </div>
+        {/* Side Control Column (1/3) */}
+        <div className="space-y-12">
+          <PendingRequests />
+        </div>
       </div>
     </div>
   );

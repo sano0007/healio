@@ -1,33 +1,32 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { SymptomInput } from "@/components/symptom-checker/symptom-input";
-import { DiagnosticEngine } from "@/components/symptom-checker/diagnostic-engine";
-import { TriageResults } from "@/components/symptom-checker/triage-results";
-import type { SymptomCheckResult } from "@/lib/api";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from 'react';
+import { SymptomInput } from '@/components/symptom-checker/symptom-input';
+import { DiagnosticEngine } from '@/components/symptom-checker/diagnostic-engine';
+import { TriageResults } from '@/components/symptom-checker/triage-results';
+import type { SymptomCheckResult } from '@/lib/api';
+import { motion, AnimatePresence } from 'framer-motion';
 
-
-type CheckerState = "input" | "analyzing" | "results";
+type CheckerState = 'input' | 'analyzing' | 'results';
 
 export default function SymptomCheckerPage() {
-  const [state, setState] = useState<CheckerState>("input");
-  const [userSymptoms, setUserSymptoms] = useState("");
+  const [state, setState] = useState<CheckerState>('input');
+  const [userSymptoms, setUserSymptoms] = useState('');
   const [results, setResults] = useState<SymptomCheckResult | null>(null);
 
   const handleAnalyze = (symptoms: string) => {
     setUserSymptoms(symptoms);
-    setState("analyzing");
+    setState('analyzing');
   };
 
   const handleAnalysisComplete = (data: SymptomCheckResult) => {
     setResults(data);
-    setState("results");
+    setState('results');
   };
 
   const handleReset = () => {
-    setState("input");
-    setUserSymptoms("");
+    setState('input');
+    setUserSymptoms('');
     setResults(null);
   };
 
@@ -41,17 +40,17 @@ export default function SymptomCheckerPage() {
           </h1>
           <div className="flex items-center gap-6">
             <p className="text-xs text-gray-400 font-medium italic">
-              Powered by <span className="text-brand-dark font-black">Healio AI</span>.
+              Powered by{' '}
+              <span className="text-brand-dark font-black">Healio AI</span>.
             </p>
           </div>
         </div>
-
       </div>
 
       {/* 2. Multi-State Dashboard */}
       <div className="min-h-[600px] relative">
         <AnimatePresence mode="wait">
-          {state === "input" && (
+          {state === 'input' && (
             <motion.div
               key="input"
               initial={{ opacity: 0, y: 10 }}
@@ -63,7 +62,7 @@ export default function SymptomCheckerPage() {
             </motion.div>
           )}
 
-          {state === "analyzing" && (
+          {state === 'analyzing' && (
             <motion.div
               key="analyzing"
               initial={{ opacity: 0, scale: 0.9 }}
@@ -71,11 +70,15 @@ export default function SymptomCheckerPage() {
               exit={{ opacity: 0, scale: 1.1 }}
               transition={{ duration: 0.6 }}
             >
-              <DiagnosticEngine symptoms={userSymptoms} onComplete={handleAnalysisComplete} onReset={handleReset} />
+              <DiagnosticEngine
+                symptoms={userSymptoms}
+                onComplete={handleAnalysisComplete}
+                onReset={handleReset}
+              />
             </motion.div>
           )}
 
-          {state === "results" && (
+          {state === 'results' && (
             <motion.div
               key="results"
               initial={{ opacity: 0, y: 20 }}
@@ -83,12 +86,13 @@ export default function SymptomCheckerPage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {results && <TriageResults results={results} onReset={handleReset} />}
+              {results && (
+                <TriageResults results={results} onReset={handleReset} />
+              )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
     </div>
   );
 }

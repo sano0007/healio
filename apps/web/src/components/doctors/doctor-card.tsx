@@ -1,11 +1,17 @@
-"use client";
+'use client';
 
-import { Star, Clock, GraduationCap, ChevronRight, CheckCircle2 } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import {
+  Star,
+  Clock,
+  GraduationCap,
+  ChevronRight,
+  CheckCircle2,
+} from 'lucide-react';
+import { Avatar } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 export interface Doctor {
   _id: string;
@@ -38,10 +44,16 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
     >
       <div className="flex items-start gap-5">
         <div className="relative">
-          <Avatar src="/images/doctor-1.png" className="w-20 h-20 lg:w-24 lg:h-24 border-2 border-brand-light/10" />
+          <Avatar
+            src="/images/doctor-1.png"
+            className="w-20 h-20 lg:w-24 lg:h-24 border-2 border-brand-light/10"
+          />
           {doctor.isVerified && (
             <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm">
-              <CheckCircle2 className="w-5 h-5 text-brand-dark" fill="currentColor" />
+              <CheckCircle2
+                className="w-5 h-5 text-brand-dark"
+                fill="currentColor"
+              />
             </div>
           )}
         </div>
@@ -53,12 +65,14 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
             </h3>
             <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 rounded-lg border border-amber-100 shrink-0">
               <Star className="w-3 h-3 text-amber-500" fill="currentColor" />
-              <span className="text-[10px] font-black text-amber-700">{rating.toFixed(1)}</span>
+              <span className="text-[10px] font-black text-amber-700">
+                {rating.toFixed(1)}
+              </span>
             </div>
           </div>
 
           <p className="text-xs text-gray-400 font-medium mb-2 truncate">
-            {doctor.specialty || "General Physician"}
+            {doctor.specialty || 'General Physician'}
           </p>
 
           <div className="flex items-center gap-3 text-xs text-gray-500">
@@ -88,7 +102,7 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
       </div>
 
       <Badge variant="secondary" className="absolute top-4 right-4">
-        {doctor.isVerified ? "Verified" : "Pending"}
+        {doctor.isVerified ? 'Verified' : 'Pending'}
       </Badge>
     </motion.div>
   );

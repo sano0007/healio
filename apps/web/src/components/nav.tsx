@@ -3,7 +3,14 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth';
-import { Activity, LogOut, User, Calendar, Stethoscope, Video } from 'lucide-react';
+import {
+  Activity,
+  LogOut,
+  User,
+  Calendar,
+  Stethoscope,
+  Video,
+} from 'lucide-react';
 
 export function Nav() {
   const { user, logout } = useAuth();
@@ -26,15 +33,24 @@ export function Nav() {
           <div className="flex items-center gap-6">
             {user?.role === 'patient' && (
               <>
-                <Link href="/doctors" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors">
+                <Link
+                  href="/doctors"
+                  className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors"
+                >
                   <Stethoscope className="h-4 w-4" />
                   Doctors
                 </Link>
-                <Link href="/appointments" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors">
+                <Link
+                  href="/appointments"
+                  className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors"
+                >
                   <Calendar className="h-4 w-4" />
                   Appointments
                 </Link>
-                <Link href="/sessions" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors">
+                <Link
+                  href="/sessions"
+                  className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors"
+                >
                   <Video className="h-4 w-4" />
                   Sessions
                 </Link>
@@ -42,17 +58,26 @@ export function Nav() {
             )}
             {user?.role === 'doctor' && (
               <>
-                <Link href="/appointments" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors">
+                <Link
+                  href="/appointments"
+                  className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors"
+                >
                   <Calendar className="h-4 w-4" />
                   Appointments
                 </Link>
-                <Link href="/sessions" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors">
+                <Link
+                  href="/sessions"
+                  className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors"
+                >
                   <Video className="h-4 w-4" />
                   Sessions
                 </Link>
               </>
             )}
-            <Link href="/dashboard" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors"
+            >
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">{user?.name}</span>
             </Link>

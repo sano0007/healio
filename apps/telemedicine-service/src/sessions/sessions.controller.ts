@@ -8,7 +8,9 @@ export class SessionsController {
   constructor(private sessionsService: SessionsService) {}
 
   @MessagePattern(MSG.TELE_CREATE_SESSION)
-  async createSession(@Payload() data: { appointmentId: string; hostId: string }) {
+  async createSession(
+    @Payload() data: { appointmentId: string; hostId: string },
+  ) {
     return this.sessionsService.createSession(data);
   }
 

@@ -1,7 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import Video, { connect, LocalVideoTrack, LocalAudioTrack, RemoteParticipant, RemoteTrack, RemoteVideoTrack, RemoteAudioTrack } from "twilio-video";
+import { useEffect, useRef, useState, useCallback } from 'react';
+import Video, {
+  connect,
+  LocalVideoTrack,
+  LocalAudioTrack,
+  RemoteParticipant,
+  RemoteTrack,
+  RemoteVideoTrack,
+  RemoteAudioTrack,
+} from 'twilio-video';
 
 interface TwilioVideoRoomProps {
   token: string;
@@ -31,7 +39,7 @@ function ParticipantVideo({ participant, isLocal }: ParticipantVideoProps) {
     if (!isRemote) return;
 
     const remoteParticipant = participant as RemoteParticipant;
-    
+
     const videoTrackSubscribed = (track: RemoteVideoTrack) => {
       if (videoRef.current && track.attach) {
         videoRef.current.srcObject = track.attach().srcObject;
@@ -46,15 +54,15 @@ function ParticipantVideo({ participant, isLocal }: ParticipantVideoProps) {
       }
     };
 
-    remoteParticipant.on("trackSubscribed", videoTrackSubscribed);
-    remoteParticipant.on("trackSubscribed", audioTrackSubscribed);
+    remoteParticipant.on('trackSubscribed', videoTrackSubscribed);
+    remoteParticipant.on('trackSubscribed', audioTrackSubscribed);
 
     const tracks = Array.from(remoteParticipant.tracks.values());
     tracks.forEach((publication) => {
       if (publication.isSubscribed && publication.track) {
-        if (publication.track.kind === "video") {
+        if (publication.track.kind === 'video') {
           videoTrackSubscribed(publication.track as RemoteVideoTrack);
-        } else if (publication.track.kind === "audio") {
+        } else if (publication.track.kind === 'audio') {
           audioTrackSubscribed(publication.track as RemoteAudioTrack);
         }
       }
@@ -67,7 +75,7 @@ function ParticipantVideo({ participant, isLocal }: ParticipantVideoProps) {
 
   useEffect(() => {
     if (!isLocal) return;
-    
+
     const localParticipant = participant as LocalParticipantDisplay;
     if (localParticipant.videoTrack && videoRef.current) {
       const track = localParticipant.videoTrack;
@@ -79,7 +87,11 @@ function ParticipantVideo({ participant, isLocal }: ParticipantVideoProps) {
     }
   }, [participant, isLocal]);
 
-  const identity = isLocal ? "You" : isRemote ? (participant as RemoteParticipant).identity : "Unknown";
+  const identity = isLocal
+    ? 'You'
+    : isRemote
+      ? (participant as RemoteParticipant).identity
+      : 'Unknown';
 
   return (
     <div className="relative w-full h-full bg-gray-900 rounded-lg overflow-hidden">
@@ -91,9 +103,7 @@ function ParticipantVideo({ participant, isLocal }: ParticipantVideoProps) {
         className="w-full h-full object-cover"
       />
       <div className="absolute bottom-4 left-4 bg-black/50 px-3 py-1 rounded-full">
-        <span className="text-white text-sm">
-          {identity}
-        </span>
+        <span className="text-white text-sm">{identity}</span>
       </div>
       {!isVideoEnabled && (
         <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
@@ -112,8 +122,12 @@ export function TwilioVideoRoom({
   onError,
 }: TwilioVideoRoomProps) {
   const [room, setRoom] = useState<Video.Room | null>(null);
-  const [localTracks, setLocalTracks] = useState<(LocalVideoTrack | LocalAudioTrack)[]>([]);
-  const [remoteParticipants, setRemoteParticipants] = useState<RemoteParticipant[]>([]);
+  const [localTracks, setLocalTracks] = useState<
+    (LocalVideoTrack | LocalAudioTrack)[]
+  >([]);
+  const [remoteParticipants, setRemoteParticipants] = useState<
+    RemoteParticipant[]
+  >([]);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isConnecting, setIsConnecting] = useState(true);
@@ -127,10 +141,10 @@ export function TwilioVideoRoom({
         setIsConnecting(true);
         setConnectionError(null);
 
-        const localTracks = await Video.createLocalTracks({
+        const localTracks = (await Video.createLocalTracks({
           audio: true,
           video: { width: 1280, height: 720 },
-        }) as (LocalVideoTrack | LocalAudioTrack)[];
+        })) as (LocalVideoTrack | LocalAudioTrack)[];
 
         if (!mounted) {
           localTracks.forEach((track) => track.stop());
@@ -150,37 +164,40 @@ export function TwilioVideoRoom({
         const participants = Array.from(connectedRoom.participants.values());
         setRemoteParticipants(participants);
 
-        connectedRoom.on("participantConnected", (participant) => {
+        connectedRoom.on('participantConnected', (participant) => {
           setRemoteParticipants((prev) => [...prev, participant]);
           onParticipantConnected?.(participant);
         });
 
-        connectedRoom.on("participantDisconnected", (participant) => {
+        connectedRoom.on('participantDisconnected', (participant) => {
           setRemoteParticipants((prev) =>
-            prev.filter((p) => p.sid !== participant.sid)
+            prev.filter((p) => p.sid !== participant.sid),
           );
           onParticipantDisconnected?.(participant);
         });
 
-        connectedRoom.on("disconnected", () => {
+        connectedRoom.on('disconnected', () => {
           setRoom(null);
           localTracks.forEach((track) => track.stop());
         });
 
-        connectedRoom.on("trackDisabled", (track) => {
-          if (track.kind === "video") setIsVideoEnabled(false);
-          if (track.kind === "audio") setIsAudioEnabled(false);
+        connectedRoom.on('trackDisabled', (track) => {
+          if (track.kind === 'video') setIsVideoEnabled(false);
+          if (track.kind === 'audio') setIsAudioEnabled(false);
         });
 
-        connectedRoom.on("trackEnabled", (track) => {
-          if (track.kind === "video") setIsVideoEnabled(true);
-          if (track.kind === "audio") setIsAudioEnabled(true);
+        connectedRoom.on('trackEnabled', (track) => {
+          if (track.kind === 'video') setIsVideoEnabled(true);
+          if (track.kind === 'audio') setIsAudioEnabled(true);
         });
 
         setIsConnecting(false);
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : "Failed to connect to video room";
-        console.error("Failed to connect to room:", error);
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Failed to connect to video room';
+        console.error('Failed to connect to room:', error);
         setConnectionError(message);
         setIsConnecting(false);
         onError?.(new Error(message));
@@ -204,7 +221,7 @@ export function TwilioVideoRoom({
 
   const toggleVideo = useCallback(() => {
     localTracks.forEach((track) => {
-      if (track.kind === "video") {
+      if (track.kind === 'video') {
         if (isVideoEnabled) {
           track.disable();
         } else {
@@ -217,7 +234,7 @@ export function TwilioVideoRoom({
 
   const toggleAudio = useCallback(() => {
     localTracks.forEach((track) => {
-      if (track.kind === "audio") {
+      if (track.kind === 'audio') {
         if (isAudioEnabled) {
           track.disable();
         } else {
@@ -251,8 +268,10 @@ export function TwilioVideoRoom({
   }
 
   const localParticipantDisplay: LocalParticipantDisplay = {
-    identity: "You",
-    videoTrack: localTracks.find((t) => t.kind === "video") as LocalVideoTrack | undefined,
+    identity: 'You',
+    videoTrack: localTracks.find((t) => t.kind === 'video') as
+      | LocalVideoTrack
+      | undefined,
   };
 
   return (

@@ -1,7 +1,12 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
-import { MSG, RegisterDto, LoginDto, RefreshTokenDto } from '@healio/shared-types';
+import {
+  MSG,
+  RegisterDto,
+  LoginDto,
+  RefreshTokenDto,
+} from '@healio/shared-types';
 
 @Controller()
 export class AuthController {

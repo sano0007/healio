@@ -7,25 +7,44 @@ import { Search, Download } from 'lucide-react';
 export default function AdminPatientsPage() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  
-  const { data: patients, isLoading, error, refetch } = usePatients({ search: debouncedSearch });
-  
+
+  const {
+    data: patients,
+    isLoading,
+    error,
+    refetch,
+  } = usePatients({ search: debouncedSearch });
+
   const exportCSV = useExportToCSV<{
-    _id: string; name: string; email: string; phone?: string; bloodGroup?: string; address?: string
-  }>(patients || [], `healio_patients_${new Date().toISOString().split('T')[0]}.csv`, [
-    { key: 'name', header: 'Name' },
-    { key: 'email', header: 'Email' },
-    { key: 'phone', header: 'Phone' },
-    { key: 'bloodGroup', header: 'Blood Group' },
-    { key: 'address', header: 'Address' },
-  ]);
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    bloodGroup?: string;
+    address?: string;
+  }>(
+    patients || [],
+    `healio_patients_${new Date().toISOString().split('T')[0]}.csv`,
+    [
+      { key: 'name', header: 'Name' },
+      { key: 'email', header: 'Email' },
+      { key: 'phone', header: 'Phone' },
+      { key: 'bloodGroup', header: 'Blood Group' },
+      { key: 'address', header: 'Address' },
+    ],
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300);
     return () => clearTimeout(timer);
   }, [search]);
 
-  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
 
   return (
     <div>
@@ -40,7 +59,9 @@ export default function AdminPatientsPage() {
             <Download className="h-4 w-4" />
             Export CSV
           </button>
-          <span className="text-sm text-gray-500">{patients?.length || 0} total</span>
+          <span className="text-sm text-gray-500">
+            {patients?.length || 0} total
+          </span>
         </div>
       </div>
 
@@ -61,25 +82,53 @@ export default function AdminPatientsPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Name</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Email</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Phone</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Blood Group</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Address</th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Name
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Email
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Phone
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Blood Group
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Address
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {patients?.map(patient => (
-              <tr key={patient._id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-5 py-3 font-medium text-gray-900">{patient.name}</td>
+            {patients?.map((patient) => (
+              <tr
+                key={patient._id}
+                className="hover:bg-gray-50 transition-colors"
+              >
+                <td className="px-5 py-3 font-medium text-gray-900">
+                  {patient.name}
+                </td>
                 <td className="px-5 py-3 text-gray-500">{patient.email}</td>
-                <td className="px-5 py-3 text-gray-600">{patient.phone || '—'}</td>
-                <td className="px-5 py-3 text-gray-600">{patient.bloodGroup || '—'}</td>
-                <td className="px-5 py-3 text-gray-600">{patient.address || '—'}</td>
+                <td className="px-5 py-3 text-gray-600">
+                  {patient.phone || '—'}
+                </td>
+                <td className="px-5 py-3 text-gray-600">
+                  {patient.bloodGroup || '—'}
+                </td>
+                <td className="px-5 py-3 text-gray-600">
+                  {patient.address || '—'}
+                </td>
               </tr>
             ))}
             {(!patients || patients.length === 0) && (
-              <tr><td colSpan={5} className="px-5 py-10 text-center text-gray-400">No patients found.</td></tr>
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-5 py-10 text-center text-gray-400"
+                >
+                  No patients found.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

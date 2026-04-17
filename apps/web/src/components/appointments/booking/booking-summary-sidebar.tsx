@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import {Calendar, Clock, Info, User, Video} from "lucide-react";
-import {Avatar} from "@/components/ui/avatar";
+import { Calendar, Clock, Info, User, Video } from 'lucide-react';
+import { Avatar } from '@/components/ui/avatar';
 
 export interface BookingSummaryProps {
   doctor: {
@@ -13,22 +13,34 @@ export interface BookingSummaryProps {
   details: {
     date: string;
     time: string;
-    type: "video" | "in-person";
+    type: 'video' | 'in-person';
     location?: string;
   };
 }
 
-export function BookingSummarySidebar({ doctor, details }: BookingSummaryProps) {
+export function BookingSummarySidebar({
+  doctor,
+  details,
+}: BookingSummaryProps) {
   return (
     <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-brand-dark/5 sticky top-24 self-start">
-      <h2 className="text-xl font-bold text-brand-black mb-8 px-1">Booking Summary</h2>
+      <h2 className="text-xl font-bold text-brand-black mb-8 px-1">
+        Booking Summary
+      </h2>
 
       {/* 1. Doctor Info */}
       <div className="flex items-center gap-4 mb-8 bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50">
-          <Avatar src={doctor.image || "/images/doctor-1.png"} className="w-16 h-16 border-2 border-white shadow-sm"/>
+        <Avatar
+          src={doctor.image || '/images/doctor-1.png'}
+          className="w-16 h-16 border-2 border-white shadow-sm"
+        />
         <div>
-          <h3 className="text-sm font-bold text-brand-black leading-none mb-1">{doctor.name}</h3>
-          <p className="text-[11px] font-bold text-brand-dark opacity-70 uppercase tracking-widest">{doctor.specialization}</p>
+          <h3 className="text-sm font-bold text-brand-black leading-none mb-1">
+            {doctor.name}
+          </h3>
+          <p className="text-[11px] font-bold text-brand-dark opacity-70 uppercase tracking-widest">
+            {doctor.specialization}
+          </p>
         </div>
       </div>
 
@@ -39,8 +51,12 @@ export function BookingSummarySidebar({ doctor, details }: BookingSummaryProps) 
             <Calendar className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</div>
-            <div className="text-sm font-bold text-brand-black">{details.date}</div>
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              Date
+            </div>
+            <div className="text-sm font-bold text-brand-black">
+              {details.date}
+            </div>
           </div>
         </div>
 
@@ -49,19 +65,31 @@ export function BookingSummarySidebar({ doctor, details }: BookingSummaryProps) 
             <Clock className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Time Slot</div>
-            <div className="text-sm font-bold text-brand-black">{details.time}</div>
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              Time Slot
+            </div>
+            <div className="text-sm font-bold text-brand-black">
+              {details.time}
+            </div>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-            {details.type === "video" ? <Video className="w-5 h-5" /> : <User className="w-5 h-5" />}
+            {details.type === 'video' ? (
+              <Video className="w-5 h-5" />
+            ) : (
+              <User className="w-5 h-5" />
+            )}
           </div>
           <div>
-            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Consultation</div>
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              Consultation
+            </div>
             <div className="text-sm font-bold text-brand-black">
-              {details.type === "video" ? "Video Consultation" : "In-Person Visit"}
+              {details.type === 'video'
+                ? 'Video Consultation'
+                : 'In-Person Visit'}
             </div>
           </div>
         </div>
@@ -70,16 +98,24 @@ export function BookingSummarySidebar({ doctor, details }: BookingSummaryProps) 
       {/* 3. Pricing Breakdown */}
       <div className="pt-8 border-t border-gray-50 space-y-4 px-1">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-500 font-medium tracking-tight">Consultation Fee</div>
-          <div className="text-sm font-bold text-brand-black">${doctor.fee}</div>
+          <div className="text-sm text-gray-500 font-medium tracking-tight">
+            Consultation Fee
+          </div>
+          <div className="text-sm font-bold text-brand-black">
+            ${doctor.fee}
+          </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-500 font-medium tracking-tight">Booking Tax</div>
+          <div className="text-sm text-gray-500 font-medium tracking-tight">
+            Booking Tax
+          </div>
           <div className="text-sm font-bold text-brand-black">$5.00</div>
         </div>
         <div className="flex items-center justify-between pt-4 border-t border-gray-50">
           <div className="text-lg font-bold text-brand-black">Total Fee</div>
-          <div className="text-xl font-bold text-brand-dark">${doctor.fee + 5}</div>
+          <div className="text-xl font-bold text-brand-dark">
+            ${doctor.fee + 5}
+          </div>
         </div>
       </div>
 

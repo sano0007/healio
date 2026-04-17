@@ -8,15 +8,20 @@ import {
   Patch,
   Post,
   Request,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
-import {ClientProxy} from '@nestjs/microservices';
-import {ConfigService} from '@nestjs/config';
-import {firstValueFrom} from 'rxjs';
-import {AppointmentStatus, MSG, NotificationType, UserRole} from '@healio/shared-types';
-import {JwtAuthGuard} from '../common/guards/jwt-auth.guard';
-import {RolesGuard} from '../common/guards/roles.guard';
-import {Roles} from '../common/decorators/roles.decorator';
+import { ClientProxy } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
+import { firstValueFrom } from 'rxjs';
+import {
+  AppointmentStatus,
+  MSG,
+  NotificationType,
+  UserRole,
+} from '@healio/shared-types';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('appointments')
 export class AppointmentsGatewayController {
@@ -48,14 +53,24 @@ export class AppointmentsGatewayController {
 
     if (doctor && doctor.availability?.length) {
       const dayOfWeek = requested.getUTCDay(); // 0 = Sunday
-      const requestedMinutes = requested.getUTCHours() * 60 + requested.getUTCMinutes();
+      const requestedMinutes =
+        requested.getUTCHours() * 60 + requested.getUTCMinutes();
 
-      const slot = doctor.availability.find((s: { dayOfWeek: number; startTime: string; endTime: string; slotDurationMins?: number }) => {
-        if (s.dayOfWeek !== dayOfWeek) return false;
-        const [sh, sm] = s.startTime.split(':').map(Number);
-        const [eh, em] = s.endTime.split(':').map(Number);
-        return requestedMinutes >= sh * 60 + sm && requestedMinutes < eh * 60 + em;
-      });
+      const slot = doctor.availability.find(
+        (s: {
+          dayOfWeek: number;
+          startTime: string;
+          endTime: string;
+          slotDurationMins?: number;
+        }) => {
+          if (s.dayOfWeek !== dayOfWeek) return false;
+          const [sh, sm] = s.startTime.split(':').map(Number);
+          const [eh, em] = s.endTime.split(':').map(Number);
+          return (
+            requestedMinutes >= sh * 60 + sm && requestedMinutes < eh * 60 + em
+          );
+        },
+      );
 
       if (!slot) {
         throw new BadRequestException(
@@ -65,34 +80,55 @@ export class AppointmentsGatewayController {
 
       // Check for conflicting appointment in the same slot window
       const existing: { scheduledAt: string }[] = await firstValueFrom(
-        this.apptClient.send(MSG.APPOINTMENT_GET_BY_DOCTOR, { doctorId: dto.doctorId }),
+        this.apptClient.send(MSG.APPOINTMENT_GET_BY_DOCTOR, {
+          doctorId: dto.doctorId,
+        }),
       ).catch(() => []);
 
       const slotDuration = 30 * 60 * 1000; // 30-minute slots
-      const conflict = existing.some(a => {
-        const diff = Math.abs(new Date(a.scheduledAt).getTime() - requested.getTime());
+      const conflict = existing.some((a) => {
+        const diff = Math.abs(
+          new Date(a.scheduledAt).getTime() - requested.getTime(),
+        );
         return diff < slotDuration;
       });
 
       if (conflict) {
-        throw new BadRequestException('This time slot is already booked. Please choose another time.');
+        throw new BadRequestException(
+          'This time slot is already booked. Please choose another time.',
+        );
       }
     }
 
     const appointment = await firstValueFrom(
-      this.apptClient.send(MSG.APPOINTMENT_BOOK, { ...dto, patientId: req.user.userId }),
+      this.apptClient.send(MSG.APPOINTMENT_BOOK, {
+        ...dto,
+        patientId: req.user.userId,
+      }),
     );
 
     // Fire-and-forget notifications to patient and doctor
-    this.emitBookingNotification(req.user.userId, dto.doctorId, appointment).catch(() => {});
+    this.emitBookingNotification(
+      req.user.userId,
+      dto.doctorId,
+      appointment,
+    ).catch(() => {});
 
     return appointment;
   }
 
-  private async emitBookingNotification(patientId: string, doctorId: string, appointment: { _id?: string; scheduledAt?: string; notes?: string }) {
+  private async emitBookingNotification(
+    patientId: string,
+    doctorId: string,
+    appointment: { _id?: string; scheduledAt?: string; notes?: string },
+  ) {
     const [patient, doctorProfile] = await Promise.all([
-      firstValueFrom(this.patientClient.send(MSG.PATIENT_GET, { userId: patientId })).catch(() => null),
-      firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET, { userId: doctorId })).catch(() => null),
+      firstValueFrom(
+        this.patientClient.send(MSG.PATIENT_GET, { userId: patientId }),
+      ).catch(() => null),
+      firstValueFrom(
+        this.doctorClient.send(MSG.DOCTOR_GET, { userId: doctorId }),
+      ).catch(() => null),
     ]);
 
     const payload = {
@@ -126,42 +162,69 @@ export class AppointmentsGatewayController {
 
   @UseGuards(JwtAuthGuard)
   @Get('my')
-  getMyAppointments(@Request() req: { user: { userId: string; role: string } }) {
-    const pattern = req.user.role === UserRole.DOCTOR ? MSG.APPOINTMENT_GET_BY_DOCTOR : MSG.APPOINTMENT_GET_BY_PATIENT;
-    return firstValueFrom(this.apptClient.send(pattern, { [req.user.role === UserRole.DOCTOR ? 'doctorId' : 'patientId']: req.user.userId }));
+  getMyAppointments(
+    @Request() req: { user: { userId: string; role: string } },
+  ) {
+    const pattern =
+      req.user.role === UserRole.DOCTOR
+        ? MSG.APPOINTMENT_GET_BY_DOCTOR
+        : MSG.APPOINTMENT_GET_BY_PATIENT;
+    return firstValueFrom(
+      this.apptClient.send(pattern, {
+        [req.user.role === UserRole.DOCTOR ? 'doctorId' : 'patientId']:
+          req.user.userId,
+      }),
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   getAppointment(@Param('id') id: string) {
-    return firstValueFrom(this.apptClient.send(MSG.APPOINTMENT_GET, {appointmentId: id}));
+    return firstValueFrom(
+      this.apptClient.send(MSG.APPOINTMENT_GET, { appointmentId: id }),
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id/cancel')
   async cancel(@Param('id') id: string, @Body() body: { reason?: string }) {
     const appointment = await firstValueFrom(
-      this.apptClient.send(MSG.APPOINTMENT_CANCEL, { appointmentId: id, reason: body.reason }),
+      this.apptClient.send(MSG.APPOINTMENT_CANCEL, {
+        appointmentId: id,
+        reason: body.reason,
+      }),
     );
-    this.emitStatusNotification(appointment, NotificationType.APPOINTMENT_CANCELLED).catch(() => {});
+    this.emitStatusNotification(
+      appointment,
+      NotificationType.APPOINTMENT_CANCELLED,
+    ).catch(() => {});
     return appointment;
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.DOCTOR)
   @Patch(':id/status')
-  async updateStatus(@Param('id') id: string, @Body() body: { status: AppointmentStatus }) {
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() body: { status: AppointmentStatus },
+  ) {
     // Doctor approving → create payment intent, set to awaiting_payment, send payment URL to patient
     if (body.status === AppointmentStatus.CONFIRMED) {
       return this.handleDoctorApproval(id);
     }
 
     const appointment = await firstValueFrom(
-      this.apptClient.send(MSG.APPOINTMENT_UPDATE_STATUS, { appointmentId: id, status: body.status }),
+      this.apptClient.send(MSG.APPOINTMENT_UPDATE_STATUS, {
+        appointmentId: id,
+        status: body.status,
+      }),
     );
 
     if (body.status === AppointmentStatus.COMPLETED) {
-      this.emitStatusNotification(appointment, NotificationType.CONSULTATION_COMPLETED).catch(() => {});
+      this.emitStatusNotification(
+        appointment,
+        NotificationType.CONSULTATION_COMPLETED,
+      ).catch(() => {});
     }
 
     return appointment;
@@ -173,17 +236,28 @@ export class AppointmentsGatewayController {
     );
 
     const [patient, doctor] = await Promise.all([
-      firstValueFrom(this.patientClient.send(MSG.PATIENT_GET, { userId: appointment.patientId })).catch(() => null),
+      firstValueFrom(
+        this.patientClient.send(MSG.PATIENT_GET, {
+          userId: appointment.patientId,
+        }),
+      ).catch(() => null),
       appointment?.doctorId
-          ? firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET, {userId: appointment.doctorId})).catch(() => null)
-          : Promise.resolve(null),
+        ? firstValueFrom(
+            this.doctorClient.send(MSG.DOCTOR_GET, {
+              userId: appointment.doctorId,
+            }),
+          ).catch(() => null)
+        : Promise.resolve(null),
     ]);
 
     const amount = doctor?.consultationFee ?? 0;
 
-    const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:3000');
+    const frontendUrl = this.config.get(
+      'FRONTEND_URL',
+      'http://localhost:3000',
+    );
     const successUrl = `${frontendUrl}/appointments?payment=success&appointmentId=${appointmentId}`;
-    const cancelUrl  = `${frontendUrl}/appointments?payment=cancelled`;
+    const cancelUrl = `${frontendUrl}/appointments?payment=cancelled`;
 
     let paymentUrl: string | undefined;
     let stripeError: string | undefined;
@@ -191,25 +265,33 @@ export class AppointmentsGatewayController {
     // Attempt to create a Stripe Checkout Session; skip if Stripe is not configured
     try {
       const result = await firstValueFrom(
-          this.paymentClient.send(MSG.PAYMENT_INITIATE, {
-            appointmentId,
-            patientId: appointment.patientId,
-            amount,
-            currency: 'usd',
-            doctorName: doctor?.name,
-            successUrl,
-            cancelUrl,
-          }),
+        this.paymentClient.send(MSG.PAYMENT_INITIATE, {
+          appointmentId,
+          patientId: appointment.patientId,
+          amount,
+          currency: 'usd',
+          doctorName: doctor?.name,
+          successUrl,
+          cancelUrl,
+        }),
       );
       paymentUrl = result.checkoutUrl;
-      console.log('[handleDoctorApproval] Stripe result:', JSON.stringify(result));
+      console.log(
+        '[handleDoctorApproval] Stripe result:',
+        JSON.stringify(result),
+      );
     } catch (err) {
       stripeError = err?.message ?? String(err);
-      console.warn('[handleDoctorApproval] Stripe payment initiation failed:', stripeError);
+      console.warn(
+        '[handleDoctorApproval] Stripe payment initiation failed:',
+        stripeError,
+      );
     }
 
     if (stripeError) {
-      throw new BadRequestException(`Payment could not be initiated: ${stripeError}`);
+      throw new BadRequestException(
+        `Payment could not be initiated: ${stripeError}`,
+      );
     }
 
     // Set appointment to awaiting_payment and store checkout URL
@@ -241,18 +323,31 @@ export class AppointmentsGatewayController {
       });
     }
 
-    return {...updated.toObject?.() ?? updated, paymentUrl};
+    return { ...(updated.toObject?.() ?? updated), paymentUrl };
   }
 
   private async emitStatusNotification(
-    appointment: { _id?: string; patientId?: string; doctorId?: string; scheduledAt?: string },
+    appointment: {
+      _id?: string;
+      patientId?: string;
+      doctorId?: string;
+      scheduledAt?: string;
+    },
     type: NotificationType,
   ) {
     if (!appointment?.patientId || !appointment?.doctorId) return;
 
     const [patient, doctorProfile] = await Promise.all([
-      firstValueFrom(this.patientClient.send(MSG.PATIENT_GET, { userId: appointment.patientId })).catch(() => null),
-      firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET, { userId: appointment.doctorId })).catch(() => null),
+      firstValueFrom(
+        this.patientClient.send(MSG.PATIENT_GET, {
+          userId: appointment.patientId,
+        }),
+      ).catch(() => null),
+      firstValueFrom(
+        this.doctorClient.send(MSG.DOCTOR_GET, {
+          userId: appointment.doctorId,
+        }),
+      ).catch(() => null),
     ]);
 
     const payload = {

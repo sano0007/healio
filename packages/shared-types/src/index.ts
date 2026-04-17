@@ -154,13 +154,13 @@ export interface InitiatePaymentDto {
 
 export interface SymptomCheckCondition {
   name: string;
-  probability: number;        // 0–100
+  probability: number; // 0–100
   description: string;
-  specialist: string;         // e.g. "Neurologist", "General Physician"
+  specialist: string; // e.g. "Neurologist", "General Physician"
 }
 
 export interface SymptomCheckResult {
   severity: 'Low' | 'Moderate' | 'High' | 'Emergency';
-  conditions: SymptomCheckCondition[];   // max 3, ranked by probability desc
-  recommendedActions: string[];          // 3–5 immediate action steps
+  conditions: SymptomCheckCondition[]; // max 3, ranked by probability desc
+  recommendedActions: string[]; // 3–5 immediate action steps
 }

@@ -32,8 +32,13 @@ export class EmailService {
     const d = new Date(raw as string);
     if (isNaN(d.getTime())) return String(raw);
     return d.toLocaleString('en-GB', {
-      weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
-      hour: '2-digit', minute: '2-digit', hour12: true,
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
     });
   }
 
@@ -69,13 +74,17 @@ export class EmailService {
     return `<a href="${url}" style="display:inline-block;margin-top:20px;padding:12px 28px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-size:15px;font-weight:600;">${text}</a>`;
   }
 
-  getEmailContent(type: NotificationType, role: 'patient' | 'doctor', payload: Record<string, unknown>) {
-    const date    = this.fmt(payload.scheduledAt);
-    const patient = payload.patientName as string ?? 'Patient';
-    const doctor  = payload.doctorName  as string ?? 'Doctor';
+  getEmailContent(
+    type: NotificationType,
+    role: 'patient' | 'doctor',
+    payload: Record<string, unknown>,
+  ) {
+    const date = this.fmt(payload.scheduledAt);
+    const patient = (payload.patientName as string) ?? 'Patient';
+    const doctor = (payload.doctorName as string) ?? 'Doctor';
     const specialty = payload.doctorSpecialty as string;
-    const amount  = `${payload.amount} ${payload.currency}`;
-    const notes   = payload.notes as string;
+    const amount = `${payload.amount} ${payload.currency}`;
+    const notes = payload.notes as string;
 
     switch (type) {
       // ─── Appointment Booked ─────────────────────────────────────────────────
@@ -83,45 +92,60 @@ export class EmailService {
         if (role === 'patient') {
           return {
             subject: 'Appointment Request Submitted — Healio',
-            html: this.wrap('Your Appointment Request', `
+            html: this.wrap(
+              'Your Appointment Request',
+              `
               <p style="color:#475569;font-size:15px;">Hi <strong>${patient}</strong>, your appointment request has been submitted. The doctor will review and confirm shortly.</p>
               ${this.table(
-                this.row('Doctor', `Dr. ${doctor}${specialty ? ` (${specialty})` : ''}`) +
-                this.row('Date &amp; Time', date) +
-                (notes ? this.row('Notes', notes) : ''),
+                this.row(
+                  'Doctor',
+                  `Dr. ${doctor}${specialty ? ` (${specialty})` : ''}`,
+                ) +
+                  this.row('Date &amp; Time', date) +
+                  (notes ? this.row('Notes', notes) : ''),
               )}
               <p style="color:#64748b;font-size:13px;margin-top:16px;">You will receive another notification once Dr. ${doctor} approves your appointment.</p>
-            `),
+            `,
+            ),
           };
         }
         return {
           subject: `New Appointment Request from ${patient} — Healio`,
-          html: this.wrap('New Appointment Request', `
+          html: this.wrap(
+            'New Appointment Request',
+            `
             <p style="color:#475569;font-size:15px;">You have a new appointment request. Please review and confirm or reject.</p>
             ${this.table(
               this.row('Patient', patient) +
-              this.row('Requested Date', date) +
-              (notes ? this.row('Notes', notes) : ''),
+                this.row('Requested Date', date) +
+                (notes ? this.row('Notes', notes) : ''),
             )}
             <p style="color:#64748b;font-size:13px;margin-top:16px;">Log in to your Healio dashboard to approve or reject this appointment.</p>
-          `),
+          `,
+          ),
         };
 
       // ─── Payment Requested ──────────────────────────────────────────────────
       case NotificationType.PAYMENT_REQUESTED:
         return {
           subject: `Action Required: Complete Payment for Your Appointment — Healio`,
-          html: this.wrap('Payment Required to Confirm Your Booking', `
+          html: this.wrap(
+            'Payment Required to Confirm Your Booking',
+            `
             <p style="color:#475569;font-size:15px;">Hi <strong>${patient}</strong>, Dr. <strong>${doctor}</strong> has approved your appointment! Complete your payment to confirm the booking.</p>
             ${this.table(
-              this.row('Doctor', `Dr. ${doctor}${specialty ? ` (${specialty})` : ''}`) +
-              this.row('Date &amp; Time', date) +
-              this.row('Amount Due', amount),
+              this.row(
+                'Doctor',
+                `Dr. ${doctor}${specialty ? ` (${specialty})` : ''}`,
+              ) +
+                this.row('Date &amp; Time', date) +
+                this.row('Amount Due', amount),
             )}
             ${this.btn('Pay Now', payload.paymentUrl as string)}
             <p style="color:#94a3b8;font-size:12px;margin-top:16px;">If the button doesn't work, copy this link into your browser:<br/><span style="word-break:break-all;">${payload.paymentUrl}</span></p>
             <p style="color:#ef4444;font-size:13px;margin-top:8px;">⚠ Your booking is not confirmed until payment is completed.</p>
-          `),
+          `,
+          ),
         };
 
       // ─── Payment Success ─────────────────────────────────────────────────────
@@ -129,27 +153,36 @@ export class EmailService {
         if (role === 'patient') {
           return {
             subject: 'Booking Confirmed — Payment Successful ✓ — Healio',
-            html: this.wrap('Your Booking is Confirmed!', `
+            html: this.wrap(
+              'Your Booking is Confirmed!',
+              `
               <p style="color:#475569;font-size:15px;">Hi <strong>${patient}</strong>, your payment was successful and your appointment is now confirmed.</p>
               ${this.table(
-                this.row('Doctor', `Dr. ${doctor}${specialty ? ` (${specialty})` : ''}`) +
-                this.row('Date &amp; Time', date) +
-                this.row('Amount Paid', amount),
+                this.row(
+                  'Doctor',
+                  `Dr. ${doctor}${specialty ? ` (${specialty})` : ''}`,
+                ) +
+                  this.row('Date &amp; Time', date) +
+                  this.row('Amount Paid', amount),
               )}
               <p style="color:#16a34a;font-size:14px;margin-top:12px;">✓ Your appointment is confirmed. See you soon!</p>
-            `),
+            `,
+            ),
           };
         }
         return {
           subject: `Payment Received from ${patient} — Healio`,
-          html: this.wrap('Payment Received', `
+          html: this.wrap(
+            'Payment Received',
+            `
             <p style="color:#475569;font-size:15px;">Payment has been received from <strong>${patient}</strong>. The appointment is now confirmed.</p>
             ${this.table(
               this.row('Patient', patient) +
-              this.row('Date &amp; Time', date) +
-              this.row('Amount', amount),
+                this.row('Date &amp; Time', date) +
+                this.row('Amount', amount),
             )}
-          `),
+          `,
+          ),
         };
 
       // ─── Appointment Cancelled ──────────────────────────────────────────────
@@ -157,25 +190,30 @@ export class EmailService {
         if (role === 'patient') {
           return {
             subject: 'Appointment Cancelled — Healio',
-            html: this.wrap('Your Appointment Has Been Cancelled', `
+            html: this.wrap(
+              'Your Appointment Has Been Cancelled',
+              `
               <p style="color:#475569;font-size:15px;">Hi <strong>${patient}</strong>, your appointment has been cancelled.</p>
               ${this.table(
                 this.row('Doctor', `Dr. ${doctor}`) +
-                this.row('Scheduled Date', date),
+                  this.row('Scheduled Date', date),
               )}
               <p style="color:#64748b;font-size:13px;margin-top:16px;">You can book a new appointment at any time through Healio.</p>
-            `),
+            `,
+            ),
           };
         }
         return {
           subject: `Appointment Cancelled — ${patient} — Healio`,
-          html: this.wrap('Appointment Cancelled', `
+          html: this.wrap(
+            'Appointment Cancelled',
+            `
             <p style="color:#475569;font-size:15px;">The appointment with <strong>${patient}</strong> has been cancelled.</p>
             ${this.table(
-              this.row('Patient', patient) +
-              this.row('Scheduled Date', date),
+              this.row('Patient', patient) + this.row('Scheduled Date', date),
             )}
-          `),
+          `,
+          ),
         };
 
       // ─── Consultation Completed ─────────────────────────────────────────────
@@ -183,29 +221,37 @@ export class EmailService {
         if (role === 'patient') {
           return {
             subject: 'Consultation Complete — Thank You — Healio',
-            html: this.wrap('Your Consultation is Complete', `
+            html: this.wrap(
+              'Your Consultation is Complete',
+              `
               <p style="color:#475569;font-size:15px;">Hi <strong>${patient}</strong>, your consultation has been completed. Thank you for choosing Healio.</p>
               ${this.table(
-                this.row('Doctor', `Dr. ${doctor}`) +
-                this.row('Date', date),
+                this.row('Doctor', `Dr. ${doctor}`) + this.row('Date', date),
               )}
               <p style="color:#64748b;font-size:13px;margin-top:16px;">If you were prescribed any medications, please check your prescription in the Healio app.</p>
-            `),
+            `,
+            ),
           };
         }
         return {
           subject: `Consultation Completed — ${patient} — Healio`,
-          html: this.wrap('Consultation Marked as Complete', `
+          html: this.wrap(
+            'Consultation Marked as Complete',
+            `
             <p style="color:#475569;font-size:15px;">The consultation with <strong>${patient}</strong> has been marked as complete.</p>
-            ${this.table(
-              this.row('Patient', patient) +
-              this.row('Date', date),
-            )}
-          `),
+            ${this.table(this.row('Patient', patient) + this.row('Date', date))}
+          `,
+          ),
         };
 
       default:
-        return { subject: 'Healio Notification', html: this.wrap('Notification', '<p>You have a new notification from Healio.</p>') };
+        return {
+          subject: 'Healio Notification',
+          html: this.wrap(
+            'Notification',
+            '<p>You have a new notification from Healio.</p>',
+          ),
+        };
     }
   }
 }

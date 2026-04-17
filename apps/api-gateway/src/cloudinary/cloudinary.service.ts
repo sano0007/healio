@@ -8,12 +8,15 @@ export class CloudinaryService {
   constructor(config: ConfigService) {
     cloudinary.config({
       cloud_name: config.get('CLOUDINARY_CLOUD_NAME'),
-      api_key:    config.get('CLOUDINARY_API_KEY'),
+      api_key: config.get('CLOUDINARY_API_KEY'),
       api_secret: config.get('CLOUDINARY_API_SECRET'),
     });
   }
 
-  uploadBuffer(buffer: Buffer, originalName: string): Promise<{ url: string; publicId: string; filename: string }> {
+  uploadBuffer(
+    buffer: Buffer,
+    originalName: string,
+  ): Promise<{ url: string; publicId: string; filename: string }> {
     return new Promise((resolve, reject) => {
       const filename = `${Date.now()}-${originalName.replace(/\s+/g, '_')}`;
 
@@ -25,7 +28,11 @@ export class CloudinaryService {
         },
         (err, result) => {
           if (err || !result) return reject(err ?? new Error('Upload failed'));
-          resolve({ url: result.secure_url, publicId: result.public_id, filename });
+          resolve({
+            url: result.secure_url,
+            publicId: result.public_id,
+            filename,
+          });
         },
       );
 

@@ -6,7 +6,10 @@ import { Prescription, PrescriptionDocument } from './prescription.schema';
 
 @Injectable()
 export class PrescriptionsService {
-  constructor(@InjectModel(Prescription.name) private prescriptionModel: Model<PrescriptionDocument>) {}
+  constructor(
+    @InjectModel(Prescription.name)
+    private prescriptionModel: Model<PrescriptionDocument>,
+  ) {}
 
   async issuePrescription(data: Partial<Prescription>) {
     const prescription = new this.prescriptionModel(data);
@@ -14,11 +17,17 @@ export class PrescriptionsService {
   }
 
   async getByDoctor(doctorId: string) {
-    return this.prescriptionModel.find({ doctorId }).sort({ issuedAt: -1 }).exec();
+    return this.prescriptionModel
+      .find({ doctorId })
+      .sort({ issuedAt: -1 })
+      .exec();
   }
 
   async getByPatient(patientId: string) {
-    return this.prescriptionModel.find({ patientId }).sort({ issuedAt: -1 }).exec();
+    return this.prescriptionModel
+      .find({ patientId })
+      .sort({ issuedAt: -1 })
+      .exec();
   }
 
   async getByAppointment(appointmentId: string) {

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useDoctor } from "@/hooks/use-doctors";
-import { DoctorProfileHeader } from "@/components/doctors/profile/doctor-profile-header";
-import { DoctorStatsGrid } from "@/components/doctors/profile/doctor-stats-grid";
-import { DoctorDetails } from "@/components/doctors/profile/doctor-details";
-import { DoctorReviews } from "@/components/doctors/profile/doctor-reviews";
-import { BookingWidget } from "@/components/doctors/profile/booking-widget";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useDoctor } from '@/hooks/use-doctors';
+import { DoctorProfileHeader } from '@/components/doctors/profile/doctor-profile-header';
+import { DoctorStatsGrid } from '@/components/doctors/profile/doctor-stats-grid';
+import { DoctorDetails } from '@/components/doctors/profile/doctor-details';
+import { DoctorReviews } from '@/components/doctors/profile/doctor-reviews';
+import { BookingWidget } from '@/components/doctors/profile/booking-widget';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ChevronLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function DoctorProfilePage() {
   const params = useParams();
@@ -34,12 +34,17 @@ export default function DoctorProfilePage() {
   if (error || !doctor) {
     return (
       <div className="max-w-7xl mx-auto space-y-10">
-        <Link href="/doctors" className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-dark transition-colors mb-6 group">
+        <Link
+          href="/doctors"
+          className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-dark transition-colors mb-6 group"
+        >
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Search
         </Link>
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <h3 className="text-xl font-bold text-brand-black mb-2">Doctor not found</h3>
+          <h3 className="text-xl font-bold text-brand-black mb-2">
+            Doctor not found
+          </h3>
           <p className="text-sm text-gray-400">
             We couldn't load the doctor profile. Please try again.
           </p>
@@ -57,13 +62,16 @@ export default function DoctorProfilePage() {
     <div className="max-w-7xl mx-auto space-y-10">
       {/* 1. Back Link & Header */}
       <div className="px-2">
-        <Link href="/doctors" className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-dark transition-colors mb-6 group">
+        <Link
+          href="/doctors"
+          className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-dark transition-colors mb-6 group"
+        >
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Search
         </Link>
-        <DoctorProfileHeader 
+        <DoctorProfileHeader
           name={doctor.name}
-          specialization={doctor.specialty || "General Physician"}
+          specialization={doctor.specialty || 'General Physician'}
           image="/images/doctor-1.png"
           rating={rating}
           reviews={reviewCount}
@@ -76,16 +84,23 @@ export default function DoctorProfilePage() {
       <div className="grid lg:grid-cols-3 gap-10 items-start">
         {/* Left Column: Info Feed */}
         <div className="lg:col-span-2 space-y-10">
-          <DoctorStatsGrid 
+          <DoctorStatsGrid
             patients={`${experience * 50}+`}
             experience={experience}
             rating={rating}
             reviews={reviewCount}
           />
-          <DoctorDetails 
-            bio={doctor.bio || "No bio available."}
+          <DoctorDetails
+            bio={doctor.bio || 'No bio available.'}
             specialties={doctor.specialty ? [doctor.specialty] : []}
-            education={doctor.qualifications?.map((q, i) => ({ id: String(i), year: "", title: q, subtitle: "" })) || []}
+            education={
+              doctor.qualifications?.map((q, i) => ({
+                id: String(i),
+                year: '',
+                title: q,
+                subtitle: '',
+              })) || []
+            }
             experience={[]}
           />
           <DoctorReviews reviews={[]} />

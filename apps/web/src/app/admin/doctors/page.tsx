@@ -4,31 +4,53 @@ import { useState, useEffect } from 'react';
 import { useDoctors, useVerifyDoctor, useExportToCSV } from '@/hooks/use-admin';
 import { Search, Download, CheckCircle, Clock } from 'lucide-react';
 
-const SPECIALTIES = ['Cardiology', 'Dermatology', 'General Physician', 'Neurology', 'Orthopedics', 'Pediatrics', 'Psychiatry', 'Other'];
+const SPECIALTIES = [
+  'Cardiology',
+  'Dermatology',
+  'General Physician',
+  'Neurology',
+  'Orthopedics',
+  'Pediatrics',
+  'Psychiatry',
+  'Other',
+];
 
 export default function AdminDoctorsPage() {
   const [search, setSearch] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [verified, setVerified] = useState<boolean | undefined>(undefined);
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  
-  const { data: doctors, isLoading, refetch } = useDoctors({ 
-    search: debouncedSearch, 
+
+  const {
+    data: doctors,
+    isLoading,
+    refetch,
+  } = useDoctors({
+    search: debouncedSearch,
     specialty: specialty || undefined,
-    isVerified: verified
+    isVerified: verified,
   });
-  
+
   const verifyDoctor = useVerifyDoctor();
-  
+
   const exportCSV = useExportToCSV<{
-    _id: string; name: string; email: string; specialty?: string; consultationFee?: number; isVerified?: boolean
-  }>(doctors || [], `healio_doctors_${new Date().toISOString().split('T')[0]}.csv`, [
-    { key: 'name', header: 'Name' },
-    { key: 'email', header: 'Email' },
-    { key: 'specialty', header: 'Specialty' },
-    { key: 'consultationFee', header: 'Consultation Fee' },
-    { key: 'isVerified', header: 'Verified' },
-  ]);
+    _id: string;
+    name: string;
+    email: string;
+    specialty?: string;
+    consultationFee?: number;
+    isVerified?: boolean;
+  }>(
+    doctors || [],
+    `healio_doctors_${new Date().toISOString().split('T')[0]}.csv`,
+    [
+      { key: 'name', header: 'Name' },
+      { key: 'email', header: 'Email' },
+      { key: 'specialty', header: 'Specialty' },
+      { key: 'consultationFee', header: 'Consultation Fee' },
+      { key: 'isVerified', header: 'Verified' },
+    ],
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300);
@@ -43,7 +65,12 @@ export default function AdminDoctorsPage() {
     }
   }
 
-  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
 
   return (
     <div>
@@ -58,7 +85,9 @@ export default function AdminDoctorsPage() {
             <Download className="h-4 w-4" />
             Export CSV
           </button>
-          <span className="text-sm text-gray-500">{doctors?.length || 0} total</span>
+          <span className="text-sm text-gray-500">
+            {doctors?.length || 0} total
+          </span>
         </div>
       </div>
 
@@ -80,14 +109,20 @@ export default function AdminDoctorsPage() {
           className="px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
         >
           <option value="">All Specialties</option>
-          {SPECIALTIES.map(s => (
-            <option key={s} value={s}>{s}</option>
+          {SPECIALTIES.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
 
         <select
           value={verified === undefined ? '' : verified.toString()}
-          onChange={(e) => setVerified(e.target.value === '' ? undefined : e.target.value === 'true')}
+          onChange={(e) =>
+            setVerified(
+              e.target.value === '' ? undefined : e.target.value === 'true',
+            )
+          }
           className="px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
         >
           <option value="">All Status</option>
@@ -100,21 +135,44 @@ export default function AdminDoctorsPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Name</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Email</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Specialty</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Fee</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Status</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Action</th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Name
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Email
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Specialty
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Fee
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Status
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {doctors?.map(doctor => (
-              <tr key={doctor._id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-5 py-3 font-medium text-gray-900">{doctor.name}</td>
+            {doctors?.map((doctor) => (
+              <tr
+                key={doctor._id}
+                className="hover:bg-gray-50 transition-colors"
+              >
+                <td className="px-5 py-3 font-medium text-gray-900">
+                  {doctor.name}
+                </td>
                 <td className="px-5 py-3 text-gray-500">{doctor.email}</td>
-                <td className="px-5 py-3 text-gray-600">{doctor.specialty || <span className="text-gray-300 italic">Not set</span>}</td>
-                <td className="px-5 py-3 text-gray-600">{doctor.consultationFee ? `$${doctor.consultationFee}` : '—'}</td>
+                <td className="px-5 py-3 text-gray-600">
+                  {doctor.specialty || (
+                    <span className="text-gray-300 italic">Not set</span>
+                  )}
+                </td>
+                <td className="px-5 py-3 text-gray-600">
+                  {doctor.consultationFee ? `$${doctor.consultationFee}` : '—'}
+                </td>
                 <td className="px-5 py-3">
                   {doctor.isVerified ? (
                     <span className="inline-flex items-center gap-1 text-green-600 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium">
@@ -128,7 +186,9 @@ export default function AdminDoctorsPage() {
                 </td>
                 <td className="px-5 py-3">
                   <button
-                    onClick={() => toggleVerify(doctor._id, !!doctor.isVerified)}
+                    onClick={() =>
+                      toggleVerify(doctor._id, !!doctor.isVerified)
+                    }
                     disabled={verifyDoctor.isPending}
                     className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${
                       doctor.isVerified
@@ -136,13 +196,24 @@ export default function AdminDoctorsPage() {
                         : 'bg-teal-50 text-teal-700 hover:bg-teal-100'
                     }`}
                   >
-                    {verifyDoctor.isPending ? '…' : doctor.isVerified ? 'Revoke' : 'Verify'}
+                    {verifyDoctor.isPending
+                      ? '…'
+                      : doctor.isVerified
+                        ? 'Revoke'
+                        : 'Verify'}
                   </button>
                 </td>
               </tr>
             ))}
             {(!doctors || doctors.length === 0) && (
-              <tr><td colSpan={6} className="px-5 py-10 text-center text-gray-400">No doctors found.</td></tr>
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-5 py-10 text-center text-gray-400"
+                >
+                  No doctors found.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

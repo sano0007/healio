@@ -1,5 +1,5 @@
-import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
-import {Document, Schema as MongooseSchema} from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type DoctorDocument = Doctor & Document;
 
@@ -50,7 +50,7 @@ export class Doctor {
   @Prop({ default: false })
   isVerified: boolean;
 
-  @Prop({ default: "online" })
+  @Prop({ default: 'online' })
   status: string;
 
   @Prop({ type: [AvailabilitySlotSchema], default: [] })
@@ -62,11 +62,13 @@ export const DoctorSchema = SchemaFactory.createForClass(Doctor);
 DoctorSchema.set('toJSON', {
   transform: (_doc, ret) => {
     if (Array.isArray(ret.availability)) {
-      ret.availability = ret.availability.map((s: { dayOfWeek: number; startTime: string; endTime: string }) => ({
-        dayOfWeek: s.dayOfWeek,
-        startTime: s.startTime,
-        endTime: s.endTime,
-      }));
+      ret.availability = ret.availability.map(
+        (s: { dayOfWeek: number; startTime: string; endTime: string }) => ({
+          dayOfWeek: s.dayOfWeek,
+          startTime: s.startTime,
+          endTime: s.endTime,
+        }),
+      );
     }
     return ret;
   },

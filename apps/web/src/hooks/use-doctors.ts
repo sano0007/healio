@@ -1,6 +1,6 @@
-import {useQuery} from '@tanstack/react-query';
-import {api, Doctor} from '@/lib/api';
-import {useAuth} from '@/contexts/auth';
+import { useQuery } from '@tanstack/react-query';
+import { api, Doctor } from '@/lib/api';
+import { useAuth } from '@/contexts/auth';
 
 export interface DoctorFilters {
   search?: string;

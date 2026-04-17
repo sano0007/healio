@@ -1,7 +1,7 @@
-import {Controller} from '@nestjs/common';
-import {MessagePattern, Payload} from '@nestjs/microservices';
-import {AppointmentStatus, MSG} from '@healio/shared-types';
-import {AppointmentsService} from './appointments.service';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { AppointmentStatus, MSG } from '@healio/shared-types';
+import { AppointmentsService } from './appointments.service';
 
 @Controller()
 export class AppointmentsController {
@@ -13,7 +13,15 @@ export class AppointmentsController {
   }
 
   @MessagePattern(MSG.APPOINTMENT_BOOK)
-  book(@Payload() dto: { patientId: string; doctorId: string; scheduledAt: string; notes?: string }) {
+  book(
+    @Payload()
+    dto: {
+      patientId: string;
+      doctorId: string;
+      scheduledAt: string;
+      notes?: string;
+    },
+  ) {
     return this.appointmentsService.book(dto);
   }
 
@@ -23,15 +31,25 @@ export class AppointmentsController {
   }
 
   @MessagePattern(MSG.APPOINTMENT_UPDATE_STATUS)
-  updateStatus(@Payload() data: {
+  updateStatus(
+    @Payload()
+    data: {
       appointmentId: string;
       status: AppointmentStatus;
       paymentStatus?: string;
       sessionId?: string;
       roomName?: string;
-      checkoutUrl?: string
-  }) {
-      return this.appointmentsService.updateStatus(data.appointmentId, data.status, data.paymentStatus, data.sessionId, data.roomName, data.checkoutUrl);
+      checkoutUrl?: string;
+    },
+  ) {
+    return this.appointmentsService.updateStatus(
+      data.appointmentId,
+      data.status,
+      data.paymentStatus,
+      data.sessionId,
+      data.roomName,
+      data.checkoutUrl,
+    );
   }
 
   @MessagePattern(MSG.APPOINTMENT_GET)

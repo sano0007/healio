@@ -4,7 +4,15 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth';
-import { Activity, LayoutDashboard, Users, Stethoscope, Calendar, CreditCard, LogOut } from 'lucide-react';
+import {
+  Activity,
+  LayoutDashboard,
+  Users,
+  Stethoscope,
+  Calendar,
+  CreditCard,
+  LogOut,
+} from 'lucide-react';
 
 const NAV = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard },
@@ -14,13 +22,18 @@ const NAV = [
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && (!user || user.role !== 'admin')) router.replace('/login');
+    if (!isLoading && (!user || user.role !== 'admin'))
+      router.replace('/login');
   }, [user, isLoading, router]);
 
   if (isLoading || !user) {
@@ -56,9 +69,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ))}
         </nav>
         <div className="px-3 py-4 border-t border-gray-100">
-          <div className="px-3 py-2 text-xs text-gray-400 truncate">{user.email}</div>
+          <div className="px-3 py-2 text-xs text-gray-400 truncate">
+            {user.email}
+          </div>
           <button
-            onClick={() => { logout(); router.push('/login'); }}
+            onClick={() => {
+              logout();
+              router.push('/login');
+            }}
             className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors w-full"
           >
             <LogOut className="h-4 w-4" />

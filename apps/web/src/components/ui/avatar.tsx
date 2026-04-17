@@ -1,23 +1,27 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
+import * as React from 'react';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 const Avatar = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { src?: string; alt?: string; fallback?: string }
+  React.HTMLAttributes<HTMLDivElement> & {
+    src?: string;
+    alt?: string;
+    fallback?: string;
+  }
 >(({ className, src, alt, fallback, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-white bg-brand-lightest",
-      className
+      'relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-white bg-brand-lightest',
+      className,
     )}
     {...props}
   >
     {src ? (
       <Image
         src={src}
-        alt={alt || ""}
+        alt={alt || ''}
         width={40}
         height={40}
         className="aspect-square h-full w-full object-cover"
@@ -28,7 +32,7 @@ const Avatar = React.forwardRef<
       </div>
     )}
   </div>
-))
-Avatar.displayName = "Avatar"
+));
+Avatar.displayName = 'Avatar';
 
-export { Avatar }
+export { Avatar };

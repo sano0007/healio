@@ -1,20 +1,20 @@
-import { TrendingUp, Target, Wifi } from "lucide-react";
+import { TrendingUp, Target, Wifi } from 'lucide-react';
 
 const whyChooseFeatures = [
   {
     icon: TrendingUp,
-    title: "Your Evolving Care Plan",
+    title: 'Your Evolving Care Plan',
     desc: "Dynamic treatment roadmaps that adapt with your progress. Your care plan isn't static—it evolves based on real-time feedback.",
   },
   {
     icon: Target,
-    title: "AI-Optimized Accuracy",
-    desc: "Our algorithm cross-references data from 50M+ health records to surface the right match. Smart data to surface insights not visible to doctors alone.",
+    title: 'AI-Optimized Accuracy',
+    desc: 'Our algorithm cross-references data from 50M+ health records to surface the right match. Smart data to surface insights not visible to doctors alone.',
   },
   {
     icon: Wifi,
-    title: "Always-On Monitoring",
-    desc: "24/7 passive tracking with intelligent alerts for proactive health management. Real-time monitoring that keeps you safe.",
+    title: 'Always-On Monitoring',
+    desc: '24/7 passive tracking with intelligent alerts for proactive health management. Real-time monitoring that keeps you safe.',
   },
 ];
 
@@ -27,8 +27,10 @@ export function WhyChooseUsSection() {
           <div>
             <span className="section-label">(Why Choose Us)</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-brand-black leading-snug mt-2">
-              The{" "}
-              <em className="font-serif italic font-normal">Right Specialist</em>
+              The{' '}
+              <em className="font-serif italic font-normal">
+                Right Specialist
+              </em>
               <br />
               Makes All the Difference
             </h2>
@@ -43,8 +45,12 @@ export function WhyChooseUsSection() {
                     <feat.icon className="w-5 h-5 text-brand-dark" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-brand-black mb-1.5">{feat.title}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{feat.desc}</p>
+                    <h3 className="font-semibold text-brand-black mb-1.5">
+                      {feat.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">
+                      {feat.desc}
+                    </p>
                   </div>
                 </div>
               </div>

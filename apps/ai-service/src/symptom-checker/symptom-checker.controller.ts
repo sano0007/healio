@@ -9,6 +9,9 @@ export class SymptomCheckerController {
 
   @MessagePattern(MSG.AI_SYMPTOM_CHECK)
   checkSymptoms(@Payload() payload: { symptoms: string; patientId: string }) {
-    return this.symptomCheckerService.checkSymptoms(payload.symptoms, payload.patientId);
+    return this.symptomCheckerService.checkSymptoms(
+      payload.symptoms,
+      payload.patientId,
+    );
   }
 }

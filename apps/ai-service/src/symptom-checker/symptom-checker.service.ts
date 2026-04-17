@@ -36,8 +36,13 @@ export class SymptomCheckerService {
     });
   }
 
-  async checkSymptoms(symptoms: string, patientId: string): Promise<SymptomCheckResult> {
-    this.logger.log(`Analyzing symptoms for patient ${patientId} (${symptoms.length} chars)`);
+  async checkSymptoms(
+    symptoms: string,
+    patientId: string,
+  ): Promise<SymptomCheckResult> {
+    this.logger.log(
+      `Analyzing symptoms for patient ${patientId} (${symptoms.length} chars)`,
+    );
 
     let raw: string;
     try {
@@ -53,23 +58,36 @@ export class SymptomCheckerService {
       raw = completion.choices[0]?.message?.content ?? '';
     } catch (err) {
       this.logger.error('Groq API call failed', err);
-      throw new RpcException('AI service is temporarily unavailable. Please try again.');
+      throw new RpcException(
+        'AI service is temporarily unavailable. Please try again.',
+      );
     }
 
     // Strip any accidental markdown code fences
-    const cleaned = raw.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim();
+    const cleaned = raw
+      .replace(/^```(?:json)?\n?/i, '')
+      .replace(/\n?```$/i, '')
+      .trim();
 
     let result: SymptomCheckResult;
     try {
       result = JSON.parse(cleaned);
     } catch {
       this.logger.error('Groq returned malformed JSON', { raw });
-      throw new RpcException('AI service returned an unexpected response. Please try again.');
+      throw new RpcException(
+        'AI service returned an unexpected response. Please try again.',
+      );
     }
 
     // Basic shape validation
-    if (!result.severity || !Array.isArray(result.conditions) || !Array.isArray(result.recommendedActions)) {
-      throw new RpcException('AI service returned incomplete data. Please try again.');
+    if (
+      !result.severity ||
+      !Array.isArray(result.conditions) ||
+      !Array.isArray(result.recommendedActions)
+    ) {
+      throw new RpcException(
+        'AI service returned incomplete data. Please try again.',
+      );
     }
 
     return result;

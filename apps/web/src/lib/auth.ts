@@ -9,7 +9,11 @@ export interface StoredUser {
   role: string;
 }
 
-export function saveAuth(token: string, user: StoredUser, refreshToken?: string) {
+export function saveAuth(
+  token: string,
+  user: StoredUser,
+  refreshToken?: string,
+) {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
   if (refreshToken) {

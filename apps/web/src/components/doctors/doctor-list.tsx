@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { DoctorCard, type Doctor } from "./doctor-card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Stethoscope } from "lucide-react";
+import { motion } from 'framer-motion';
+import { DoctorCard, type Doctor } from './doctor-card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Stethoscope } from 'lucide-react';
 
-export function DoctorList({ 
-  doctors = [], 
+export function DoctorList({
+  doctors = [],
   isLoading = false,
   error,
-}: { 
+}: {
   doctors?: Doctor[];
   isLoading?: boolean;
   error?: Error | null;
@@ -18,7 +18,10 @@ export function DoctorList({
     return (
       <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-[280px] bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm animate-pulse space-y-4">
+          <div
+            key={i}
+            className="h-[280px] bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm animate-pulse space-y-4"
+          >
             <div className="flex items-start gap-5">
               <div className="w-20 h-20 bg-gray-100 rounded-full" />
               <div className="flex-1 space-y-2">
@@ -40,9 +43,12 @@ export function DoctorList({
         <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mb-6">
           <Stethoscope className="w-10 h-10 text-red-300" />
         </div>
-        <h3 className="text-xl font-bold text-brand-black mb-2">Failed to load doctors</h3>
+        <h3 className="text-xl font-bold text-brand-black mb-2">
+          Failed to load doctors
+        </h3>
         <p className="text-sm text-gray-400 max-w-xs mx-auto">
-          We couldn't load the doctors. Please check your connection and try again.
+          We couldn't load the doctors. Please check your connection and try
+          again.
         </p>
       </div>
     );
@@ -54,9 +60,12 @@ export function DoctorList({
         <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center mb-6">
           <Stethoscope className="w-10 h-10 text-gray-300" />
         </div>
-        <h3 className="text-xl font-bold text-brand-black mb-2">No doctors found</h3>
+        <h3 className="text-xl font-bold text-brand-black mb-2">
+          No doctors found
+        </h3>
         <p className="text-sm text-gray-400 max-w-xs mx-auto">
-          We couldn't find any specialist matching your criteria. Try adjusting your filters or search terms.
+          We couldn't find any specialist matching your criteria. Try adjusting
+          your filters or search terms.
         </p>
       </div>
     );

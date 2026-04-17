@@ -13,7 +13,9 @@ export class PatientsController {
   }
 
   @MessagePattern(MSG.PATIENT_CREATE)
-  createProfile(@Payload() data: { userId: string; name: string; email: string }) {
+  createProfile(
+    @Payload() data: { userId: string; name: string; email: string },
+  ) {
     return this.patientsService.createProfile(data);
   }
 
@@ -23,12 +25,23 @@ export class PatientsController {
   }
 
   @MessagePattern(MSG.PATIENT_UPDATE)
-  updateProfile(@Payload() data: { userId: string; updates: Record<string, unknown> }) {
-    return this.patientsService.updateProfile(data.userId, data.updates as Record<string, unknown>);
+  updateProfile(
+    @Payload() data: { userId: string; updates: Record<string, unknown> },
+  ) {
+    return this.patientsService.updateProfile(
+      data.userId,
+      data.updates as Record<string, unknown>,
+    );
   }
 
   @MessagePattern(MSG.PATIENT_UPLOAD_REPORT)
-  uploadReport(@Payload() data: { userId: string; report: { filename: string; originalName: string; url: string } }) {
+  uploadReport(
+    @Payload()
+    data: {
+      userId: string;
+      report: { filename: string; originalName: string; url: string };
+    },
+  ) {
     return this.patientsService.uploadReport(data.userId, data.report);
   }
 

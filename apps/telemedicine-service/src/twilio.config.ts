@@ -47,7 +47,7 @@ export class TwilioConfigService {
   validate(): void {
     if (!this.isConfigured()) {
       throw new Error(
-        'Twilio is not configured. Please set TWILIO_ACCOUNT_SID, TWILIO_API_KEY, and TWILIO_API_SECRET environment variables.'
+        'Twilio is not configured. Please set TWILIO_ACCOUNT_SID, TWILIO_API_KEY, and TWILIO_API_SECRET environment variables.',
       );
     }
   }

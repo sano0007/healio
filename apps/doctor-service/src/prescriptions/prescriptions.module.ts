@@ -5,7 +5,11 @@ import { PrescriptionsService } from './prescriptions.service';
 import { PrescriptionsController } from './prescriptions.controller';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Prescription.name, schema: PrescriptionSchema }])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Prescription.name, schema: PrescriptionSchema },
+    ]),
+  ],
   controllers: [PrescriptionsController],
   providers: [PrescriptionsService],
   exports: [PrescriptionsService],

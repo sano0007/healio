@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { CloudSun, CalendarDays } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
+import { motion } from 'framer-motion';
+import { CloudSun, CalendarDays } from 'lucide-react';
+import { Avatar } from '@/components/ui/avatar';
 
 export function WelcomeBanner({ name }: { name: string }) {
-  const today = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 
   return (
@@ -21,14 +21,16 @@ export function WelcomeBanner({ name }: { name: string }) {
     >
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-5">
-          <Avatar 
-            src="/images/doctor-1.png" 
+          <Avatar
+            src="/images/doctor-1.png"
             className="w-16 h-16 lg:w-20 lg:h-20 border-4 border-white/10"
           />
           <div>
             <div className="flex items-center gap-2 text-brand-light/80 mb-1">
               <CloudSun className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wider">Good Morning</span>
+              <span className="text-xs font-medium uppercase tracking-wider">
+                Good Morning
+              </span>
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">
               Hello, {name} 👋

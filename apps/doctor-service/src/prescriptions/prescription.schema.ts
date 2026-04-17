@@ -14,8 +14,17 @@ export class Prescription {
   @Prop({ required: true })
   appointmentId: string;
 
-  @Prop({ type: [{ name: String, dosage: String, frequency: String, duration: String }] })
-  medications: { name: string; dosage: string; frequency: string; duration: string }[];
+  @Prop({
+    type: [
+      { name: String, dosage: String, frequency: String, duration: String },
+    ],
+  })
+  medications: {
+    name: string;
+    dosage: string;
+    frequency: string;
+    duration: string;
+  }[];
 
   @Prop()
   notes: string;

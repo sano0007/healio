@@ -13,40 +13,43 @@
 ## File Map
 
 ### New files
-| File | Purpose |
-|------|---------|
-| `apps/ai-service/package.json` | NestJS + openai dependencies |
-| `apps/ai-service/tsconfig.json` | TypeScript config |
-| `apps/ai-service/nest-cli.json` | NestJS CLI config |
-| `apps/ai-service/src/main.ts` | TCP microservice bootstrap on port 5008 |
-| `apps/ai-service/src/app.module.ts` | Root module (ConfigModule + SymptomCheckerModule) |
-| `apps/ai-service/src/symptom-checker/symptom-checker.module.ts` | Feature module |
-| `apps/ai-service/src/symptom-checker/symptom-checker.controller.ts` | Handles `MSG.AI_SYMPTOM_CHECK` TCP pattern |
-| `apps/ai-service/src/symptom-checker/symptom-checker.service.ts` | Groq call + JSON parse + error handling |
-| `apps/api-gateway/src/ai/ai-gateway.module.ts` | Gateway feature module |
-| `apps/api-gateway/src/ai/ai-gateway.controller.ts` | `POST /ai/symptom-check` with JWT guard |
-| `infra/docker/ai-service.Dockerfile` | Multi-stage Docker build |
-| `infra/k8s/18-ai-service.yaml` | Kubernetes Deployment + Service |
+
+| File                                                                | Purpose                                           |
+| ------------------------------------------------------------------- | ------------------------------------------------- |
+| `apps/ai-service/package.json`                                      | NestJS + openai dependencies                      |
+| `apps/ai-service/tsconfig.json`                                     | TypeScript config                                 |
+| `apps/ai-service/nest-cli.json`                                     | NestJS CLI config                                 |
+| `apps/ai-service/src/main.ts`                                       | TCP microservice bootstrap on port 5008           |
+| `apps/ai-service/src/app.module.ts`                                 | Root module (ConfigModule + SymptomCheckerModule) |
+| `apps/ai-service/src/symptom-checker/symptom-checker.module.ts`     | Feature module                                    |
+| `apps/ai-service/src/symptom-checker/symptom-checker.controller.ts` | Handles `MSG.AI_SYMPTOM_CHECK` TCP pattern        |
+| `apps/ai-service/src/symptom-checker/symptom-checker.service.ts`    | Groq call + JSON parse + error handling           |
+| `apps/api-gateway/src/ai/ai-gateway.module.ts`                      | Gateway feature module                            |
+| `apps/api-gateway/src/ai/ai-gateway.controller.ts`                  | `POST /ai/symptom-check` with JWT guard           |
+| `infra/docker/ai-service.Dockerfile`                                | Multi-stage Docker build                          |
+| `infra/k8s/18-ai-service.yaml`                                      | Kubernetes Deployment + Service                   |
 
 ### Modified files
-| File | Change |
-|------|--------|
-| `packages/shared-types/src/index.ts` | Add `SymptomCheckResult` type + `MSG.AI_SYMPTOM_CHECK` |
-| `apps/api-gateway/src/clients.module.ts` | Register `AI_SERVICE` TCP client |
-| `apps/api-gateway/src/app.module.ts` | Import `AiGatewayModule` |
-| `apps/web/src/lib/api.ts` | Add `api.ai.checkSymptoms()` |
-| `apps/web/src/app/(app)/symptom-checker/page.tsx` | Add `results` state, wire `DiagnosticEngine` + `TriageResults` |
-| `apps/web/src/components/symptom-checker/diagnostic-engine.tsx` | Real API call + animation coordination + error state |
-| `apps/web/src/components/symptom-checker/triage-results.tsx` | Replace `mockResults` const with `results` prop |
-| `infra/docker-compose.yml` | Add `ai-service` container |
-| `infra/k8s/02-configmap.yaml` | Add `AI_SERVICE_HOST` + `AI_SERVICE_PORT` |
-| `.env` / `.env.example` | Add `GROQ_API_KEY`, `AI_SERVICE_PORT=5008`, `AI_SERVICE_HOST=localhost` |
+
+| File                                                            | Change                                                                  |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `packages/shared-types/src/index.ts`                            | Add `SymptomCheckResult` type + `MSG.AI_SYMPTOM_CHECK`                  |
+| `apps/api-gateway/src/clients.module.ts`                        | Register `AI_SERVICE` TCP client                                        |
+| `apps/api-gateway/src/app.module.ts`                            | Import `AiGatewayModule`                                                |
+| `apps/web/src/lib/api.ts`                                       | Add `api.ai.checkSymptoms()`                                            |
+| `apps/web/src/app/(app)/symptom-checker/page.tsx`               | Add `results` state, wire `DiagnosticEngine` + `TriageResults`          |
+| `apps/web/src/components/symptom-checker/diagnostic-engine.tsx` | Real API call + animation coordination + error state                    |
+| `apps/web/src/components/symptom-checker/triage-results.tsx`    | Replace `mockResults` const with `results` prop                         |
+| `infra/docker-compose.yml`                                      | Add `ai-service` container                                              |
+| `infra/k8s/02-configmap.yaml`                                   | Add `AI_SERVICE_HOST` + `AI_SERVICE_PORT`                               |
+| `.env` / `.env.example`                                         | Add `GROQ_API_KEY`, `AI_SERVICE_PORT=5008`, `AI_SERVICE_HOST=localhost` |
 
 ---
 
 ## Task 1: Add shared types
 
 **Files:**
+
 - Modify: `packages/shared-types/src/index.ts`
 
 - [ ] **Step 1: Add `SymptomCheckResult` types and `AI_SYMPTOM_CHECK` message**
@@ -58,15 +61,15 @@ Open `packages/shared-types/src/index.ts` and add the following at the end of th
 
 export interface SymptomCheckCondition {
   name: string;
-  probability: number;        // 0–100
+  probability: number; // 0–100
   description: string;
-  specialist: string;         // e.g. "Neurologist", "General Physician"
+  specialist: string; // e.g. "Neurologist", "General Physician"
 }
 
 export interface SymptomCheckResult {
   severity: 'Low' | 'Moderate' | 'High' | 'Emergency';
-  conditions: SymptomCheckCondition[];   // max 3, ranked by probability desc
-  recommendedActions: string[];          // 3–5 immediate action steps
+  conditions: SymptomCheckCondition[]; // max 3, ranked by probability desc
+  recommendedActions: string[]; // 3–5 immediate action steps
 }
 ```
 
@@ -98,6 +101,7 @@ git commit -m "feat(shared-types): add SymptomCheckResult types and AI_SYMPTOM_C
 ## Task 2: Scaffold ai-service
 
 **Files:**
+
 - Create: `apps/ai-service/package.json`
 - Create: `apps/ai-service/tsconfig.json`
 - Create: `apps/ai-service/nest-cli.json`
@@ -182,15 +186,20 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-    transport: Transport.TCP,
-    options: {
-      host: '0.0.0.0',
-      port: parseInt(process.env.AI_SERVICE_PORT || '5008'),
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.TCP,
+      options: {
+        host: '0.0.0.0',
+        port: parseInt(process.env.AI_SERVICE_PORT || '5008'),
+      },
     },
-  });
+  );
   await app.listen();
-  console.log(`AI-service listening on port ${process.env.AI_SERVICE_PORT || 5008}`);
+  console.log(
+    `AI-service listening on port ${process.env.AI_SERVICE_PORT || 5008}`,
+  );
 }
 bootstrap();
 ```
@@ -204,7 +213,10 @@ import { SymptomCheckerModule } from './symptom-checker/symptom-checker.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../../.env', '.env'] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['../../.env', '.env'],
+    }),
     SymptomCheckerModule,
   ],
 })
@@ -232,11 +244,12 @@ git commit -m "feat(ai-service): scaffold NestJS TCP microservice"
 ## Task 3: Implement SymptomCheckerService
 
 **Files:**
+
 - Create: `apps/ai-service/src/symptom-checker/symptom-checker.service.ts`
 
 - [ ] **Step 1: Create the service**
 
-```typescript
+````typescript
 // apps/ai-service/src/symptom-checker/symptom-checker.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -293,29 +306,42 @@ export class SymptomCheckerService {
       raw = completion.choices[0]?.message?.content ?? '';
     } catch (err) {
       this.logger.error('Groq API call failed', err);
-      throw new RpcException('AI service is temporarily unavailable. Please try again.');
+      throw new RpcException(
+        'AI service is temporarily unavailable. Please try again.',
+      );
     }
 
     // Strip any accidental markdown code fences
-    const cleaned = raw.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim();
+    const cleaned = raw
+      .replace(/^```(?:json)?\n?/i, '')
+      .replace(/\n?```$/i, '')
+      .trim();
 
     let result: SymptomCheckResult;
     try {
       result = JSON.parse(cleaned);
     } catch {
       this.logger.error('Groq returned malformed JSON', { raw });
-      throw new RpcException('AI service returned an unexpected response. Please try again.');
+      throw new RpcException(
+        'AI service returned an unexpected response. Please try again.',
+      );
     }
 
     // Basic shape validation
-    if (!result.severity || !Array.isArray(result.conditions) || !Array.isArray(result.recommendedActions)) {
-      throw new RpcException('AI service returned incomplete data. Please try again.');
+    if (
+      !result.severity ||
+      !Array.isArray(result.conditions) ||
+      !Array.isArray(result.recommendedActions)
+    ) {
+      throw new RpcException(
+        'AI service returned incomplete data. Please try again.',
+      );
     }
 
     return result;
   }
 }
-```
+````
 
 - [ ] **Step 2: Commit**
 
@@ -329,6 +355,7 @@ git commit -m "feat(ai-service): implement SymptomCheckerService with Groq integ
 ## Task 4: Implement SymptomCheckerController and Module
 
 **Files:**
+
 - Create: `apps/ai-service/src/symptom-checker/symptom-checker.controller.ts`
 - Create: `apps/ai-service/src/symptom-checker/symptom-checker.module.ts`
 
@@ -386,6 +413,7 @@ git commit -m "feat(ai-service): add SymptomCheckerController and Module"
 ## Task 5: Wire AI_SERVICE into the API Gateway
 
 **Files:**
+
 - Modify: `apps/api-gateway/src/clients.module.ts`
 - Modify: `apps/api-gateway/src/app.module.ts`
 - Create: `apps/api-gateway/src/ai/ai-gateway.module.ts`
@@ -418,9 +446,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @Controller('ai')
 export class AiGatewayController {
-  constructor(
-    @Inject('AI_SERVICE') private aiClient: ClientProxy,
-  ) {}
+  constructor(@Inject('AI_SERVICE') private aiClient: ClientProxy) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('symptom-check')
@@ -453,11 +479,13 @@ export class AiGatewayModule {}
 - [ ] **Step 4: Import `AiGatewayModule` in `apps/api-gateway/src/app.module.ts`**
 
 Add the import at the top:
+
 ```typescript
 import { AiGatewayModule } from './ai/ai-gateway.module';
 ```
 
 Add `AiGatewayModule` to the `imports` array:
+
 ```typescript
 imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../../.env', '.env'] }),
@@ -494,17 +522,20 @@ git commit -m "feat(api-gateway): wire AI_SERVICE client and AiGatewayController
 ## Task 6: Add environment variables
 
 **Files:**
+
 - Modify: `.env` (root)
 - Modify: `.env.example` (if it exists at root)
 
 - [ ] **Step 1: Add vars to `.env`**
 
 Check if `.env` exists at the repo root:
+
 ```bash
 ls /Users/stoxmod/WebstormProjects/healio/.env
 ```
 
 Append these lines:
+
 ```env
 # AI Service (Groq)
 GROQ_API_KEY=your_groq_api_key_here
@@ -521,6 +552,7 @@ ls /Users/stoxmod/WebstormProjects/healio/.env.example 2>/dev/null && echo "exis
 ```
 
 If it exists, append the same block with a blank key value:
+
 ```env
 # AI Service (Groq)
 GROQ_API_KEY=
@@ -546,6 +578,7 @@ Before touching the frontend, verify the full backend chain works.
 - [ ] **Step 1: Start MongoDB and both services**
 
 In one terminal:
+
 ```bash
 cd /Users/stoxmod/WebstormProjects/healio
 bun run dev --filter=ai-service
@@ -554,6 +587,7 @@ bun run dev --filter=ai-service
 Expected output: `AI-service listening on port 5008`
 
 In another terminal:
+
 ```bash
 bun run dev --filter=api-gateway
 ```
@@ -580,6 +614,7 @@ curl -s -X POST http://localhost:3001/api/ai/symptom-check \
 ```
 
 Expected: JSON response with `severity`, `conditions` array, and `recommendedActions` array. Example:
+
 ```json
 {
   "severity": "Moderate",
@@ -596,6 +631,7 @@ Expected: JSON response with `severity`, `conditions` array, and `recommendedAct
 ## Task 8: Add `api.ai` to the frontend API client
 
 **Files:**
+
 - Modify: `apps/web/src/lib/api.ts`
 
 - [ ] **Step 1: Add the `SymptomCheckResult` import and `ai` namespace**
@@ -641,6 +677,7 @@ git commit -m "feat(web): add api.ai.checkSymptoms to API client"
 ## Task 9: Update `TriageResults` to accept real data
 
 **Files:**
+
 - Modify: `apps/web/src/components/symptom-checker/triage-results.tsx`
 
 - [ ] **Step 1: Replace `mockResults` with a `results` prop**
@@ -652,15 +689,19 @@ Make these changes:
 1. Remove the entire `const mockResults = { ... }` block (lines 9–21).
 
 2. Add an import for `SymptomCheckResult` from the API lib. At the top of the file, add:
+
 ```typescript
 import type { SymptomCheckResult } from '@/lib/api';
 ```
 
 3. Change the component signature from:
+
 ```typescript
 export function TriageResults({ onReset }: { onReset: () => void }) {
 ```
+
 to:
+
 ```typescript
 export function TriageResults({ results, onReset }: { results: SymptomCheckResult; onReset: () => void }) {
 ```
@@ -679,6 +720,7 @@ git commit -m "feat(web): wire TriageResults to accept real SymptomCheckResult p
 ## Task 10: Update `DiagnosticEngine` to call the real API
 
 **Files:**
+
 - Modify: `apps/web/src/components/symptom-checker/diagnostic-engine.tsx`
 
 - [ ] **Step 1: Rewrite `DiagnosticEngine` with real API call**
@@ -867,6 +909,7 @@ git commit -m "feat(web): wire DiagnosticEngine to real Groq API call"
 ## Task 11: Update `page.tsx` to wire state between components
 
 **Files:**
+
 - Modify: `apps/web/src/app/(app)/symptom-checker/page.tsx`
 
 - [ ] **Step 1: Add `results` state and update handler signatures**
@@ -874,43 +917,49 @@ git commit -m "feat(web): wire DiagnosticEngine to real Groq API call"
 Open `apps/web/src/app/(app)/symptom-checker/page.tsx`.
 
 Add the import for `SymptomCheckResult` at the top:
+
 ```typescript
-import type { SymptomCheckResult } from "@/lib/api";
+import type { SymptomCheckResult } from '@/lib/api';
 ```
 
 Change the state declarations from:
+
 ```typescript
-const [state, setState] = useState<CheckerState>("input");
-const [userSymptoms, setUserSymptoms] = useState("");
+const [state, setState] = useState<CheckerState>('input');
+const [userSymptoms, setUserSymptoms] = useState('');
 ```
 
 to:
+
 ```typescript
-const [state, setState] = useState<CheckerState>("input");
-const [userSymptoms, setUserSymptoms] = useState("");
+const [state, setState] = useState<CheckerState>('input');
+const [userSymptoms, setUserSymptoms] = useState('');
 const [results, setResults] = useState<SymptomCheckResult | null>(null);
 ```
 
 Change `handleAnalysisComplete` from:
+
 ```typescript
 const handleAnalysisComplete = () => {
-  setState("results");
+  setState('results');
 };
 ```
 
 to:
+
 ```typescript
 const handleAnalysisComplete = (data: SymptomCheckResult) => {
   setResults(data);
-  setState("results");
+  setState('results');
 };
 ```
 
 Update `handleReset` to also clear results:
+
 ```typescript
 const handleReset = () => {
-  setState("input");
-  setUserSymptoms("");
+  setState('input');
+  setUserSymptoms('');
   setResults(null);
 };
 ```
@@ -918,21 +967,25 @@ const handleReset = () => {
 - [ ] **Step 2: Pass new props to `DiagnosticEngine` and `TriageResults`**
 
 Change the `DiagnosticEngine` usage from:
+
 ```typescript
 <DiagnosticEngine onComplete={handleAnalysisComplete} />
 ```
 
 to:
+
 ```typescript
 <DiagnosticEngine symptoms={userSymptoms} onComplete={handleAnalysisComplete} onReset={handleReset} />
 ```
 
 Change the `TriageResults` usage from:
+
 ```typescript
 <TriageResults onReset={handleReset} />
 ```
 
 to:
+
 ```typescript
 {results && <TriageResults results={results} onReset={handleReset} />}
 ```
@@ -949,6 +1002,7 @@ git commit -m "feat(web): wire symptom checker page to real AI results"
 ## Task 12: Add Docker support for ai-service
 
 **Files:**
+
 - Create: `infra/docker/ai-service.Dockerfile`
 - Modify: `infra/docker-compose.yml`
 
@@ -996,35 +1050,37 @@ CMD ["node", "dist/main.js"]
 Add this service block after the `notification-service` block (before the `networks:` section):
 
 ```yaml
-  # ─── AI Service ──────────────────────────────────────────────────────────────
-  ai-service:
-    build:
-      context: /Users/stoxmod/WebstormProjects/healio
-      dockerfile: infra/docker/ai-service.Dockerfile
-    image: healio/ai-service:latest
-    container_name: healio-ai-service
-    restart: unless-stopped
-    ports:
-      - '5008:5008'
-    environment:
-      - PORT=5008
-      - GROQ_API_KEY=${GROQ_API_KEY:-}
-    networks:
-      - healio-net
+# ─── AI Service ──────────────────────────────────────────────────────────────
+ai-service:
+  build:
+    context: /Users/stoxmod/WebstormProjects/healio
+    dockerfile: infra/docker/ai-service.Dockerfile
+  image: healio/ai-service:latest
+  container_name: healio-ai-service
+  restart: unless-stopped
+  ports:
+    - '5008:5008'
+  environment:
+    - PORT=5008
+    - GROQ_API_KEY=${GROQ_API_KEY:-}
+  networks:
+    - healio-net
 ```
 
 Also add `ai-service` to the `api-gateway` `depends_on` block:
+
 ```yaml
-      ai-service:
-        condition: service_started
+ai-service:
+  condition: service_started
 ```
 
 - [ ] **Step 3: Update api-gateway environment in docker-compose to include AI service**
 
 Inside the `api-gateway` `environment:` list, add:
+
 ```yaml
-      - AI_SERVICE_HOST=ai-service
-      - AI_SERVICE_PORT=5008
+- AI_SERVICE_HOST=ai-service
+- AI_SERVICE_PORT=5008
 ```
 
 - [ ] **Step 4: Commit**
@@ -1039,6 +1095,7 @@ git commit -m "feat(infra): add ai-service Docker support"
 ## Task 13: Add Kubernetes manifests for ai-service
 
 **Files:**
+
 - Create: `infra/k8s/18-ai-service.yaml`
 - Modify: `infra/k8s/02-configmap.yaml`
 
@@ -1068,7 +1125,7 @@ spec:
             - containerPort: 5008
           env:
             - name: PORT
-              value: "5008"
+              value: '5008'
             - name: GROQ_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -1092,9 +1149,10 @@ spec:
 - [ ] **Step 2: Add AI service discovery to `infra/k8s/02-configmap.yaml`**
 
 At the end of the `data:` section, add:
+
 ```yaml
-  AI_SERVICE_HOST: "ai-service"
-  AI_SERVICE_PORT: "5008"
+AI_SERVICE_HOST: 'ai-service'
+AI_SERVICE_PORT: '5008'
 ```
 
 - [ ] **Step 3: Add `GROQ_API_KEY` to K8s secrets script**
@@ -1102,6 +1160,7 @@ At the end of the `data:` section, add:
 Open `infra/k8s/01-secrets.yaml` (or the gen-secrets script at the repo root — check `package.json` for `k8s:gen-secrets`). Make sure `GROQ_API_KEY` is included when regenerating secrets from `.env`.
 
 Find the gen-secrets script:
+
 ```bash
 grep -r "gen-secrets" /Users/stoxmod/WebstormProjects/healio/package.json
 ```
@@ -1111,17 +1170,18 @@ If it's a shell script that reads from `.env` and generates the manifest, `GROQ_
 - [ ] **Step 4: Add `AI_SERVICE_HOST` and `AI_SERVICE_PORT` to api-gateway K8s manifest**
 
 Open `infra/k8s/10-api-gateway.yaml`. In the `env:` section, add:
+
 ```yaml
-            - name: AI_SERVICE_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: healio-configmap
-                  key: AI_SERVICE_HOST
-            - name: AI_SERVICE_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: healio-configmap
-                  key: AI_SERVICE_PORT
+- name: AI_SERVICE_HOST
+  valueFrom:
+    configMapKeyRef:
+      name: healio-configmap
+      key: AI_SERVICE_HOST
+- name: AI_SERVICE_PORT
+  valueFrom:
+    configMapKeyRef:
+      name: healio-configmap
+      key: AI_SERVICE_PORT
 ```
 
 - [ ] **Step 5: Commit**

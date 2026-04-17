@@ -9,13 +9,17 @@ export class PrescriptionsController {
 
   @MessagePattern(MSG.DOCTOR_ISSUE_PRESCRIPTION)
   issuePrescription(@Payload() data: Record<string, unknown>) {
-    return this.prescriptionsService.issuePrescription(data as Record<string, unknown>);
+    return this.prescriptionsService.issuePrescription(
+      data as Record<string, unknown>,
+    );
   }
 
   @MessagePattern(MSG.DOCTOR_GET_PRESCRIPTIONS)
   getPrescriptions(@Payload() data: { doctorId?: string; patientId?: string }) {
-    if (data.doctorId) return this.prescriptionsService.getByDoctor(data.doctorId);
-    if (data.patientId) return this.prescriptionsService.getByPatient(data.patientId);
+    if (data.doctorId)
+      return this.prescriptionsService.getByDoctor(data.doctorId);
+    if (data.patientId)
+      return this.prescriptionsService.getByPatient(data.patientId);
     return [];
   }
 

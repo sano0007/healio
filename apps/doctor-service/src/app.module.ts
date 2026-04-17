@@ -6,7 +6,10 @@ import { PrescriptionsModule } from './prescriptions/prescriptions.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../../.env', '.env'] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['../../.env', '.env'],
+    }),
     MongooseModule.forRootAsync({
       useFactory: (config) => ({ uri: config.get('MONGO_DOCTOR_URI') }),
       inject: [ConfigService],

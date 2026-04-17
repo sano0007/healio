@@ -9,13 +9,13 @@ import {
   Param,
   Post,
   Req,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
-import {ClientProxy} from '@nestjs/microservices';
-import {ConfigService} from '@nestjs/config';
-import {firstValueFrom} from 'rxjs';
-import {MSG, NotificationType} from '@healio/shared-types';
-import {JwtAuthGuard} from '../common/guards/jwt-auth.guard';
+import { ClientProxy } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
+import { firstValueFrom } from 'rxjs';
+import { MSG, NotificationType } from '@healio/shared-types';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const StripeLib = require('stripe');
 
@@ -24,10 +24,10 @@ export class PaymentGatewayController {
   private stripe: any;
 
   constructor(
-    @Inject('PAYMENT_SERVICE')      private paymentClient: ClientProxy,
-    @Inject('PATIENT_SERVICE')      private patientClient: ClientProxy,
-    @Inject('DOCTOR_SERVICE')       private doctorClient: ClientProxy,
-    @Inject('APPOINTMENT_SERVICE')  private apptClient: ClientProxy,
+    @Inject('PAYMENT_SERVICE') private paymentClient: ClientProxy,
+    @Inject('PATIENT_SERVICE') private patientClient: ClientProxy,
+    @Inject('DOCTOR_SERVICE') private doctorClient: ClientProxy,
+    @Inject('APPOINTMENT_SERVICE') private apptClient: ClientProxy,
     @Inject('NOTIFICATION_SERVICE') private notificationClient: ClientProxy,
     @Inject('TELEMEDICINE_SERVICE') private teleClient: ClientProxy,
     private config: ConfigService,
@@ -40,7 +40,7 @@ export class PaymentGatewayController {
   @Post('webhook')
   @HttpCode(200)
   async stripeWebhook(
-      @Req() req: { body: Buffer; headers: { 'stripe-signature'?: string } },
+    @Req() req: { body: Buffer; headers: { 'stripe-signature'?: string } },
     @Headers('stripe-signature') sig: string,
   ) {
     const webhookSecret = this.config.get<string>('STRIPE_WEBHOOK_SECRET');
@@ -55,9 +55,15 @@ export class PaymentGatewayController {
 
     let event: any;
     try {
-      event = await this.stripe.webhooks.constructEventAsync(req.body, sig, webhookSecret);
+      event = await this.stripe.webhooks.constructEventAsync(
+        req.body,
+        sig,
+        webhookSecret,
+      );
     } catch (err: any) {
-      throw new BadRequestException(`Invalid Stripe webhook signature: ${err?.message}`);
+      throw new BadRequestException(
+        `Invalid Stripe webhook signature: ${err?.message}`,
+      );
     }
 
     if (event.type === 'checkout.session.completed') {
@@ -84,7 +90,10 @@ export class PaymentGatewayController {
   }
 
   // ─── Shared payment success handler ──────────────────────────────────────
-  private async handlePaymentSuccess(checkoutSessionId: string, appointmentId: string) {
+  private async handlePaymentSuccess(
+    checkoutSessionId: string,
+    appointmentId: string,
+  ) {
     // Confirm payment record in payment service
     const payment = await firstValueFrom(
       this.paymentClient.send(MSG.PAYMENT_CONFIRM, { checkoutSessionId }),
@@ -118,7 +127,9 @@ export class PaymentGatewayController {
     );
 
     // Notify patient + doctor (fire-and-forget), include session link if created
-    this.emitPaymentSuccessNotification(appointmentId, payment, session).catch(() => {});
+    this.emitPaymentSuccessNotification(appointmentId, payment, session).catch(
+      () => {},
+    );
   }
 
   private async emitPaymentSuccessNotification(
@@ -134,9 +145,15 @@ export class PaymentGatewayController {
     if (!patientId) return;
 
     const [patient, doctor] = await Promise.all([
-      firstValueFrom(this.patientClient.send(MSG.PATIENT_GET, { userId: patientId })).catch(() => null),
+      firstValueFrom(
+        this.patientClient.send(MSG.PATIENT_GET, { userId: patientId }),
+      ).catch(() => null),
       appointment?.doctorId
-        ? firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET, { userId: appointment.doctorId })).catch(() => null)
+        ? firstValueFrom(
+            this.doctorClient.send(MSG.DOCTOR_GET, {
+              userId: appointment.doctorId,
+            }),
+          ).catch(() => null)
         : Promise.resolve(null),
     ]);
 
@@ -174,6 +191,8 @@ export class PaymentGatewayController {
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   getPayment(@Param('id') id: string) {
-    return firstValueFrom(this.paymentClient.send(MSG.PAYMENT_GET, { paymentId: id }));
+    return firstValueFrom(
+      this.paymentClient.send(MSG.PAYMENT_GET, { paymentId: id }),
+    );
   }
 }

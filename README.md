@@ -18,6 +18,7 @@ AI-Enabled Smart Healthcare Appointment & Telemedicine Platform.
 ## Environment Setup
 
 1. Copy the root `.env.example` to `.env` in the project root:
+
    ```bash
    cp .env.example .env
    ```
@@ -40,6 +41,7 @@ bun run docker:up
 ```
 
 This builds all 8 service containers and starts:
+
 - API Gateway on port 3001
 - auth-service on port 9001
 - patient-service on port 9002
@@ -72,6 +74,7 @@ bun run docker:down
 ### Prerequisites
 
 1. Build and push all Docker images to a container registry:
+
    ```bash
    # Login to your registry (e.g., Docker Hub, GCR, ECR, ACR)
    docker login
@@ -87,6 +90,7 @@ bun run docker:down
 ### Step 1 — Update secrets
 
 Edit `infra/k8s/01-secrets.yaml` and replace placeholder values:
+
 - `JWT_SECRET`
 - `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`
 - `SMTP_USER` / `SMTP_PASS`
@@ -99,6 +103,7 @@ kubectl apply -f infra/k8s/
 ```
 
 This creates:
+
 - `healio` namespace
 - `healio-secrets` secret
 - `healio-configmap` configmap
@@ -131,14 +136,14 @@ kubectl delete -f infra/k8s/
 
 ## Service Ports Reference
 
-| Service | Port | Protocol |
-|---------|------|----------|
-| Frontend (Next.js) | 3000 | HTTP |
-| API Gateway | 3001 | HTTP/TCP |
-| auth-service | 9001 | TCP |
-| patient-service | 9002 | TCP |
-| doctor-service | 9003 | TCP |
-| appointment-service | 9004 | TCP |
-| telemedicine-service | 9005 | TCP |
-| payment-service | 9006 | TCP |
-| notification-service | 9007 | TCP |
+| Service              | Port | Protocol |
+| -------------------- | ---- | -------- |
+| Frontend (Next.js)   | 3000 | HTTP     |
+| API Gateway          | 3001 | HTTP/TCP |
+| auth-service         | 9001 | TCP      |
+| patient-service      | 9002 | TCP      |
+| doctor-service       | 9003 | TCP      |
+| appointment-service  | 9004 | TCP      |
+| telemedicine-service | 9005 | TCP      |
+| payment-service      | 9006 | TCP      |
+| notification-service | 9007 | TCP      |

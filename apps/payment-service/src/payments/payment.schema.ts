@@ -17,7 +17,10 @@ export class Payment {
   @Prop({ default: 'usd' })
   currency: string;
 
-  @Prop({ default: 'pending', enum: ['pending', 'success', 'failed', 'refunded'] })
+  @Prop({
+    default: 'pending',
+    enum: ['pending', 'success', 'failed', 'refunded'],
+  })
   status: string;
 
   @Prop({ default: 'stripe' })

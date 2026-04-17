@@ -4,25 +4,44 @@ import { useState } from 'react';
 import { useAppointments, useExportToCSV } from '@/hooks/use-admin';
 import { Download, Calendar, Clock, CheckCircle, XCircle } from 'lucide-react';
 
-const STATUS_OPTIONS = ['all', 'pending', 'confirmed', 'completed', 'cancelled'];
+const STATUS_OPTIONS = [
+  'all',
+  'pending',
+  'confirmed',
+  'completed',
+  'cancelled',
+];
 
 export default function AdminAppointmentsPage() {
   const [status, setStatus] = useState('all');
-  
-  const { data: appointments, isLoading, refetch } = useAppointments({ 
-    status: status === 'all' ? undefined : status
+
+  const {
+    data: appointments,
+    isLoading,
+    refetch,
+  } = useAppointments({
+    status: status === 'all' ? undefined : status,
   });
-  
+
   const exportCSV = useExportToCSV<{
-    _id: string; doctorId: string; patientId: string; scheduledAt: string; status: string; notes?: string
-  }>(appointments || [], `healio_appointments_${new Date().toISOString().split('T')[0]}.csv`, [
-    { key: '_id', header: 'ID' },
-    { key: 'doctorId', header: 'Doctor ID' },
-    { key: 'patientId', header: 'Patient ID' },
-    { key: 'scheduledAt', header: 'Scheduled At' },
-    { key: 'status', header: 'Status' },
-    { key: 'notes', header: 'Notes' },
-  ]);
+    _id: string;
+    doctorId: string;
+    patientId: string;
+    scheduledAt: string;
+    status: string;
+    notes?: string;
+  }>(
+    appointments || [],
+    `healio_appointments_${new Date().toISOString().split('T')[0]}.csv`,
+    [
+      { key: '_id', header: 'ID' },
+      { key: 'doctorId', header: 'Doctor ID' },
+      { key: 'patientId', header: 'Patient ID' },
+      { key: 'scheduledAt', header: 'Scheduled At' },
+      { key: 'status', header: 'Status' },
+      { key: 'notes', header: 'Notes' },
+    ],
+  );
 
   const STATUS_STYLES: Record<string, string> = {
     pending: 'bg-yellow-50 text-yellow-700',
@@ -31,7 +50,12 @@ export default function AdminAppointmentsPage() {
     cancelled: 'bg-red-50 text-red-500',
   };
 
-  if (isLoading) return <div className="flex items-center justify-center h-64"><div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" /></div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="h-7 w-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
 
   return (
     <div>
@@ -46,17 +70,21 @@ export default function AdminAppointmentsPage() {
             <Download className="h-4 w-4" />
             Export CSV
           </button>
-          <span className="text-sm text-gray-500">{appointments?.length || 0} total</span>
+          <span className="text-sm text-gray-500">
+            {appointments?.length || 0} total
+          </span>
         </div>
       </div>
 
       <div className="flex gap-2 mb-5">
-        {STATUS_OPTIONS.map(s => (
+        {STATUS_OPTIONS.map((s) => (
           <button
             key={s}
             onClick={() => setStatus(s)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors capitalize ${
-              status === s ? 'bg-teal-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-teal-400'
+              status === s
+                ? 'bg-teal-600 text-white'
+                : 'bg-white border border-gray-200 text-gray-600 hover:border-teal-400'
             }`}
           >
             {s}
@@ -68,21 +96,39 @@ export default function AdminAppointmentsPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Patient ID</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Doctor ID</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Scheduled</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Status</th>
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Notes</th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Patient ID
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Doctor ID
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Scheduled
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Status
+              </th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">
+                Notes
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {appointments?.map(appt => (
+            {appointments?.map((appt) => (
               <tr key={appt._id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-5 py-3 text-gray-500 font-mono text-xs">{appt.patientId}</td>
-                <td className="px-5 py-3 text-gray-500 font-mono text-xs">{appt.doctorId}</td>
-                <td className="px-5 py-3 text-gray-700">{new Date(appt.scheduledAt).toLocaleString()}</td>
+                <td className="px-5 py-3 text-gray-500 font-mono text-xs">
+                  {appt.patientId}
+                </td>
+                <td className="px-5 py-3 text-gray-500 font-mono text-xs">
+                  {appt.doctorId}
+                </td>
+                <td className="px-5 py-3 text-gray-700">
+                  {new Date(appt.scheduledAt).toLocaleString()}
+                </td>
                 <td className="px-5 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[appt.status] || 'bg-gray-100 text-gray-600'}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[appt.status] || 'bg-gray-100 text-gray-600'}`}
+                  >
                     {appt.status}
                   </span>
                 </td>
@@ -90,7 +136,14 @@ export default function AdminAppointmentsPage() {
               </tr>
             ))}
             {(!appointments || appointments.length === 0) && (
-              <tr><td colSpan={5} className="px-5 py-10 text-center text-gray-400">No appointments found.</td></tr>
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-5 py-10 text-center text-gray-400"
+                >
+                  No appointments found.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

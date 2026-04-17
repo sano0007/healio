@@ -1,11 +1,11 @@
-import {Injectable} from '@nestjs/common';
-import {InjectModel} from '@nestjs/mongoose';
-import {ConfigService} from '@nestjs/config';
-import {Model} from 'mongoose';
-import {RpcException} from '@nestjs/microservices';
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
+import { Model } from 'mongoose';
+import { RpcException } from '@nestjs/microservices';
 import Stripe from 'stripe';
-import {Payment, PaymentDocument} from './payment.schema';
-import {InitiatePaymentDto} from '@healio/shared-types';
+import { Payment, PaymentDocument } from './payment.schema';
+import { InitiatePaymentDto } from '@healio/shared-types';
 
 @Injectable()
 export class PaymentsService {
@@ -16,14 +16,18 @@ export class PaymentsService {
     private config: ConfigService,
   ) {
     const stripeKey = this.config.get('STRIPE_SECRET_KEY', '');
-    this.stripe = stripeKey ? new Stripe(stripeKey, {
-      apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
-    }) : null as any;
+    this.stripe = stripeKey
+      ? new Stripe(stripeKey, {
+          apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
+        })
+      : (null as any);
   }
 
   private getStripe(): Stripe {
     if (!this.stripe) {
-      throw new Error('Stripe is not configured. Set STRIPE_SECRET_KEY environment variable.');
+      throw new Error(
+        'Stripe is not configured. Set STRIPE_SECRET_KEY environment variable.',
+      );
     }
     return this.stripe;
   }
@@ -71,11 +75,16 @@ export class PaymentsService {
       throw new RpcException('Payment has not been completed');
     }
 
-    const payment = await this.paymentModel.findOneAndUpdate(
-      { stripeCheckoutSessionId: checkoutSessionId },
-      { status: 'success', stripePaymentIntentId: session.payment_intent as string },
-      { new: true },
-    ).exec();
+    const payment = await this.paymentModel
+      .findOneAndUpdate(
+        { stripeCheckoutSessionId: checkoutSessionId },
+        {
+          status: 'success',
+          stripePaymentIntentId: session.payment_intent as string,
+        },
+        { new: true },
+      )
+      .exec();
     if (!payment) throw new RpcException('Payment record not found');
     return payment;
   }

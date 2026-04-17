@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { GraduationCap, Briefcase, Award, CheckCircle2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { GraduationCap, Briefcase, Award, CheckCircle2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export interface TimelineItem {
   id: string;
@@ -31,17 +31,17 @@ export function DoctorDetails({
           <Award className="w-5 h-5 text-brand-dark" />
           About Me
         </h2>
-        <p className="text-gray-500 leading-relaxed font-medium">
-          {bio}
-        </p>
+        <p className="text-gray-500 leading-relaxed font-medium">{bio}</p>
       </section>
 
       {/* 2. Specialties */}
       <section>
-        <h2 className="text-xl font-bold text-brand-black mb-4">Specialties & Expertise</h2>
+        <h2 className="text-xl font-bold text-brand-black mb-4">
+          Specialties & Expertise
+        </h2>
         <div className="flex flex-wrap gap-2">
           {specialties.map((spec) => (
-            <div 
+            <div
               key={spec}
               className="px-4 py-2 bg-gray-50 rounded-xl text-sm font-bold text-gray-500 border border-transparent hover:border-brand-light/20 hover:text-brand-dark transition-all"
             >
@@ -70,9 +70,15 @@ export function DoctorDetails({
                 <div className="absolute left-0 top-1.5 w-4.5 h-4.5 rounded-full bg-white border-2 border-brand-light flex items-center justify-center p-0.5">
                   <div className="w-full h-full rounded-full bg-brand-light" />
                 </div>
-                <div className="text-[11px] font-bold text-brand-dark uppercase tracking-widest mb-1">{item.year}</div>
-                <h4 className="text-sm font-bold text-brand-black mb-1">{item.title}</h4>
-                <p className="text-xs text-gray-500 font-medium">{item.subtitle}</p>
+                <div className="text-[11px] font-bold text-brand-dark uppercase tracking-widest mb-1">
+                  {item.year}
+                </div>
+                <h4 className="text-sm font-bold text-brand-black mb-1">
+                  {item.title}
+                </h4>
+                <p className="text-xs text-gray-500 font-medium">
+                  {item.subtitle}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -96,9 +102,15 @@ export function DoctorDetails({
                 <div className="absolute left-0 top-1.5 w-4.5 h-4.5 rounded-full bg-white border-2 border-emerald-500 flex items-center justify-center p-0.5">
                   <div className="w-full h-full rounded-full bg-emerald-500" />
                 </div>
-                <div className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mb-1">{item.year}</div>
-                <h4 className="text-sm font-bold text-brand-black mb-1">{item.title}</h4>
-                <p className="text-xs text-gray-500 font-medium">{item.subtitle}</p>
+                <div className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mb-1">
+                  {item.year}
+                </div>
+                <h4 className="text-sm font-bold text-brand-black mb-1">
+                  {item.title}
+                </h4>
+                <p className="text-xs text-gray-500 font-medium">
+                  {item.subtitle}
+                </p>
               </motion.div>
             ))}
           </div>

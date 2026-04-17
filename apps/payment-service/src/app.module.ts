@@ -5,7 +5,10 @@ import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../../.env', '.env'] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['../../.env', '.env'],
+    }),
     MongooseModule.forRootAsync({
       useFactory: (config) => ({ uri: config.get('MONGO_PAYMENT_URI') }),
       inject: [ConfigService],

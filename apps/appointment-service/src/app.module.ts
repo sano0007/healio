@@ -5,7 +5,10 @@ import { AppointmentsModule } from './appointments/appointments.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../../.env', '.env'] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['../../.env', '.env'],
+    }),
     MongooseModule.forRootAsync({
       useFactory: (config) => ({ uri: config.get('MONGO_APPOINTMENT_URI') }),
       inject: [ConfigService],

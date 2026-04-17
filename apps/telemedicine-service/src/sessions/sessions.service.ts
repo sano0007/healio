@@ -30,11 +30,11 @@ export class SessionsService implements OnModuleInit {
     // Generate Twilio token for host if Twilio is configured
     if (Twilio && this.twilioConfig.isConfigured()) {
       token = this.generateToken(roomName, data.hostId, 'host');
-      
+
       try {
         const twilioClient = Twilio(
           this.twilioConfig.accountSid,
-          this.twilioConfig.apiSecret
+          this.twilioConfig.apiSecret,
         );
         const twilioRoom = await twilioClient.video.v1.rooms.create({
           uniqueName: roomName,
@@ -49,9 +49,11 @@ export class SessionsService implements OnModuleInit {
           try {
             const twilioClient = Twilio(
               this.twilioConfig.accountSid,
-              this.twilioConfig.apiSecret
+              this.twilioConfig.apiSecret,
             );
-            const twilioRoom = await twilioClient.video.v1.rooms(roomName).fetch();
+            const twilioRoom = await twilioClient.video.v1
+              .rooms(roomName)
+              .fetch();
             roomSid = twilioRoom.sid;
             console.log(`Using existing Twilio room: ${roomSid}`);
           } catch (fetchError: any) {
@@ -125,7 +127,7 @@ export class SessionsService implements OnModuleInit {
       try {
         const twilioClient = Twilio(
           this.twilioConfig.accountSid,
-          this.twilioConfig.apiSecret
+          this.twilioConfig.apiSecret,
         );
         await twilioClient.video.v1.rooms(session.twilioRoomSid).update({
           status: 'completed',
@@ -143,7 +145,11 @@ export class SessionsService implements OnModuleInit {
     };
   }
 
-  private generateToken(roomName: string, identity: string, role: 'host' | 'participant'): string {
+  private generateToken(
+    roomName: string,
+    identity: string,
+    role: 'host' | 'participant',
+  ): string {
     if (!Twilio) {
       throw new Error('Twilio is not initialized');
     }
@@ -158,7 +164,7 @@ export class SessionsService implements OnModuleInit {
       {
         identity: `${role}-${identity}-${Date.now()}`,
         ttl: 14400, // 4 hours in seconds
-      }
+      },
     );
 
     const videoGrant = new VideoGrant({

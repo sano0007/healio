@@ -1,11 +1,10 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "healio",
       "devDependencies": {
-        "prettier": "^3.4.2",
+        "prettier": "^3.8.3",
         "turbo": "^2.3.3",
       },
     },

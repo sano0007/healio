@@ -1,10 +1,10 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {useRouter} from 'next/navigation';
-import {Activity} from 'lucide-react';
-import {useAuth} from '@/contexts/auth';
+import { useRouter } from 'next/navigation';
+import { Activity } from 'lucide-react';
+import { useAuth } from '@/contexts/auth';
 
 export default function LoginPage() {
   const { login, user, isLoading } = useAuth();
@@ -16,7 +16,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      router.replace(user.role === 'doctor' ? '/doctor/dashboard' : '/dashboard');
+      router.replace(
+        user.role === 'doctor' ? '/doctor/dashboard' : '/dashboard',
+      );
     }
   }, [user, isLoading, router]);
 
@@ -26,7 +28,9 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       const loggedInUser = await login(email, password);
-      router.push(loggedInUser.role === 'doctor' ? '/doctor/dashboard' : '/dashboard');
+      router.push(
+        loggedInUser.role === 'doctor' ? '/doctor/dashboard' : '/dashboard',
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
@@ -38,7 +42,10 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 justify-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 justify-center"
+          >
             <Activity className="h-7 w-7 text-teal-600" />
             <span className="text-2xl font-bold text-gray-900">Healio</span>
           </Link>
@@ -53,23 +60,27 @@ export default function LoginPage() {
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email
+              </label>
               <input
                 type="email"
                 required
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 placeholder="you@example.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Password
+              </label>
               <input
                 type="password"
                 required
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 placeholder="••••••••"
               />
@@ -86,7 +97,10 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/register" className="text-teal-600 font-medium hover:underline">
+          <Link
+            href="/register"
+            className="text-teal-600 font-medium hover:underline"
+          >
             Create one
           </Link>
         </p>

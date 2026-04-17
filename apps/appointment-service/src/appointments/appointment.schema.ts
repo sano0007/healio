@@ -1,5 +1,5 @@
-import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
-import {Document} from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 export type AppointmentDocument = Appointment & Document;
 
@@ -14,7 +14,16 @@ export class Appointment {
   @Prop({ required: true })
   scheduledAt: Date;
 
-  @Prop({ default: 'pending', enum: ['pending', 'awaiting_payment', 'confirmed', 'cancelled', 'completed'] })
+  @Prop({
+    default: 'pending',
+    enum: [
+      'pending',
+      'awaiting_payment',
+      'confirmed',
+      'cancelled',
+      'completed',
+    ],
+  })
   status: string;
 
   @Prop()
@@ -32,8 +41,8 @@ export class Appointment {
   @Prop()
   roomName: string;
 
-    @Prop()
-    checkoutUrl: string;
+  @Prop()
+  checkoutUrl: string;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);

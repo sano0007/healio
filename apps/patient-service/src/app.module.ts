@@ -5,7 +5,10 @@ import { PatientsModule } from './patients/patients.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../../.env', '.env'] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['../../.env', '.env'],
+    }),
     MongooseModule.forRootAsync({
       useFactory: (config) => ({ uri: config.get('MONGO_PATIENT_URI') }),
       inject: [ConfigService],

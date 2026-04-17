@@ -1,5 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api, AdminStats, PatientProfile, Doctor, Appointment, Payment } from '@/lib/api';
+import {
+  api,
+  AdminStats,
+  PatientProfile,
+  Doctor,
+  Appointment,
+  Payment,
+} from '@/lib/api';
 
 export interface PaginationParams {
   page?: number;
@@ -85,7 +92,13 @@ export function useVerifyDoctor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, isVerified }: { userId: string; isVerified: boolean }) => {
+    mutationFn: async ({
+      userId,
+      isVerified,
+    }: {
+      userId: string;
+      isVerified: boolean;
+    }) => {
       const result = await api.admin.verifyDoctor(userId, isVerified);
       return result;
     },
@@ -115,19 +128,21 @@ function sanitizeCSVValue(value: unknown): string {
 export function useExportToCSV<T extends Record<string, unknown>>(
   data: T[],
   filename: string,
-  columns: { key: keyof T; header: string }[]
+  columns: { key: keyof T; header: string }[],
 ) {
   return () => {
-    const headers = columns.map(c => c.header).join(',');
-    const rows = data.map(row =>
-      columns.map(col => {
-        const value = row[col.key as keyof T];
-        const str = sanitizeCSVValue(value);
-        if (str.includes(',')) {
-          return `"${str}"`;
-        }
-        return str;
-      }).join(',')
+    const headers = columns.map((c) => c.header).join(',');
+    const rows = data.map((row) =>
+      columns
+        .map((col) => {
+          const value = row[col.key as keyof T];
+          const str = sanitizeCSVValue(value);
+          if (str.includes(',')) {
+            return `"${str}"`;
+          }
+          return str;
+        })
+        .join(','),
     );
     const csv = [headers, ...rows].join('\n');
 

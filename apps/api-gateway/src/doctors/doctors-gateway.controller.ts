@@ -1,10 +1,21 @@
-import {Body, Controller, Get, Inject, Param, Patch, Post, Query, Request, UseGuards} from '@nestjs/common';
-import {ClientProxy} from '@nestjs/microservices';
-import {firstValueFrom} from 'rxjs';
-import {MSG, UserRole} from '@healio/shared-types';
-import {JwtAuthGuard} from '../common/guards/jwt-auth.guard';
-import {RolesGuard} from '../common/guards/roles.guard';
-import {Roles} from '../common/decorators/roles.decorator';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
+import { MSG, UserRole } from '@healio/shared-types';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 export interface DoctorFilters {
   search?: string;
@@ -23,7 +34,9 @@ export class DoctorsGatewayController {
   @Get('me')
   getMe(@Request() req: { user: { userId: string } }) {
     console.log('GET /doctors/me called, user:', req.user);
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET, { userId: req.user.userId }));
+    return firstValueFrom(
+      this.doctorClient.send(MSG.DOCTOR_GET, { userId: req.user.userId }),
+    );
   }
 
   @Get()
@@ -33,14 +46,24 @@ export class DoctorsGatewayController {
 
   @Get(':id')
   getById(@Param('id') id: string) {
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET, { userId: id }));
+    return firstValueFrom(
+      this.doctorClient.send(MSG.DOCTOR_GET, { userId: id }),
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.DOCTOR)
   @Patch('me')
-  updateProfile(@Request() req: { user: { userId: string } }, @Body() updates: Record<string, unknown>) {
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_UPDATE, { userId: req.user.userId, updates }));
+  updateProfile(
+    @Request() req: { user: { userId: string } },
+    @Body() updates: Record<string, unknown>,
+  ) {
+    return firstValueFrom(
+      this.doctorClient.send(MSG.DOCTOR_UPDATE, {
+        userId: req.user.userId,
+        updates,
+      }),
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -48,11 +71,31 @@ export class DoctorsGatewayController {
   @Post('availability')
   setAvailability(
     @Request() req: { user: { userId: string } },
-    @Body() body: { availability: { day?: string; dayOfWeek?: number; startTime: string; endTime: string }[] } | { day?: string; dayOfWeek?: number; startTime: string; endTime: string }[],
+    @Body()
+    body:
+      | {
+          availability: {
+            day?: string;
+            dayOfWeek?: number;
+            startTime: string;
+            endTime: string;
+          }[];
+        }
+      | {
+          day?: string;
+          dayOfWeek?: number;
+          startTime: string;
+          endTime: string;
+        }[],
   ) {
     const DAY_MAP: Record<string, number> = {
-      sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
-      thursday: 4, friday: 5, saturday: 6,
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
     };
     const slots = Array.isArray(body) ? body : body.availability;
     const availability = slots.map((s) => ({
@@ -60,43 +103,83 @@ export class DoctorsGatewayController {
       startTime: s.startTime,
       endTime: s.endTime,
     }));
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_SET_AVAILABILITY, { userId: req.user.userId, availability }));
+    return firstValueFrom(
+      this.doctorClient.send(MSG.DOCTOR_SET_AVAILABILITY, {
+        userId: req.user.userId,
+        availability,
+      }),
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Patch(':id/verify')
   verifyDoctor(@Param('id') id: string, @Body() body: { isVerified: boolean }) {
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_VERIFY, { userId: id, isVerified: body.isVerified }));
+    return firstValueFrom(
+      this.doctorClient.send(MSG.DOCTOR_VERIFY, {
+        userId: id,
+        isVerified: body.isVerified,
+      }),
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.DOCTOR)
   @Post('prescriptions')
-  issuePrescription(@Request() req: { user: { userId: string } }, @Body() data: Record<string, unknown>) {
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_ISSUE_PRESCRIPTION, { ...data, doctorId: req.user.userId }));
+  issuePrescription(
+    @Request() req: { user: { userId: string } },
+    @Body() data: Record<string, unknown>,
+  ) {
+    return firstValueFrom(
+      this.doctorClient.send(MSG.DOCTOR_ISSUE_PRESCRIPTION, {
+        ...data,
+        doctorId: req.user.userId,
+      }),
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('prescriptions')
-  getMyPrescriptions(@Request() req: { user: { userId: string; role: string } }) {
+  getMyPrescriptions(
+    @Request() req: { user: { userId: string; role: string } },
+  ) {
     if (req.user.role === UserRole.PATIENT) {
-      return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET_PRESCRIPTIONS, {patientId: req.user.userId}));
+      return firstValueFrom(
+        this.doctorClient.send(MSG.DOCTOR_GET_PRESCRIPTIONS, {
+          patientId: req.user.userId,
+        }),
+      );
     }
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET_PRESCRIPTIONS, {doctorId: req.user.userId}));
+    return firstValueFrom(
+      this.doctorClient.send(MSG.DOCTOR_GET_PRESCRIPTIONS, {
+        doctorId: req.user.userId,
+      }),
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.DOCTOR)
   @Get('prescriptions/:id')
   getPrescriptionById(@Param('id') id: string) {
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET_PRESCRIPTION_BY_ID, { prescriptionId: id }));
+    return firstValueFrom(
+      this.doctorClient.send(MSG.DOCTOR_GET_PRESCRIPTION_BY_ID, {
+        prescriptionId: id,
+      }),
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.DOCTOR)
   @Patch('status')
-  updateStatus(@Request() req: { user: { userId: string } }, @Body() body: { status: string }) {
-    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_UPDATE_STATUS, { userId: req.user.userId, status: body.status }));
+  updateStatus(
+    @Request() req: { user: { userId: string } },
+    @Body() body: { status: string },
+  ) {
+    return firstValueFrom(
+      this.doctorClient.send(MSG.DOCTOR_UPDATE_STATUS, {
+        userId: req.user.userId,
+        status: body.status,
+      }),
+    );
   }
 }

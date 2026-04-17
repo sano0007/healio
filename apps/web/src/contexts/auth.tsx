@@ -1,14 +1,40 @@
 'use client';
 
-import {createContext, ReactNode, useCallback, useContext, useEffect, useState} from 'react';
-import {clearAuth, getRefreshToken, getToken, getUser, saveAuth, StoredUser} from '@/lib/auth';
-import {api, AuthResponse, clearAuthTokens, getAccessToken, setAuthTokens} from '@/lib/api';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import {
+  clearAuth,
+  getRefreshToken,
+  getToken,
+  getUser,
+  saveAuth,
+  StoredUser,
+} from '@/lib/auth';
+import {
+  api,
+  AuthResponse,
+  clearAuthTokens,
+  getAccessToken,
+  setAuthTokens,
+} from '@/lib/api';
 
 interface AuthContextValue {
   user: StoredUser | null;
   token: string | null;
-    login: (email: string, password: string) => Promise<StoredUser>;
-    register: (name: string, email: string, password: string, role: string, phone?: string) => Promise<StoredUser>;
+  login: (email: string, password: string) => Promise<StoredUser>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    role: string,
+    phone?: string,
+  ) => Promise<StoredUser>;
   logout: () => void;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -42,17 +68,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const res = await api.auth.login({ email, password });
-    handleAuthResponse(res);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const res = await api.auth.login({ email, password });
+      handleAuthResponse(res);
       return res.user;
-  }, [handleAuthResponse]);
+    },
+    [handleAuthResponse],
+  );
 
-  const register = useCallback(async (name: string, email: string, password: string, role: string, phone?: string) => {
-    const res = await api.auth.register({ name, email, password, role, phone });
-    handleAuthResponse(res);
+  const register = useCallback(
+    async (
+      name: string,
+      email: string,
+      password: string,
+      role: string,
+      phone?: string,
+    ) => {
+      const res = await api.auth.register({
+        name,
+        email,
+        password,
+        role,
+        phone,
+      });
+      handleAuthResponse(res);
       return res.user;
-  }, [handleAuthResponse]);
+    },
+    [handleAuthResponse],
+  );
 
   const logout = useCallback(() => {
     clearAuth();
@@ -62,7 +106,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, isLoading, isAuthenticated: !!token && !!user }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        register,
+        logout,
+        isLoading,
+        isAuthenticated: !!token && !!user,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

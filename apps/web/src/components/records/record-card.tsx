@@ -1,29 +1,63 @@
-"use client";
+'use client';
 
-import { FileText, Image as ImageIcon, Pill, Microscope, MoreVertical, Download, Eye, Calendar, User, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import {
+  FileText,
+  Image as ImageIcon,
+  Pill,
+  Microscope,
+  MoreVertical,
+  Download,
+  Eye,
+  Calendar,
+  User,
+  ShieldCheck,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
-export type RecordType = "lab" | "imaging" | "prescription" | "note";
+export type RecordType = 'lab' | 'imaging' | 'prescription' | 'note';
 
 interface RecordCardProps {
   title: string;
   type: RecordType;
   date: string;
   doctor: string;
-  status: "verified" | "pending";
+  status: 'verified' | 'pending';
   size: string;
 }
 
 const typeConfig = {
-  lab: { icon: <Microscope />, label: "Lab Report", color: "text-blue-600 bg-blue-50 border-blue-100" },
-  imaging: { icon: <ImageIcon />, label: "Imaging/Scan", color: "text-purple-600 bg-purple-50 border-purple-100" },
-  prescription: { icon: <Pill />, label: "Prescription", color: "text-emerald-600 bg-emerald-50 border-emerald-100" },
-  note: { icon: <FileText />, label: "Clinical Note", color: "text-amber-600 bg-amber-50 border-amber-100" },
+  lab: {
+    icon: <Microscope />,
+    label: 'Lab Report',
+    color: 'text-blue-600 bg-blue-50 border-blue-100',
+  },
+  imaging: {
+    icon: <ImageIcon />,
+    label: 'Imaging/Scan',
+    color: 'text-purple-600 bg-purple-50 border-purple-100',
+  },
+  prescription: {
+    icon: <Pill />,
+    label: 'Prescription',
+    color: 'text-emerald-600 bg-emerald-50 border-emerald-100',
+  },
+  note: {
+    icon: <FileText />,
+    label: 'Clinical Note',
+    color: 'text-amber-600 bg-amber-50 border-amber-100',
+  },
 };
 
-export function RecordCard({ title, type, date, doctor, status, size }: RecordCardProps) {
+export function RecordCard({
+  title,
+  type,
+  date,
+  doctor,
+  status,
+  size,
+}: RecordCardProps) {
   const config = typeConfig[type];
 
   return (
@@ -33,11 +67,20 @@ export function RecordCard({ title, type, date, doctor, status, size }: RecordCa
     >
       {/* 1. Card Header (Type & Actions) */}
       <div className="flex items-start justify-between mb-6">
-        <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border transition-colors group-hover:scale-110", config.color)}>
+        <div
+          className={cn(
+            'w-12 h-12 rounded-2xl flex items-center justify-center border transition-colors group-hover:scale-110',
+            config.color,
+          )}
+        >
           {config.icon}
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="w-8 h-8 rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8 rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
             <MoreVertical className="w-4 h-4" />
           </Button>
         </div>
@@ -47,13 +90,20 @@ export function RecordCard({ title, type, date, doctor, status, size }: RecordCa
       <div className="flex-1 space-y-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className={cn("px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border", config.color)}>
+            <span
+              className={cn(
+                'px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border',
+                config.color,
+              )}
+            >
               {config.label}
             </span>
-            {status === "verified" && (
+            {status === 'verified' && (
               <div className="flex items-center gap-1 text-emerald-500">
                 <ShieldCheck className="w-3 h-3" />
-                <span className="text-[9px] font-bold uppercase tracking-widest">Verified</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest">
+                  Verified
+                </span>
               </div>
             )}
           </div>
@@ -75,20 +125,32 @@ export function RecordCard({ title, type, date, doctor, status, size }: RecordCa
               <User className="w-3 h-3" />
               Doctor
             </p>
-            <p className="text-xs font-bold text-brand-black truncate">{doctor}</p>
+            <p className="text-xs font-bold text-brand-black truncate">
+              {doctor}
+            </p>
           </div>
         </div>
       </div>
 
       {/* 3. Footer Actions */}
       <div className="pt-4 flex items-center justify-between">
-        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{size}</span>
+        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+          {size}
+        </span>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-8 rounded-xl px-3 text-[10px] font-bold gap-1.5 border-gray-100 hover:bg-gray-50">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 rounded-xl px-3 text-[10px] font-bold gap-1.5 border-gray-100 hover:bg-gray-50"
+          >
             <Eye className="w-3.5 h-3.5" />
             Preview
           </Button>
-          <Button variant="dark" size="sm" className="h-8 w-8 rounded-xl p-0 flex items-center justify-center">
+          <Button
+            variant="dark"
+            size="sm"
+            className="h-8 w-8 rounded-xl p-0 flex items-center justify-center"
+          >
             <Download className="w-3.5 h-3.5" />
           </Button>
         </div>

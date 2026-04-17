@@ -14,14 +14,25 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() dto: RegisterDto) {
-    const result = await firstValueFrom(this.authClient.send(MSG.AUTH_REGISTER, dto));
+    const result = await firstValueFrom(
+      this.authClient.send(MSG.AUTH_REGISTER, dto),
+    );
 
     // Create profile in the appropriate service after auth registers the user
-    const profilePayload = { userId: result.user.id, name: dto.name, email: dto.email, ...(dto.phone && { phone: dto.phone }) };
+    const profilePayload = {
+      userId: result.user.id,
+      name: dto.name,
+      email: dto.email,
+      ...(dto.phone && { phone: dto.phone }),
+    };
     if (dto.role === UserRole.PATIENT) {
-      await firstValueFrom(this.patientClient.send(MSG.PATIENT_CREATE, profilePayload));
+      await firstValueFrom(
+        this.patientClient.send(MSG.PATIENT_CREATE, profilePayload),
+      );
     } else if (dto.role === UserRole.DOCTOR) {
-      await firstValueFrom(this.doctorClient.send(MSG.DOCTOR_CREATE, profilePayload));
+      await firstValueFrom(
+        this.doctorClient.send(MSG.DOCTOR_CREATE, profilePayload),
+      );
     }
 
     return result;
@@ -34,7 +45,9 @@ export class AuthController {
 
   @Post('refresh')
   async refresh(@Body() dto: { refreshToken: string }) {
-    const result = await firstValueFrom(this.authClient.send(MSG.AUTH_REFRESH, dto));
+    const result = await firstValueFrom(
+      this.authClient.send(MSG.AUTH_REFRESH, dto),
+    );
     return result;
   }
 }

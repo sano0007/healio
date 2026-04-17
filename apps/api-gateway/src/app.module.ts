@@ -12,7 +12,10 @@ import { AiGatewayModule } from './ai/ai-gateway.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../../.env', '.env'] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['../../.env', '.env'],
+    }),
     ClientsProxyModule,
     AuthModule,
     UsersGatewayModule,

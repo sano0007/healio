@@ -8,7 +8,10 @@ export class NotificationsController {
   constructor(private notificationsService: NotificationsService) {}
 
   @EventPattern(MSG.NOTIFY_SEND)
-  handleNotification(@Payload() dto: Parameters<typeof this.notificationsService.handleNotification>[0]) {
+  handleNotification(
+    @Payload()
+    dto: Parameters<typeof this.notificationsService.handleNotification>[0],
+  ) {
     return this.notificationsService.handleNotification(dto);
   }
 }

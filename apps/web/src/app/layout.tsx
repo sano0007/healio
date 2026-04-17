@@ -14,7 +14,11 @@ export const metadata: Metadata = {
   description: 'AI-Powered Healthcare Appointment & Telemedicine Platform',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="antialiased bg-gray-50 text-gray-900">

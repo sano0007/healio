@@ -1,16 +1,20 @@
-"use client";
+'use client';
 
-import {use, useEffect, useState} from "react";
-import {ConsultationHUD} from "@/components/consultations/consultation-hud";
-import {ConsultationGrid} from "@/components/consultations/consultation-grid";
-import {ConsultationControls} from "@/components/consultations/consultation-controls";
-import {ConsultationSidebar} from "@/components/consultations/consultation-sidebar";
-import {TwilioVideoRoom} from "@/components/consultations/twilio-video-room";
-import {useRouter} from "next/navigation";
-import {motion} from "framer-motion";
-import {useCreateSession, useEndSession} from "@/hooks/use-sessions";
+import { use, useEffect, useState } from 'react';
+import { ConsultationHUD } from '@/components/consultations/consultation-hud';
+import { ConsultationGrid } from '@/components/consultations/consultation-grid';
+import { ConsultationControls } from '@/components/consultations/consultation-controls';
+import { ConsultationSidebar } from '@/components/consultations/consultation-sidebar';
+import { TwilioVideoRoom } from '@/components/consultations/twilio-video-room';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { useCreateSession, useEndSession } from '@/hooks/use-sessions';
 
-export default function ConsultationRoomPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ConsultationRoomPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const resolvedParams = use(params);
   const router = useRouter();
   const appointmentId = resolvedParams.id;
@@ -29,9 +33,9 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
     specialty: string;
     image: string;
   }>({
-    name: "Doctor",
-    specialty: "Specialist",
-      image: "/images/doctor-1.png",
+    name: 'Doctor',
+    specialty: 'Specialist',
+    image: '/images/doctor-1.png',
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +52,7 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
         setError(null);
 
         const result = await createSession.mutateAsync(appointmentId);
-        
+
         setSessionData({
           sessionId: result.sessionId,
           token: result.token,
@@ -56,13 +60,13 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
         });
 
         setDoctor({
-          name: "Dr. Sarah Johnson",
-          specialty: "Senior Cardiologist",
-          image: "/images/doctor-1.png",
+          name: 'Dr. Sarah Johnson',
+          specialty: 'Senior Cardiologist',
+          image: '/images/doctor-1.png',
         });
       } catch (err: any) {
-        console.error("Failed to create session:", err);
-        setError(err.message || "Failed to connect to video session");
+        console.error('Failed to create session:', err);
+        setError(err.message || 'Failed to connect to video session');
       } finally {
         setIsLoading(false);
       }
@@ -76,7 +80,7 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
       try {
         await endSession.mutateAsync(sessionData.sessionId);
       } catch (err) {
-        console.error("Failed to end session:", err);
+        console.error('Failed to end session:', err);
       }
     }
     router.push(`/appointments/${appointmentId}`);
@@ -85,7 +89,7 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
   if (isLoading) {
     return (
       <div className="relative h-full flex flex-col bg-brand-black">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 1 }}
           className="absolute inset-0 z-[100] bg-brand-black flex flex-col items-center justify-center gap-8"
         >
@@ -98,8 +102,12 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
             </div>
           </div>
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-bold text-white tracking-tight">Connecting to Clinical Session</h2>
-            <p className="text-xs font-bold text-white/30 uppercase tracking-[0.2em]">Authenticating Secure Bridge...</p>
+            <h2 className="text-xl font-bold text-white tracking-tight">
+              Connecting to Clinical Session
+            </h2>
+            <p className="text-xs font-bold text-white/30 uppercase tracking-[0.2em]">
+              Authenticating Secure Bridge...
+            </p>
           </div>
         </motion.div>
       </div>
@@ -111,7 +119,9 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
       <div className="relative h-full flex flex-col bg-brand-black">
         <div className="absolute inset-0 z-[100] bg-brand-black flex flex-col items-center justify-center gap-8">
           <div className="text-center space-y-4">
-            <h2 className="text-xl font-bold text-red-400 tracking-tight">Connection Failed</h2>
+            <h2 className="text-xl font-bold text-red-400 tracking-tight">
+              Connection Failed
+            </h2>
             <p className="text-sm text-gray-400">{error}</p>
             <button
               onClick={() => router.back()}
@@ -128,10 +138,10 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
   return (
     <div className="relative h-full flex flex-col bg-brand-black">
       {/* 1. Heads-Up Display (Overlay) */}
-      <ConsultationHUD 
+      <ConsultationHUD
         doctorName={doctor.name}
         doctorSpecialty={doctor.specialty}
-        doctorImage={doctor.image || "/images/doctor-1.png"}
+        doctorImage={doctor.image || '/images/doctor-1.png'}
       />
 
       {/* 2. Main Video Display Layer */}
@@ -144,18 +154,18 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
           />
         ) : (
           <ConsultationGrid
-              doctorImage={doctor.image || "/images/doctor-1.png"}
+            doctorImage={doctor.image || '/images/doctor-1.png'}
             isMuted={isMuted}
             isCameraOff={isCameraOff}
             isSidebarOpen={isSidebarOpen}
           />
         )}
-        
+
         <ConsultationSidebar isOpen={isSidebarOpen} />
       </div>
 
       {/* 3. Interaction Control Layer */}
-      <ConsultationControls 
+      <ConsultationControls
         isMuted={isMuted}
         onToggleMute={() => setIsMuted(!isMuted)}
         isCameraOff={isCameraOff}

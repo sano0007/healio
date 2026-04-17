@@ -97,13 +97,8 @@
             },
             "url": {
               "raw": "{{base}}/auth/register",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "auth",
-                "register"
-              ]
+              "host": ["{{base}}"],
+              "path": ["auth", "register"]
             }
           }
         },
@@ -139,13 +134,8 @@
             },
             "url": {
               "raw": "{{base}}/auth/register",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "auth",
-                "register"
-              ]
+              "host": ["{{base}}"],
+              "path": ["auth", "register"]
             }
           }
         },
@@ -180,13 +170,8 @@
             },
             "url": {
               "raw": "{{base}}/auth/register",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "auth",
-                "register"
-              ]
+              "host": ["{{base}}"],
+              "path": ["auth", "register"]
             }
           }
         },
@@ -222,13 +207,8 @@
             },
             "url": {
               "raw": "{{base}}/auth/login",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "auth",
-                "login"
-              ]
+              "host": ["{{base}}"],
+              "path": ["auth", "login"]
             }
           }
         },
@@ -264,13 +244,8 @@
             },
             "url": {
               "raw": "{{base}}/auth/login",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "auth",
-                "login"
-              ]
+              "host": ["{{base}}"],
+              "path": ["auth", "login"]
             }
           }
         },
@@ -305,13 +280,8 @@
             },
             "url": {
               "raw": "{{base}}/auth/login",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "auth",
-                "login"
-              ]
+              "host": ["{{base}}"],
+              "path": ["auth", "login"]
             }
           }
         }
@@ -332,13 +302,8 @@
             ],
             "url": {
               "raw": "{{base}}/patients/me",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "patients",
-                "me"
-              ]
+              "host": ["{{base}}"],
+              "path": ["patients", "me"]
             }
           }
         },
@@ -362,13 +327,8 @@
             },
             "url": {
               "raw": "{{base}}/patients/me",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "patients",
-                "me"
-              ]
+              "host": ["{{base}}"],
+              "path": ["patients", "me"]
             }
           }
         },
@@ -395,14 +355,8 @@
             },
             "url": {
               "raw": "{{base}}/patients/{{patient_id}}/reports",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "patients",
-                "{{patient_id}}",
-                "reports"
-              ]
+              "host": ["{{base}}"],
+              "path": ["patients", "{{patient_id}}", "reports"]
             },
             "description": "Doctor uploads a document to a patient's medical record. File is stored on Cloudinary and the URL is saved in the patient's medicalReports array."
           }
@@ -419,12 +373,8 @@
             "header": [],
             "url": {
               "raw": "{{base}}/doctors",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "doctors"
-              ]
+              "host": ["{{base}}"],
+              "path": ["doctors"]
             },
             "description": "Public — no auth required. Returns only isVerified: true doctors."
           }
@@ -436,13 +386,8 @@
             "header": [],
             "url": {
               "raw": "{{base}}/doctors/{{doctor_id}}",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "doctors",
-                "{{doctor_id}}"
-              ]
+              "host": ["{{base}}"],
+              "path": ["doctors", "{{doctor_id}}"]
             },
             "description": "Public — no auth required."
           }
@@ -467,13 +412,8 @@
             },
             "url": {
               "raw": "{{base}}/doctors/me",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "doctors",
-                "me"
-              ]
+              "host": ["{{base}}"],
+              "path": ["doctors", "me"]
             },
             "description": "isVerified is silently stripped — doctors cannot self-verify."
           }
@@ -498,13 +438,8 @@
             },
             "url": {
               "raw": "{{base}}/doctors/availability",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "doctors",
-                "availability"
-              ]
+              "host": ["{{base}}"],
+              "path": ["doctors", "availability"]
             },
             "description": "Accepts day as string (\"Monday\") or dayOfWeek as number (0=Sun … 6=Sat). Gateway normalises to dayOfWeek before storing. Replaces the entire availability array."
           }
@@ -529,13 +464,8 @@
             },
             "url": {
               "raw": "{{base}}/doctors/prescriptions",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "doctors",
-                "prescriptions"
-              ]
+              "host": ["{{base}}"],
+              "path": ["doctors", "prescriptions"]
             }
           }
         }
@@ -579,12 +509,8 @@
             },
             "url": {
               "raw": "{{base}}/appointments",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "appointments"
-              ]
+              "host": ["{{base}}"],
+              "path": ["appointments"]
             },
             "description": "Patient only. Gateway validates scheduledAt against doctor's availability (day + time window) and checks 30-min slot conflicts before forwarding."
           }
@@ -601,13 +527,8 @@
             ],
             "url": {
               "raw": "{{base}}/appointments/my",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "appointments",
-                "my"
-              ]
+              "host": ["{{base}}"],
+              "path": ["appointments", "my"]
             }
           }
         },
@@ -623,13 +544,8 @@
             ],
             "url": {
               "raw": "{{base}}/appointments/my",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "appointments",
-                "my"
-              ]
+              "host": ["{{base}}"],
+              "path": ["appointments", "my"]
             },
             "description": "Same endpoint — role-aware. Returns appointments by doctorId when called with doctor token."
           }
@@ -654,14 +570,8 @@
             },
             "url": {
               "raw": "{{base}}/appointments/{{appointment_id}}/cancel",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "appointments",
-                "{{appointment_id}}",
-                "cancel"
-              ]
+              "host": ["{{base}}"],
+              "path": ["appointments", "{{appointment_id}}", "cancel"]
             }
           }
         },
@@ -685,14 +595,8 @@
             },
             "url": {
               "raw": "{{base}}/appointments/{{appointment_id}}/status",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "appointments",
-                "{{appointment_id}}",
-                "status"
-              ]
+              "host": ["{{base}}"],
+              "path": ["appointments", "{{appointment_id}}", "status"]
             },
             "description": "Doctor only. When status is 'confirmed', triggers Stripe Checkout flow: creates a payment session, sets appointment to 'awaiting_payment', and sends payment URL to patient. After patient pays, the appointment is auto-confirmed and a Jitsi telemedicine session is auto-created. Valid flow: pending → confirmed (via payment) → completed."
           }
@@ -739,13 +643,8 @@
             },
             "url": {
               "raw": "{{base}}/payments/initiate",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "payments",
-                "initiate"
-              ]
+              "host": ["{{base}}"],
+              "path": ["payments", "initiate"]
             },
             "description": "Creates a Stripe PaymentIntent. Use the returned clientSecret with Stripe.js on the frontend to collect card details. Note: payment is normally initiated automatically when a doctor confirms an appointment."
           }
@@ -762,13 +661,8 @@
             ],
             "url": {
               "raw": "{{base}}/payments/{{payment_id}}",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "payments",
-                "{{payment_id}}"
-              ]
+              "host": ["{{base}}"],
+              "path": ["payments", "{{payment_id}}"]
             }
           }
         },
@@ -807,13 +701,8 @@
             },
             "url": {
               "raw": "{{base}}/payments/complete",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "payments",
-                "complete"
-              ]
+              "host": ["{{base}}"],
+              "path": ["payments", "complete"]
             },
             "description": "Dev/testing fallback for manually completing a payment when Stripe webhooks are not reachable (e.g. no ngrok tunnel). Pass the Stripe checkoutSessionId from the Checkout URL. This confirms the payment, marks the appointment as confirmed, and auto-creates a Jitsi telemedicine session."
           }
@@ -860,12 +749,8 @@
             },
             "url": {
               "raw": "{{base}}/sessions",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "sessions"
-              ]
+              "host": ["{{base}}"],
+              "path": ["sessions"]
             },
             "description": "Creates a Jitsi Meet session. Returns sessionId and jitsiUrl to embed in an iframe."
           }
@@ -890,13 +775,8 @@
             },
             "url": {
               "raw": "{{base}}/sessions/join",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "sessions",
-                "join"
-              ]
+              "host": ["{{base}}"],
+              "path": ["sessions", "join"]
             }
           }
         }
@@ -944,13 +824,8 @@
             },
             "url": {
               "raw": "{{base}}/ai/symptom-check",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "ai",
-                "symptom-check"
-              ]
+              "host": ["{{base}}"],
+              "path": ["ai", "symptom-check"]
             },
             "description": "Analyzes patient-reported symptoms using Groq (llama-3.3-70b-versatile) via the HealioMed clinical triage system.\n\nRequest body:\n  symptoms (string, required) — natural language description, max 2000 chars\n\nResponse shape (SymptomCheckResult):\n```json\n{\n  \"severity\": \"Low\" | \"Moderate\" | \"High\" | \"Emergency\",\n  \"conditions\": [\n    {\n      \"name\": string,\n      \"probability\": number (0-100),\n      \"description\": string,\n      \"specialist\": \"General Physician\" | \"Neurologist\" | \"Cardiologist\" |\n                    \"Pulmonologist\" | \"Gastroenterologist\" | \"Dermatologist\" |\n                    \"Orthopedist\" | \"ENT Specialist\" | \"Ophthalmologist\" | \"Psychiatrist\"\n    }\n  ],\n  \"recommendedActions\": string[]  // 3-5 immediate action steps\n}\n```\n\nRules enforced by the AI:\n  • Up to 3 conditions, ranked by probability (highest first)\n  • Severity reflects the most urgent identified condition\n  • Emergency severity always includes 'Call emergency services (911) immediately'\n  • Triage tool only — never claims a definitive diagnosis\n\nError cases:\n  • 401 — missing/invalid JWT\n  • 403 — non-patient role\n  • 503 — Groq API unavailable\n  • 500 — malformed AI response (retry recommended)"
           }
@@ -973,13 +848,8 @@
             ],
             "url": {
               "raw": "{{base}}/admin/stats",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "admin",
-                "stats"
-              ]
+              "host": ["{{base}}"],
+              "path": ["admin", "stats"]
             },
             "description": "Aggregates: totalPatients, totalDoctors, verifiedDoctors, pendingVerification, appointmentsByStatus, totalRevenue, totalPayments, successfulPayments"
           }
@@ -996,13 +866,8 @@
             ],
             "url": {
               "raw": "{{base}}/admin/patients",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "admin",
-                "patients"
-              ]
+              "host": ["{{base}}"],
+              "path": ["admin", "patients"]
             }
           }
         },
@@ -1018,13 +883,8 @@
             ],
             "url": {
               "raw": "{{base}}/admin/doctors",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "admin",
-                "doctors"
-              ]
+              "host": ["{{base}}"],
+              "path": ["admin", "doctors"]
             }
           }
         },
@@ -1040,13 +900,8 @@
             ],
             "url": {
               "raw": "{{base}}/admin/appointments",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "admin",
-                "appointments"
-              ]
+              "host": ["{{base}}"],
+              "path": ["admin", "appointments"]
             }
           }
         },
@@ -1062,13 +917,8 @@
             ],
             "url": {
               "raw": "{{base}}/admin/payments",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "admin",
-                "payments"
-              ]
+              "host": ["{{base}}"],
+              "path": ["admin", "payments"]
             }
           }
         },
@@ -1092,15 +942,8 @@
             },
             "url": {
               "raw": "{{base}}/admin/doctors/{{doctor_id}}/verify",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "admin",
-                "doctors",
-                "{{doctor_id}}",
-                "verify"
-              ]
+              "host": ["{{base}}"],
+              "path": ["admin", "doctors", "{{doctor_id}}", "verify"]
             }
           }
         },
@@ -1124,15 +967,8 @@
             },
             "url": {
               "raw": "{{base}}/admin/doctors/{{doctor_id}}/verify",
-              "host": [
-                "{{base}}"
-              ],
-              "path": [
-                "admin",
-                "doctors",
-                "{{doctor_id}}",
-                "verify"
-              ]
+              "host": ["{{base}}"],
+              "path": ["admin", "doctors", "{{doctor_id}}", "verify"]
             }
           }
         }

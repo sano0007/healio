@@ -246,7 +246,7 @@ Next.js 15 App Router uses **route groups** `(folder)` to organize layouts witho
 ```mermaid
 graph TD
     Root["Root Layout<br/>layout.tsx<br/>(fonts, providers, metadata)"]
-    
+
     Root --> Public["(public) Layout<br/>Navbar only, no sidebar<br/>Full-width pages"]
     Root --> App["(app) Layout<br/>Sidebar + Navbar<br/>Patient pages"]
     Root --> Doctor["(doctor) Layout<br/>Doctor sidebar + Navbar<br/>Doctor pages"]
@@ -273,13 +273,13 @@ graph TD
 
 ### Layout Hierarchy
 
-| Layout | Components | Auth Required | Role Guard |
-|---|---|---|---|
-| Root | Font loading, `AuthProvider`, `ThemeProvider`, `ToastProvider` | No | – |
-| (public) | Public Navbar, Footer | No | – |
-| (app) | App Navbar, Patient Sidebar | Yes | `patient` |
-| (doctor) | App Navbar, Doctor Sidebar | Yes | `doctor` |
-| (admin) | App Navbar, Admin Sidebar | Yes | `admin` |
+| Layout   | Components                                                     | Auth Required | Role Guard |
+| -------- | -------------------------------------------------------------- | ------------- | ---------- |
+| Root     | Font loading, `AuthProvider`, `ThemeProvider`, `ToastProvider` | No            | –          |
+| (public) | Public Navbar, Footer                                          | No            | –          |
+| (app)    | App Navbar, Patient Sidebar                                    | Yes           | `patient`  |
+| (doctor) | App Navbar, Doctor Sidebar                                     | Yes           | `doctor`   |
+| (admin)  | App Navbar, Admin Sidebar                                      | Yes           | `admin`    |
 
 ---
 
@@ -287,65 +287,66 @@ graph TD
 
 ### 4.1 Color Palette
 
-| Token | Light Mode | Usage |
-|---|---|---|
-| `primary-50` to `primary-950` | Sky blue scale (#f0f9ff → #082f49) | Primary actions, links, branding |
-| `medical-50` to `medical-900` | Teal scale (#f0fdfa → #134e4a) | Medical/health accents |
-| `success` | `#10b981` (emerald-500) | Confirmed, completed, success states |
-| `warning` | `#f59e0b` (amber-500) | Pending, attention needed |
-| `danger` | `#ef4444` (red-500) | Errors, cancellations, delete actions |
-| `info` | `#3b82f6` (blue-500) | Information, in-progress |
-| `neutral` | gray-50 to gray-900 | Text, backgrounds, borders |
+| Token                         | Light Mode                         | Usage                                 |
+| ----------------------------- | ---------------------------------- | ------------------------------------- |
+| `primary-50` to `primary-950` | Sky blue scale (#f0f9ff → #082f49) | Primary actions, links, branding      |
+| `medical-50` to `medical-900` | Teal scale (#f0fdfa → #134e4a)     | Medical/health accents                |
+| `success`                     | `#10b981` (emerald-500)            | Confirmed, completed, success states  |
+| `warning`                     | `#f59e0b` (amber-500)              | Pending, attention needed             |
+| `danger`                      | `#ef4444` (red-500)                | Errors, cancellations, delete actions |
+| `info`                        | `#3b82f6` (blue-500)               | Information, in-progress              |
+| `neutral`                     | gray-50 to gray-900                | Text, backgrounds, borders            |
 
 ### 4.2 Typography
 
-| Style | Font | Size | Weight | Usage |
-|---|---|---|---|---|
-| H1 | Geist Sans | 36px / 2.25rem | 700 Bold | Page titles |
-| H2 | Geist Sans | 30px / 1.875rem | 600 Semibold | Section titles |
-| H3 | Geist Sans | 24px / 1.5rem | 600 Semibold | Card titles |
-| H4 | Geist Sans | 20px / 1.25rem | 500 Medium | Subsection titles |
-| Body | Geist Sans | 16px / 1rem | 400 Regular | Default body text |
-| Body SM | Geist Sans | 14px / 0.875rem | 400 Regular | Secondary text, captions |
-| Label | Geist Sans | 14px / 0.875rem | 500 Medium | Form labels, badges |
-| Mono | Geist Mono | 14px / 0.875rem | 400 Regular | Code, transaction IDs |
+| Style   | Font       | Size            | Weight       | Usage                    |
+| ------- | ---------- | --------------- | ------------ | ------------------------ |
+| H1      | Geist Sans | 36px / 2.25rem  | 700 Bold     | Page titles              |
+| H2      | Geist Sans | 30px / 1.875rem | 600 Semibold | Section titles           |
+| H3      | Geist Sans | 24px / 1.5rem   | 600 Semibold | Card titles              |
+| H4      | Geist Sans | 20px / 1.25rem  | 500 Medium   | Subsection titles        |
+| Body    | Geist Sans | 16px / 1rem     | 400 Regular  | Default body text        |
+| Body SM | Geist Sans | 14px / 0.875rem | 400 Regular  | Secondary text, captions |
+| Label   | Geist Sans | 14px / 0.875rem | 500 Medium   | Form labels, badges      |
+| Mono    | Geist Mono | 14px / 0.875rem | 400 Regular  | Code, transaction IDs    |
 
 ### 4.3 Spacing Scale
 
 TailwindCSS default spacing scale (0.25rem base):
+
 - `p-4` (1rem / 16px) — Default component padding
 - `gap-4` to `gap-6` — Grid/flex gaps
 - `space-y-6` — Section spacing
 
 ### 4.4 Border Radius
 
-| Token | Value | Usage |
-|---|---|---|
-| `rounded-lg` | 8px | Buttons, inputs |
-| `rounded-xl` | 12px | Cards |
-| `rounded-2xl` | 16px | Feature cards, modals |
+| Token          | Value  | Usage                  |
+| -------------- | ------ | ---------------------- |
+| `rounded-lg`   | 8px    | Buttons, inputs        |
+| `rounded-xl`   | 12px   | Cards                  |
+| `rounded-2xl`  | 16px   | Feature cards, modals  |
 | `rounded-full` | 9999px | Avatars, badges, pills |
 
 ### 4.5 Shadows
 
-| Token | Usage |
-|---|---|
-| `shadow-sm` | Subtle card elevation |
-| `shadow-md` | Hovered cards, dropdowns |
+| Token       | Usage                     |
+| ----------- | ------------------------- |
+| `shadow-sm` | Subtle card elevation     |
+| `shadow-md` | Hovered cards, dropdowns  |
 | `shadow-lg` | Modals, floating elements |
-| `shadow-xl` | Navbar on scroll |
+| `shadow-xl` | Navbar on scroll          |
 
 ### 4.6 Animations
 
-| Animation | CSS | Usage |
-|---|---|---|
-| Fade in | `animate-fadeIn` (opacity 0→1, 300ms) | Page transitions, modals |
-| Slide up | `animate-slideUp` (translateY 10→0, 300ms) | Cards, notifications |
-| Pulse | `animate-pulse` | Skeleton loaders |
-| Spin | `animate-spin` | Loading spinners |
-| Bounce | `animate-bounce` | Notification badge |
-| Scale | Hover `scale-[1.02]` | Card hover effects |
-| Shake | `animate-shake` | Form validation errors |
+| Animation | CSS                                        | Usage                    |
+| --------- | ------------------------------------------ | ------------------------ |
+| Fade in   | `animate-fadeIn` (opacity 0→1, 300ms)      | Page transitions, modals |
+| Slide up  | `animate-slideUp` (translateY 10→0, 300ms) | Cards, notifications     |
+| Pulse     | `animate-pulse`                            | Skeleton loaders         |
+| Spin      | `animate-spin`                             | Loading spinners         |
+| Bounce    | `animate-bounce`                           | Notification badge       |
+| Scale     | Hover `scale-[1.02]`                       | Card hover effects       |
+| Shake     | `animate-shake`                            | Form validation errors   |
 
 ---
 
@@ -358,18 +359,18 @@ sequenceDiagram
     participant U as User
     participant F as Frontend
     participant API as Backend (/api/auth)
-    
+
     U->>F: Enter credentials
     F->>API: POST /api/auth/login
     API-->>F: { access_token, user }
     F->>F: Store token (cookie/localStorage)
     F->>F: Set AuthContext state
     F->>F: Redirect by role
-    
+
     Note over F: On every API call
     F->>API: Request + Authorization: Bearer {token}
     API-->>F: Response / 401 Unauthorized
-    
+
     Note over F: On 401
     F->>F: Clear auth state
     F->>F: Redirect to /auth/login
@@ -377,21 +378,29 @@ sequenceDiagram
 
 ### 5.2 Client-Side Data Fetching Strategy
 
-| Approach | When to Use | Example |
-|---|---|---|
-| **Server Components** (default) | Static/semi-static data, SEO-critical pages | Landing page, Doctor profile |
-| **Client Components** (`'use client'`) | Interactive UI, real-time data, user actions | Dashboard, forms, video room |
-| **SWR / React Query** | Cached client-side fetching with revalidation | Appointment lists, notifications |
-| **React Context** | Global state shared across components | Auth state, theme, notifications |
+| Approach                               | When to Use                                   | Example                          |
+| -------------------------------------- | --------------------------------------------- | -------------------------------- |
+| **Server Components** (default)        | Static/semi-static data, SEO-critical pages   | Landing page, Doctor profile     |
+| **Client Components** (`'use client'`) | Interactive UI, real-time data, user actions  | Dashboard, forms, video room     |
+| **SWR / React Query**                  | Cached client-side fetching with revalidation | Appointment lists, notifications |
+| **React Context**                      | Global state shared across components         | Auth state, theme, notifications |
 
 ### 5.3 Context Providers
 
 ```tsx
 // Root Layout Provider Stack
-<AuthProvider>          {/* JWT token, user data, login/logout */}
-  <ThemeProvider>       {/* Light/dark mode */}
-    <NotificationProvider> {/* Notification count, real-time updates */}
-      <ToastProvider>   {/* Global toast notifications */}
+<AuthProvider>
+  {' '}
+  {/* JWT token, user data, login/logout */}
+  <ThemeProvider>
+    {' '}
+    {/* Light/dark mode */}
+    <NotificationProvider>
+      {' '}
+      {/* Notification count, real-time updates */}
+      <ToastProvider>
+        {' '}
+        {/* Global toast notifications */}
         {children}
       </ToastProvider>
     </NotificationProvider>
@@ -429,7 +438,7 @@ apiClient.interceptors.response.use(
       window.location.href = '/auth/login';
     }
     return Promise.reject(error);
-  }
+  },
 );
 ```
 
@@ -440,12 +449,16 @@ Each API module exports typed functions:
 ```typescript
 // lib/api/appointments.ts
 export const appointmentsApi = {
-  searchDoctors: (params: SearchParams) => apiClient.get('/appointments/doctors/search', { params }),
-  getDoctorSlots: (doctorId: string) => apiClient.get(`/appointments/doctors/${doctorId}/slots`),
+  searchDoctors: (params: SearchParams) =>
+    apiClient.get('/appointments/doctors/search', { params }),
+  getDoctorSlots: (doctorId: string) =>
+    apiClient.get(`/appointments/doctors/${doctorId}/slots`),
   book: (data: BookingData) => apiClient.post('/appointments', data),
   getMyAppointments: () => apiClient.get('/appointments/my'),
-  modify: (id: string, data: Partial<Appointment>) => apiClient.patch(`/appointments/${id}`, data),
-  accept: (id: string, status: 'confirmed' | 'rejected') => apiClient.patch(`/appointments/${id}/accept`, { status }),
+  modify: (id: string, data: Partial<Appointment>) =>
+    apiClient.patch(`/appointments/${id}`, data),
+  accept: (id: string, status: 'confirmed' | 'rejected') =>
+    apiClient.patch(`/appointments/${id}/accept`, { status }),
 };
 ```
 
@@ -459,7 +472,10 @@ export const appointmentsApi = {
 // components/auth/auth-guard.tsx
 'use client';
 
-export function AuthGuard({ children, allowedRoles }: {
+export function AuthGuard({
+  children,
+  allowedRoles,
+}: {
   children: React.ReactNode;
   allowedRoles: ('patient' | 'doctor' | 'admin')[];
 }) {
@@ -536,7 +552,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 <Card>
   <Card.Header>
     <Card.Title>Upcoming Appointment</Card.Title>
-    <Card.Action><Badge>Confirmed</Badge></Card.Action>
+    <Card.Action>
+      <Badge>Confirmed</Badge>
+    </Card.Action>
   </Card.Header>
   <Card.Body>...</Card.Body>
   <Card.Footer>
@@ -549,57 +567,58 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 ## 9. Responsive Breakpoints
 
-| Breakpoint | Width | Target |
-|---|---|---|
-| `sm` | ≥ 640px | Large phones (landscape) |
-| `md` | ≥ 768px | Tablets |
-| `lg` | ≥ 1024px | Small laptops |
-| `xl` | ≥ 1280px | Desktops |
-| `2xl` | ≥ 1536px | Large screens |
+| Breakpoint | Width    | Target                   |
+| ---------- | -------- | ------------------------ |
+| `sm`       | ≥ 640px  | Large phones (landscape) |
+| `md`       | ≥ 768px  | Tablets                  |
+| `lg`       | ≥ 1024px | Small laptops            |
+| `xl`       | ≥ 1280px | Desktops                 |
+| `2xl`      | ≥ 1536px | Large screens            |
 
 ### Responsive Behaviors
 
-| Element | Mobile | Tablet | Desktop |
-|---|---|---|---|
-| Sidebar | Hidden (hamburger toggle) | Collapsed (icons only) | Expanded (icons + labels) |
-| Doctor cards grid | 1 column | 2 columns | 3 columns |
-| Dashboard stats | 2×2 grid | 4 in a row | 4 in a row |
-| Navbar search | Hidden (icon toggle) | Compact | Full width |
-| Data tables | Card view (stacked) | Scrollable table | Full table |
+| Element           | Mobile                    | Tablet                 | Desktop                   |
+| ----------------- | ------------------------- | ---------------------- | ------------------------- |
+| Sidebar           | Hidden (hamburger toggle) | Collapsed (icons only) | Expanded (icons + labels) |
+| Doctor cards grid | 1 column                  | 2 columns              | 3 columns                 |
+| Dashboard stats   | 2×2 grid                  | 4 in a row             | 4 in a row                |
+| Navbar search     | Hidden (icon toggle)      | Compact                | Full width                |
+| Data tables       | Card view (stacked)       | Scrollable table       | Full table                |
 
 ---
 
 ## 10. Third-Party Integrations
 
-| Integration | Package | Usage |
-|---|---|---|
-| **Jitsi Meet** | `@jitsi/react-sdk` or iframe | Video consultations |
-| **Stripe** | `@stripe/stripe-js` + `@stripe/react-stripe-js` | Payment checkout |
-| **Chart.js** | `chart.js` + `react-chartjs-2` | Dashboard analytics charts |
-| **Date Picker** | `react-day-picker` or `date-fns` | Calendar & date selection |
-| **Toast** | `react-hot-toast` or custom | Notification toasts |
-| **Form Validation** | `react-hook-form` + `zod` | Form handling & validation |
-| **Icons** | `lucide-react` (already installed) | UI icons |
+| Integration         | Package                                         | Usage                      |
+| ------------------- | ----------------------------------------------- | -------------------------- |
+| **Jitsi Meet**      | `@jitsi/react-sdk` or iframe                    | Video consultations        |
+| **Stripe**          | `@stripe/stripe-js` + `@stripe/react-stripe-js` | Payment checkout           |
+| **Chart.js**        | `chart.js` + `react-chartjs-2`                  | Dashboard analytics charts |
+| **Date Picker**     | `react-day-picker` or `date-fns`                | Calendar & date selection  |
+| **Toast**           | `react-hot-toast` or custom                     | Notification toasts        |
+| **Form Validation** | `react-hook-form` + `zod`                       | Form handling & validation |
+| **Icons**           | `lucide-react` (already installed)              | UI icons                   |
 
 ---
 
 ## 11. Performance Optimization
 
-| Strategy | Implementation |
-|---|---|
-| **Code Splitting** | Next.js automatic per-route splitting |
-| **Lazy Loading** | `dynamic()` for heavy components (Charts, Jitsi, Calendar) |
-| **Image Optimization** | `next/image` for all images |
-| **Skeleton Loading** | Custom skeleton components for every data-dependent page |
-| **Debounced Search** | `useDebounce` hook for search inputs (300ms delay) |
-| **Memoization** | `React.memo` for expensive list items (DoctorCard, AppointmentCard) |
-| **Virtual Scrolling** | For long lists (notification history, transaction logs) |
+| Strategy               | Implementation                                                      |
+| ---------------------- | ------------------------------------------------------------------- |
+| **Code Splitting**     | Next.js automatic per-route splitting                               |
+| **Lazy Loading**       | `dynamic()` for heavy components (Charts, Jitsi, Calendar)          |
+| **Image Optimization** | `next/image` for all images                                         |
+| **Skeleton Loading**   | Custom skeleton components for every data-dependent page            |
+| **Debounced Search**   | `useDebounce` hook for search inputs (300ms delay)                  |
+| **Memoization**        | `React.memo` for expensive list items (DoctorCard, AppointmentCard) |
+| **Virtual Scrolling**  | For long lists (notification history, transaction logs)             |
 
 ---
 
 ## 12. Build Order (Implementation Phases)
 
 ### Phase 1: Foundation & Landing Page (Day 1–2)
+
 - [ ] Set up directory structure (all folders)
 - [ ] Create design system components (`button`, `input`, `card`, `badge`, `modal`, `avatar`)
 - [ ] Create layout components (`navbar`, `sidebar`, `footer`, `page-header`)
@@ -609,6 +628,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 - [ ] **Redesign Landing Page** — Full rebuild with: Hero + animated CTA, Trust Bar (stats counters), Features Grid, How It Works (4-step flow), Specialties Grid, Testimonials, CTA Banner, Footer. The current landing page is a basic skeleton and needs a premium, production-quality redesign.
 
 ### Phase 2: Auth Pages (Day 3)
+
 - [ ] Login page
 - [ ] Patient registration page
 - [ ] Doctor registration page (multi-step)
@@ -616,6 +636,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 - [ ] Auth guard implementation & testing
 
 ### Phase 3: Patient Core (Day 4–5)
+
 - [ ] Patient dashboard
 - [ ] Doctor search & listing page
 - [ ] Doctor profile page
@@ -624,6 +645,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 - [ ] Appointment detail page
 
 ### Phase 4: Patient Extended (Day 6–7)
+
 - [ ] Medical records page (with upload)
 - [ ] Prescriptions page
 - [ ] AI symptom checker
@@ -632,18 +654,21 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 - [ ] Settings page
 
 ### Phase 5: Doctor Pages (Day 8–9)
+
 - [ ] Doctor dashboard
 - [ ] Doctor appointment management
 - [ ] Availability schedule manager
 - [ ] Issue prescription form
 
 ### Phase 6: Admin Pages (Day 10)
+
 - [ ] Admin dashboard
 - [ ] User management
 - [ ] Doctor verification
 - [ ] Transaction overview
 
 ### Phase 7: Video & Polish (Day 11–12)
+
 - [ ] Video consultation room (Jitsi integration)
 - [ ] Responsive testing & fixes
 - [ ] Animation & micro-interaction polish

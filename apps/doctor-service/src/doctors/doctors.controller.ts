@@ -8,7 +8,9 @@ export class DoctorsController {
   constructor(private doctorsService: DoctorsService) {}
 
   @MessagePattern(MSG.DOCTOR_CREATE)
-  createProfile(@Payload() data: { userId: string; name: string; email: string }) {
+  createProfile(
+    @Payload() data: { userId: string; name: string; email: string },
+  ) {
     return this.doctorsService.createProfile(data);
   }
 
@@ -28,8 +30,13 @@ export class DoctorsController {
   }
 
   @MessagePattern(MSG.DOCTOR_UPDATE)
-  update(@Payload() data: { userId: string; updates: Record<string, unknown> }) {
-    return this.doctorsService.update(data.userId, data.updates as Record<string, unknown>);
+  update(
+    @Payload() data: { userId: string; updates: Record<string, unknown> },
+  ) {
+    return this.doctorsService.update(
+      data.userId,
+      data.updates as Record<string, unknown>,
+    );
   }
 
   @MessagePattern(MSG.DOCTOR_VERIFY)
@@ -38,7 +45,9 @@ export class DoctorsController {
   }
 
   @MessagePattern(MSG.DOCTOR_SET_AVAILABILITY)
-  setAvailability(@Payload() data: { userId: string; availability: unknown[] }) {
+  setAvailability(
+    @Payload() data: { userId: string; availability: unknown[] },
+  ) {
     return this.doctorsService.setAvailability(data.userId, data.availability);
   }
 

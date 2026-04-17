@@ -1,10 +1,10 @@
 'use client';
 
-import {Suspense, useEffect, useState} from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
-import {useRouter, useSearchParams} from 'next/navigation';
-import {Activity} from 'lucide-react';
-import {useAuth} from '@/contexts/auth';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Activity } from 'lucide-react';
+import { useAuth } from '@/contexts/auth';
 
 function RegisterForm() {
   const { register, user, isLoading } = useAuth();
@@ -19,7 +19,9 @@ function RegisterForm() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      router.replace(user.role === 'doctor' ? '/doctor/dashboard' : '/dashboard');
+      router.replace(
+        user.role === 'doctor' ? '/doctor/dashboard' : '/dashboard',
+      );
     }
   }, [user, isLoading, router]);
 
@@ -33,7 +35,9 @@ function RegisterForm() {
     setSubmitting(true);
     try {
       const newUser = await register(name, email, password, role);
-      router.push(newUser.role === 'doctor' ? '/doctor/dashboard' : '/dashboard');
+      router.push(
+        newUser.role === 'doctor' ? '/doctor/dashboard' : '/dashboard',
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
@@ -45,7 +49,10 @@ function RegisterForm() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 justify-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 justify-center"
+          >
             <Activity className="h-7 w-7 text-teal-600" />
             <span className="text-2xl font-bold text-gray-900">Healio</span>
           </Link>
@@ -62,9 +69,11 @@ function RegisterForm() {
 
             {/* Role toggle */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">I am a</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                I am a
+              </label>
               <div className="grid grid-cols-2 gap-2">
-                {(['patient', 'doctor'] as const).map(r => (
+                {(['patient', 'doctor'] as const).map((r) => (
                   <button
                     key={r}
                     type="button"
@@ -82,34 +91,42 @@ function RegisterForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Full name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Full name
+              </label>
               <input
                 type="text"
                 required
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                placeholder={role === 'doctor' ? 'Dr. Jane Smith' : 'Jane Smith'}
+                placeholder={
+                  role === 'doctor' ? 'Dr. Jane Smith' : 'Jane Smith'
+                }
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email
+              </label>
               <input
                 type="email"
                 required
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 placeholder="you@example.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Password
+              </label>
               <input
                 type="password"
                 required
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 placeholder="Min. 8 characters"
               />
@@ -126,7 +143,10 @@ function RegisterForm() {
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-teal-600 font-medium hover:underline">
+          <Link
+            href="/login"
+            className="text-teal-600 font-medium hover:underline"
+          >
             Sign in
           </Link>
         </p>
@@ -137,7 +157,13 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-gray-400">Loading…</div></div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-gray-400">Loading…</div>
+        </div>
+      }
+    >
       <RegisterForm />
     </Suspense>
   );

@@ -1,6 +1,6 @@
-import Image from "next/image";
-import { Search, ArrowUpRight, Target } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Image from 'next/image';
+import { Search, ArrowUpRight, Target } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function HeroSection() {
   return (
@@ -10,14 +10,18 @@ export function HeroSection() {
           {/* Left Content */}
           <div className="pb-12 lg:pb-20">
             <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-[4rem] font-bold leading-[1.1] text-brand-black mb-5">
-              Your Health<br />
-              Deserves the{" "}
+              Your Health
+              <br />
+              Deserves the{' '}
               <em className="font-serif italic font-normal text-brand-dark">
-                right<br className="hidden sm:block" />specialist
+                right
+                <br className="hidden sm:block" />
+                specialist
               </em>
             </h1>
             <p className="text-gray-500 text-base lg:text-lg mb-8 max-w-md leading-relaxed">
-              Connect with top rated doctors who listen and prioritize your health journey
+              Connect with top rated doctors who listen and prioritize your
+              health journey
             </p>
             <div className="flex flex-wrap gap-3">
               <Button variant="primary">
@@ -49,7 +53,10 @@ export function HeroSection() {
                   <Target className="w-4 h-4 text-white" />
                 </div>
                 <p className="text-xs text-gray-600 leading-snug">
-                  <span className="font-semibold text-brand-black">Your full medical history</span> available to every clinician
+                  <span className="font-semibold text-brand-black">
+                    Your full medical history
+                  </span>{' '}
+                  available to every clinician
                 </p>
               </div>
 
@@ -58,27 +65,52 @@ export function HeroSection() {
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex -space-x-2">
                     <div className="w-7 h-7 rounded-full bg-brand-light border-2 border-white overflow-hidden">
-                      <Image src="/images/doctor-1.png" alt="" width={28} height={28} className="w-full h-full object-cover" />
+                      <Image
+                        src="/images/doctor-1.png"
+                        alt=""
+                        width={28}
+                        height={28}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div className="w-7 h-7 rounded-full bg-brand-lighter border-2 border-white overflow-hidden">
-                      <Image src="/images/doctor-2.png" alt="" width={28} height={28} className="w-full h-full object-cover" />
+                      <Image
+                        src="/images/doctor-2.png"
+                        alt=""
+                        width={28}
+                        height={28}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
-                  <span className="text-xs font-bold bg-brand-dark text-white px-2 py-0.5 rounded-full">30M+</span>
+                  <span className="text-xs font-bold bg-brand-dark text-white px-2 py-0.5 rounded-full">
+                    30M+
+                  </span>
                 </div>
                 <p className="text-xs text-gray-600 leading-snug">
-                  Join millions who found the right doctor for their unique health needs.
+                  Join millions who found the right doctor for their unique
+                  health needs.
                 </p>
               </div>
 
               {/* Floating Card – 24/7 Care */}
               <div className="floating-card absolute bottom-16 -right-4 lg:right-0 xl:-right-6 max-w-[240px] animate-float-slow hidden sm:flex items-start gap-3">
                 <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
-                  <Image src="/images/consultation.png" alt="" width={48} height={48} className="w-full h-full object-cover" />
+                  <Image
+                    src="/images/consultation.png"
+                    alt=""
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-brand-black">24/7 Virtual Care Team at Your Service</p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">Board certified doctors available anytime</p>
+                  <p className="text-xs font-semibold text-brand-black">
+                    24/7 Virtual Care Team at Your Service
+                  </p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">
+                    Board certified doctors available anytime
+                  </p>
                 </div>
               </div>
             </div>

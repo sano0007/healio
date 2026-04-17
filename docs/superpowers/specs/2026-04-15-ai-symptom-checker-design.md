@@ -36,47 +36,47 @@ Frontend renders real results in TriageResults
 
 ### Backend
 
-| Path | Purpose |
-|------|---------|
-| `apps/ai-service/src/main.ts` | TCP microservice bootstrap on port 5008 |
-| `apps/ai-service/src/app.module.ts` | Root module (ConfigModule + SymptomCheckerModule) |
-| `apps/ai-service/src/symptom-checker/symptom-checker.module.ts` | Feature module |
-| `apps/ai-service/src/symptom-checker/symptom-checker.controller.ts` | Handles `MSG.AI_SYMPTOM_CHECK` message pattern |
-| `apps/ai-service/src/symptom-checker/symptom-checker.service.ts` | Calls Groq, parses response |
-| `apps/ai-service/package.json` | NestJS + openai SDK dependencies |
-| `apps/ai-service/tsconfig.json` | TypeScript config |
+| Path                                                                | Purpose                                           |
+| ------------------------------------------------------------------- | ------------------------------------------------- |
+| `apps/ai-service/src/main.ts`                                       | TCP microservice bootstrap on port 5008           |
+| `apps/ai-service/src/app.module.ts`                                 | Root module (ConfigModule + SymptomCheckerModule) |
+| `apps/ai-service/src/symptom-checker/symptom-checker.module.ts`     | Feature module                                    |
+| `apps/ai-service/src/symptom-checker/symptom-checker.controller.ts` | Handles `MSG.AI_SYMPTOM_CHECK` message pattern    |
+| `apps/ai-service/src/symptom-checker/symptom-checker.service.ts`    | Calls Groq, parses response                       |
+| `apps/ai-service/package.json`                                      | NestJS + openai SDK dependencies                  |
+| `apps/ai-service/tsconfig.json`                                     | TypeScript config                                 |
 
 ### Gateway
 
-| Path | Purpose |
-|------|---------|
-| `apps/api-gateway/src/ai/ai-gateway.module.ts` | Gateway feature module |
+| Path                                               | Purpose                                      |
+| -------------------------------------------------- | -------------------------------------------- |
+| `apps/api-gateway/src/ai/ai-gateway.module.ts`     | Gateway feature module                       |
 | `apps/api-gateway/src/ai/ai-gateway.controller.ts` | `POST /ai/symptom-check` with `JwtAuthGuard` |
 
 ### Shared Types
 
-| Path | Change |
-|------|--------|
+| Path                                    | Change                                                    |
+| --------------------------------------- | --------------------------------------------------------- |
 | `packages/shared-types/src/messages.ts` | Add `AI_SYMPTOM_CHECK = 'ai.symptom_check'` to `MSG` enum |
-| `packages/shared-types/src/index.ts` | Export `SymptomCheckResult` type |
+| `packages/shared-types/src/index.ts`    | Export `SymptomCheckResult` type                          |
 
 ### Infrastructure
 
-| Path | Change |
-|------|--------|
-| `apps/api-gateway/src/clients.module.ts` | Add `AI_SERVICE` TCP client (port 5008) |
-| `apps/api-gateway/src/app.module.ts` | Import `AiGatewayModule` |
-| `.env` | Add `GROQ_API_KEY`, `AI_SERVICE_PORT=5008`, `AI_SERVICE_HOST=localhost` |
-| `docker-compose.yml` | Add `ai-service` container |
-| `infra/k8s/` | Add AI service deployment + service manifests |
+| Path                                     | Change                                                                  |
+| ---------------------------------------- | ----------------------------------------------------------------------- |
+| `apps/api-gateway/src/clients.module.ts` | Add `AI_SERVICE` TCP client (port 5008)                                 |
+| `apps/api-gateway/src/app.module.ts`     | Import `AiGatewayModule`                                                |
+| `.env`                                   | Add `GROQ_API_KEY`, `AI_SERVICE_PORT=5008`, `AI_SERVICE_HOST=localhost` |
+| `docker-compose.yml`                     | Add `ai-service` container                                              |
+| `infra/k8s/`                             | Add AI service deployment + service manifests                           |
 
 ### Frontend
 
-| Path | Change |
-|------|--------|
-| `apps/web/src/app/(app)/symptom-checker/page.tsx` | Add `results` state, pass `symptoms` to `DiagnosticEngine`, pass `results` to `TriageResults` |
-| `apps/web/src/components/symptom-checker/diagnostic-engine.tsx` | Fire real API call alongside animation; call `onComplete(data)` when both finish |
-| `apps/web/src/components/symptom-checker/triage-results.tsx` | Replace `mockResults` const with `results` prop of type `SymptomCheckResult` |
+| Path                                                            | Change                                                                                        |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `apps/web/src/app/(app)/symptom-checker/page.tsx`               | Add `results` state, pass `symptoms` to `DiagnosticEngine`, pass `results` to `TriageResults` |
+| `apps/web/src/components/symptom-checker/diagnostic-engine.tsx` | Fire real API call alongside animation; call `onComplete(data)` when both finish              |
+| `apps/web/src/components/symptom-checker/triage-results.tsx`    | Replace `mockResults` const with `results` prop of type `SymptomCheckResult`                  |
 
 ---
 
@@ -89,15 +89,15 @@ Frontend renders real results in TriageResults
 
 export interface SymptomCheckCondition {
   name: string;
-  probability: number;        // 0–100
+  probability: number; // 0–100
   description: string;
-  specialist: string;         // e.g. "Neurologist", "General Physician"
+  specialist: string; // e.g. "Neurologist", "General Physician"
 }
 
 export interface SymptomCheckResult {
   severity: 'Low' | 'Moderate' | 'High' | 'Emergency';
-  conditions: SymptomCheckCondition[];   // max 3, ranked by probability desc
-  recommendedActions: string[];          // 3–5 immediate action steps
+  conditions: SymptomCheckCondition[]; // max 3, ranked by probability desc
+  recommendedActions: string[]; // 3–5 immediate action steps
 }
 ```
 
@@ -105,10 +105,13 @@ export interface SymptomCheckResult {
 
 ```ts
 // Request payload sent from gateway to ai-service
-{ symptoms: string; patientId: string }
+{
+  symptoms: string;
+  patientId: string;
+}
 
 // Response
-SymptomCheckResult
+SymptomCheckResult;
 ```
 
 ### HTTP Endpoint
@@ -202,7 +205,7 @@ const handleAnalysisComplete = (data: SymptomCheckResult) => {
 interface DiagnosticEngineProps {
   symptoms: string;
   onComplete: (result: SymptomCheckResult) => void;
-  onReset: () => void;   // needed for error state "Try Again" button
+  onReset: () => void; // needed for error state "Try Again" button
 }
 ```
 
@@ -243,16 +246,16 @@ AI_SERVICE_HOST=localhost
 
 ## Service Port Map (updated)
 
-| Service | Port |
-|---------|------|
-| auth-service | 5001 |
-| patient-service | 5002 |
-| doctor-service | 5003 |
-| appointment-service | 5004 |
-| telemedicine-service | 5005 |
-| payment-service | 5006 |
-| notification-service | 5007 |
-| **ai-service** | **5008** |
+| Service              | Port     |
+| -------------------- | -------- |
+| auth-service         | 5001     |
+| patient-service      | 5002     |
+| doctor-service       | 5003     |
+| appointment-service  | 5004     |
+| telemedicine-service | 5005     |
+| payment-service      | 5006     |
+| notification-service | 5007     |
+| **ai-service**       | **5008** |
 
 ---
 

@@ -4,7 +4,10 @@ import { SymptomCheckerModule } from './symptom-checker/symptom-checker.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../../.env', '.env'] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['../../.env', '.env'],
+    }),
     SymptomCheckerModule,
   ],
 })

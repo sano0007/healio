@@ -16,7 +16,9 @@ async function bootstrap() {
   );
 
   await app.listen();
-  console.log(`Auth microservice listening on port ${process.env.AUTH_SERVICE_PORT || 5001}`);
+  console.log(
+    `Auth microservice listening on port ${process.env.AUTH_SERVICE_PORT || 5001}`,
+  );
 }
 
 bootstrap();

@@ -10,16 +10,25 @@ export class SmsService {
   constructor(private config: ConfigService) {}
 
   async sendSms(to: string, message: string): Promise<void> {
-    const userId   = this.config.get<string>('NOTIFY_LK_USER_ID');
-    const apiKey   = this.config.get<string>('NOTIFY_LK_API_KEY');
-    const senderId = this.config.get<string>('NOTIFY_LK_SENDER_ID', 'NotifyDEMO');
+    const userId = this.config.get<string>('NOTIFY_LK_USER_ID');
+    const apiKey = this.config.get<string>('NOTIFY_LK_API_KEY');
+    const senderId = this.config.get<string>(
+      'NOTIFY_LK_SENDER_ID',
+      'NotifyDEMO',
+    );
 
     if (!userId || !apiKey) {
       this.logger.warn('notify.lk credentials not configured — skipping SMS');
       return;
     }
 
-    const params = new URLSearchParams({ user_id: userId, api_key: apiKey, sender_id: senderId, to, message });
+    const params = new URLSearchParams({
+      user_id: userId,
+      api_key: apiKey,
+      sender_id: senderId,
+      to,
+      message,
+    });
     const res = await fetch(`${this.apiUrl}?${params.toString()}`);
     const body = await res.json().catch(() => ({}));
 
@@ -35,16 +44,24 @@ export class SmsService {
     const d = new Date(raw as string);
     if (isNaN(d.getTime())) return String(raw);
     return d.toLocaleString('en-GB', {
-      day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit', hour12: true,
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
     });
   }
 
-  getSmsMessage(type: NotificationType, role: 'patient' | 'doctor', payload: Record<string, unknown>): string {
-    const date    = this.fmt(payload.scheduledAt);
-    const patient = payload.patientName as string ?? 'Patient';
-    const doctor  = payload.doctorName  as string ?? 'Doctor';
-    const amount  = `${payload.amount} ${payload.currency}`;
+  getSmsMessage(
+    type: NotificationType,
+    role: 'patient' | 'doctor',
+    payload: Record<string, unknown>,
+  ): string {
+    const date = this.fmt(payload.scheduledAt);
+    const patient = (payload.patientName as string) ?? 'Patient';
+    const doctor = (payload.doctorName as string) ?? 'Doctor';
+    const amount = `${payload.amount} ${payload.currency}`;
 
     switch (type) {
       case NotificationType.APPOINTMENT_BOOKED:
