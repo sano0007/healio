@@ -28,7 +28,7 @@ export default function PrescriptionsPage() {
   return (
     <div className="max-w-7xl mx-auto py-8 lg:py-12 px-4 space-y-12 mb-20">
       {/* 1. Header & Quick Summary */}
-      <PrescriptionHeader />
+        <PrescriptionHeader prescriptionCount={activeMeds.length}/>
 
       {/* 2. Visual Medication Routine Hub */}
       <section className="space-y-6">
@@ -36,7 +36,7 @@ export default function PrescriptionsPage() {
            <div className="w-1.5 h-6 bg-brand-dark rounded-full" />
            <h2 className="text-xl font-bold text-brand-black tracking-tight uppercase tracking-widest text-[11px] leading-none">Daily Health Routine</h2>
         </div>
-        <MedicationRoutine />
+          <MedicationRoutine prescriptions={Array.isArray(prescriptions) ? prescriptions : []}/>
       </section>
 
       {/* 3. Active Meds Grid */}
