@@ -111,4 +111,18 @@ export class DoctorsService {
     const doctor = new this.doctorModel(data);
     return doctor.save();
   }
+
+  async updateStatus(userId: string, status: string) {
+    const validStatuses = ["online", "busy", "offline"];
+    if (!validStatuses.includes(status)) {
+      throw new RpcException('Invalid status. Must be online, busy, or offline');
+    }
+    const doctor = await this.doctorModel.findOneAndUpdate(
+      { userId },
+      { status },
+      { new: true },
+    ).exec();
+    if (!doctor) throw new RpcException('Doctor profile not found');
+    return doctor;
+  }
 }

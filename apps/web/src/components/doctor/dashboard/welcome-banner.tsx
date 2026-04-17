@@ -3,15 +3,34 @@
 import {motion} from "framer-motion";
 import {Activity, Calendar, ChevronRight, Clock, ShieldCheck} from "lucide-react";
 import {useState, useEffect} from "react";
+import {useRouter} from "next/navigation";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {cn} from "@/lib/utils";
 import {useAuth} from "@/contexts/auth";
 import {useDoctorAppointments} from "@/hooks/use-doctor-appointments";
+import {useDoctorProfile} from "@/hooks/use-doctors";
+import {api} from "@/lib/api";
 
 export function WelcomeBanner() {
+  const router = useRouter();
   const {user} = useAuth();
-  const [status, setStatus] = useState<"online" | "busy" | "offline">("online");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const queryClient = useQueryClient();
+  const {data: doctor} = useDoctorProfile();
   const {data: appointments} = useDoctorAppointments();
+  const statusMutation = useMutation({
+    mutationFn: (status: string) => api.doctors.updateStatus(status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['doctor-profile']});
+    },
+  });
+
+  const [localStatus, setLocalStatus] = useState<"online" | "busy" | "offline">("online");
+  const currentStatus = (doctor?.status as "online" | "busy" | "offline") || localStatus;
+  const setStatus = (newStatus: "online" | "busy" | "offline") => {
+    setLocalStatus(newStatus);
+    statusMutation.mutate(newStatus);
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -125,7 +144,7 @@ export function WelcomeBanner() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-light">Status</span>
-              <Activity className={cn("w-4 h-4 transition-colors", status === "online" ? "text-emerald-400" : "text-gray-400")} />
+              <Activity className={cn("w-4 h-4 transition-colors", currentStatus === "online" ? "text-emerald-400" : "text-gray-400")} />
             </div>
             
             <div className="space-y-3">
@@ -135,7 +154,7 @@ export function WelcomeBanner() {
                   onClick={() => setStatus(s)}
                   className={cn(
                     "w-full px-5 py-4 rounded-2xl border transition-all flex items-center justify-between group/btn",
-                    status === s 
+                    currentStatus === s 
                       ? "bg-white text-brand-dark border-transparent shadow-xl" 
                       : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:text-white"
                   )}
@@ -144,14 +163,17 @@ export function WelcomeBanner() {
                   <div className={cn(
                     "w-2 h-2 rounded-full transition-all",
                     s === "online" ? "bg-emerald-500" : s === "busy" ? "bg-orange-500" : "bg-gray-400",
-                    status === s ? "scale-125" : "scale-100 group-hover/btn:scale-110"
+                    currentStatus === s ? "scale-125" : "scale-100 group-hover/btn:scale-110"
                   )} />
                 </button>
               ))}
             </div>
           </div>
 
-          <button className="w-full h-14 bg-brand-light text-brand-dark rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white transition-all shadow-lg active:scale-[0.98]">
+          <button 
+            onClick={() => router.push('/doctor/settings')}
+            className="w-full h-14 bg-brand-light text-brand-dark rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white transition-all shadow-lg active:scale-[0.98]"
+          >
             Edit Profile
             <ChevronRight className="w-4 h-4" />
           </button>
