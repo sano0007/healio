@@ -19,9 +19,9 @@ export default function DoctorSettingsPage() {
         phone: "",
         specialty: "",
         qualifications: [],
-        experience: undefined,
+        experience: 0,
         bio: "",
-        consultationFee: undefined,
+        consultationFee: 0,
     });
 
     const [qualificationsText, setQualificationsText] = useState("");
@@ -36,9 +36,9 @@ export default function DoctorSettingsPage() {
                 phone: doctor.phone || "",
                 specialty: doctor.specialty || "",
                 qualifications: doctor.qualifications || [],
-                experience: doctor.experience,
+                experience: doctor.experience ?? 0,
                 bio: doctor.bio || "",
-                consultationFee: doctor.consultationFee,
+                consultationFee: doctor.consultationFee ?? 0,
             });
             setQualificationsText(doctor.qualifications?.join(", ") || "");
         }
@@ -181,7 +181,7 @@ export default function DoctorSettingsPage() {
                                 <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-dark opacity-40"/>
                                 <Input
                                     value={form.experience}
-                                    onChange={(e) => updateField("experience", parseInt(e.target.value) || undefined)}
+                                    onChange={(e) => updateField("experience", parseInt(e.target.value) || 0)}
                                     type="number"
                                     placeholder="e.g., 10"
                                     className="h-14 pl-12 rounded-2xl border-gray-100 bg-gray-50/30 focus:bg-white focus:ring-brand-light"
@@ -194,7 +194,7 @@ export default function DoctorSettingsPage() {
                                 <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-dark opacity-40"/>
                                 <Input
                                     value={form.consultationFee}
-                                    onChange={(e) => updateField("consultationFee", parseFloat(e.target.value) || undefined)}
+                                    onChange={(e) => updateField("consultationFee", parseFloat(e.target.value) || 0)}
                                     type="number"
                                     placeholder="e.g., 100"
                                     className="h-14 pl-12 rounded-2xl border-gray-100 bg-gray-50/30 focus:bg-white focus:ring-brand-light"
