@@ -115,7 +115,7 @@ export function DiagnosticEngine({ symptoms, onComplete, onReset }: DiagnosticEn
       <div className="w-full max-w-md space-y-8 text-center px-6">
         <div className="space-y-3">
           <h3 className="text-xl font-bold text-brand-black tracking-tight">Clinical Diagnosis Engine</h3>
-          <p className="text-sm font-medium text-gray-400 italic">Processing natural language inputs with HealioMed-7B Model...</p>
+          <p className="text-sm font-medium text-gray-400 italic">Processing natural language inputs with Healio AI...</p>
         </div>
 
         <div className="space-y-6">
