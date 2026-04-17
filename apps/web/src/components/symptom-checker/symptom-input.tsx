@@ -73,10 +73,6 @@ export function SymptomInput({ onAnalyze }: SymptomInputProps) {
                {symptom.label}
              </button>
            ))}
-           <button className="px-6 py-3 bg-gray-50 rounded-2xl border border-gray-100 text-[11px] font-bold text-gray-400 flex items-center gap-2 hover:text-brand-dark transition-colors">
-              <PlusIcon className="w-3.5 h-3.5" />
-              View All
-           </button>
         </div>
       </div>
 
@@ -93,13 +89,5 @@ export function SymptomInput({ onAnalyze }: SymptomInputProps) {
          </div>
       </div>
     </div>
-  );
-}
-
-function PlusIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
-    </svg>
   );
 }

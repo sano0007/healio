@@ -45,7 +45,7 @@ export default function SymptomCheckerPage() {
           </h1>
           <div className="flex items-center gap-6">
             <p className="text-xs text-gray-400 font-medium italic">
-              Powered by <span className="text-brand-dark font-black">HealioMed AI</span> Diagnostic Model.
+              Powered by <span className="text-brand-dark font-black">Healio AI</span>.
             </p>
             <div className="flex items-center gap-2">
                <Activity className="w-3.5 h-3.5 text-brand-dark" />
