@@ -106,9 +106,6 @@ export function TriageResults({ results, onReset }: { results: SymptomCheckResul
                  ))}
               </div>
 
-              <Button variant="outline" className="w-full h-12 rounded-2xl bg-white/10 border-white/20 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-brand-black relative z-10 transition-colors">
-                 Download Full Report
-              </Button>
 
               <div className="absolute -left-20 -bottom-20 w-60 h-60 rounded-full bg-brand-light/10 blur-3xl" />
            </div>
