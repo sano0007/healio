@@ -1,5 +1,6 @@
 import {useQuery} from '@tanstack/react-query';
 import {api, Doctor} from '@/lib/api';
+import {useAuth} from '@/contexts/auth';
 
 export interface DoctorFilters {
   search?: string;
@@ -38,9 +39,11 @@ export function useDoctor(doctorId: string) {
 }
 
 export function useDoctorProfile() {
+  const { isLoading: authLoading } = useAuth();
   return useQuery({
     queryKey: ['doctor-profile'],
     queryFn: () => api.doctors.getMe() as Promise<Doctor>,
+    enabled: !authLoading,
     staleTime: 1000 * 60 * 5,
   });
 }
