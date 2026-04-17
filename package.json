@@ -12,6 +12,7 @@
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "clean": "turbo clean && rm -rf node_modules",
+    "web:dev": "turbo dev --filter=web",
     "docker:up": "docker compose -f infra/docker-compose.yml --env-file .env up",
     "docker:up:build": "docker compose -f infra/docker-compose.yml --env-file .env up --build",
     "docker:up:fresh": "docker compose -f infra/docker-compose.yml --env-file .env build --no-cache && docker compose -f infra/docker-compose.yml --env-file .env up",
