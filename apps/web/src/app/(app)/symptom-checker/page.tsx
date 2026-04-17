@@ -6,7 +6,7 @@ import { DiagnosticEngine } from "@/components/symptom-checker/diagnostic-engine
 import { TriageResults } from "@/components/symptom-checker/triage-results";
 import type { SymptomCheckResult } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 type CheckerState = "input" | "analyzing" | "results";
 
@@ -47,10 +47,6 @@ export default function SymptomCheckerPage() {
             <p className="text-xs text-gray-400 font-medium italic">
               Powered by <span className="text-brand-dark font-black">Healio AI</span>.
             </p>
-            <div className="flex items-center gap-2">
-               <Activity className="w-3.5 h-3.5 text-brand-dark" />
-               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clinical Confidence: 98%</span>
-            </div>
           </div>
         </div>
 
