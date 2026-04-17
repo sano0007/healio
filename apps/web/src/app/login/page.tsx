@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Activity } from 'lucide-react';
-import { useAuth } from '@/contexts/auth';
+import {useRouter} from 'next/navigation';
+import {Activity} from 'lucide-react';
+import {useAuth} from '@/contexts/auth';
 
 export default function LoginPage() {
   const { login, user, isLoading } = useAuth();
@@ -15,7 +15,9 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && user) router.replace('/dashboard');
+    if (!isLoading && user) {
+      router.replace(user.role === 'doctor' ? '/doctor/dashboard' : '/dashboard');
+    }
   }, [user, isLoading, router]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -23,8 +25,8 @@ export default function LoginPage() {
     setError('');
     setSubmitting(true);
     try {
-      await login(email, password);
-      router.push('/dashboard');
+      const loggedInUser = await login(email, password);
+      router.push(loggedInUser.role === 'doctor' ? '/doctor/dashboard' : '/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
