@@ -7,10 +7,30 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 const commonSymptoms = [
-  { id: "headache", label: "Severe Headache", icon: <Brain className="w-3.5 h-3.5" /> },
-  { id: "fever", label: "High Fever", icon: <Thermometer className="w-3.5 h-3.5" /> },
-  { id: "fatigue", label: "Extreme Fatigue", icon: <Activity className="w-3.5 h-3.5" /> },
-  { id: "chest_pain", label: "Chest Pain", icon: <HeartPulse className="w-3.5 h-3.5" /> },
+  {
+    id: "headache",
+    label: "Severe Headache",
+    icon: <Brain className="w-3.5 h-3.5" />,
+    preset: "I've been having a severe headache for the past two days. The pain is sharp and concentrated behind my eyes, and it gets worse when I look at bright lights or screens. I also feel slightly nauseous.",
+  },
+  {
+    id: "fever",
+    label: "High Fever",
+    icon: <Thermometer className="w-3.5 h-3.5" />,
+    preset: "I've had a high fever since yesterday evening — my temperature is around 39°C (102°F). I feel hot and sweaty, have chills, and my body aches all over. I've been feeling very weak.",
+  },
+  {
+    id: "fatigue",
+    label: "Extreme Fatigue",
+    icon: <Activity className="w-3.5 h-3.5" />,
+    preset: "I've been experiencing extreme fatigue for the past week. Even after a full night's sleep I wake up exhausted. I have no energy to do daily tasks, and I feel mentally foggy most of the time.",
+  },
+  {
+    id: "chest_pain",
+    label: "Chest Pain",
+    icon: <HeartPulse className="w-3.5 h-3.5" />,
+    preset: "I'm having a tightness and dull aching pain in the center of my chest. It started a few hours ago and comes and goes. I also feel a little short of breath when I walk up stairs or move quickly.",
+  },
 ];
 
 interface SymptomInputProps {
@@ -20,8 +40,8 @@ interface SymptomInputProps {
 export function SymptomInput({ onAnalyze }: SymptomInputProps) {
   const [text, setText] = useState("");
 
-  const handleQuickSelect = (label: string) => {
-    setText((prev) => (prev ? `${prev}, ${label}` : label));
+  const handleQuickSelect = (preset: string) => {
+    setText(preset);
   };
 
   return (
@@ -66,7 +86,7 @@ export function SymptomInput({ onAnalyze }: SymptomInputProps) {
            {commonSymptoms.map((symptom) => (
              <button
                key={symptom.id}
-               onClick={() => handleQuickSelect(symptom.label)}
+               onClick={() => handleQuickSelect(symptom.preset)}
                className="px-6 py-3 bg-white rounded-2xl border border-gray-100 text-[11px] font-bold text-brand-black flex items-center gap-2 hover:border-brand-light/30 hover:bg-gray-50/50 hover:shadow-lg transition-all active:scale-95"
              >
                <span className="text-brand-dark">{symptom.icon}</span>
