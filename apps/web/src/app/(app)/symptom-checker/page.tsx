@@ -6,7 +6,7 @@ import { DiagnosticEngine } from "@/components/symptom-checker/diagnostic-engine
 import { TriageResults } from "@/components/symptom-checker/triage-results";
 import type { SymptomCheckResult } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Activity, ShieldCheck, Info } from "lucide-react";
+import { Activity, ShieldCheck } from "lucide-react";
 
 type CheckerState = "input" | "analyzing" | "results";
 
@@ -54,17 +54,6 @@ export default function SymptomCheckerPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 bg-gray-50 p-2 rounded-2xl border border-gray-100">
-           <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-brand-dark shadow-sm">
-             <Sparkles className="w-4 h-4" />
-           </div>
-           <p className="text-[10px] font-black text-brand-black uppercase tracking-widest pr-4 border-r border-gray-200">
-             Smart Diagnosis
-           </p>
-           <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest pl-2">
-             v4.2.0-clinical
-           </p>
-        </div>
       </div>
 
       {/* 2. Multi-State Dashboard */}
@@ -108,26 +97,6 @@ export default function SymptomCheckerPage() {
         </AnimatePresence>
       </div>
 
-      {/* 3. Footer / Disclaimer */}
-      <div className="pt-12 border-t border-gray-50 flex items-center justify-between opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-         <div className="flex items-center gap-2">
-            <Info className="w-3.5 h-3.5 text-gray-400" />
-            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.1em]">
-              This is a decision support tool, not a medical diagnosis. In emergencies, call local emergency services immediately.
-            </p>
-         </div>
-         <div className="flex items-center gap-6">
-            <div className="flex flex-col items-end">
-               <p className="text-[9px] font-black text-brand-black uppercase tracking-widest mb-1">Encrypted Infrastructure</p>
-               <p className="text-[8px] font-medium text-gray-400">Cert-ID: HL-8829-DIAG</p>
-            </div>
-            <div className="w-px h-8 bg-gray-100" />
-            <div className="flex items-center gap-2">
-               <ShieldCheck className="w-5 h-5 text-emerald-500" />
-               <p className="text-[10px] font-black text-brand-black uppercase">Verified</p>
-            </div>
-         </div>
-      </div>
     </div>
   );
 }
