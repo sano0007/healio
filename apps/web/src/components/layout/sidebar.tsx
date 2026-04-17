@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {usePathname, useRouter} from "next/navigation";
 import {
-
   Calendar,
   CalendarCheck,
   ClipboardList,
@@ -36,7 +35,6 @@ const doctorNavigation = [
 ];
 
 const secondaryNavigation = [
-  { name: "Notifications", href: "/notifications", icon: Bell },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
