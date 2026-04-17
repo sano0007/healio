@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import {CheckCircle2, Heart, MapPin, Share2} from "lucide-react";
-import {Avatar} from "@/components/ui/avatar";
-import {Button} from "@/components/ui/button";
+import { CheckCircle2, Heart, MapPin, Share2 } from 'lucide-react';
+import { Avatar } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 
 export interface DoctorProfileHeaderProps {
   name: string;
@@ -36,7 +36,10 @@ export function DoctorProfileHeader({
           </div>
           {isVerified && (
             <div className="absolute bottom-2 right-2 bg-white rounded-full p-1.5 shadow-lg border border-gray-50">
-              <CheckCircle2 className="w-6 h-6 text-brand-dark" fill="currentColor" />
+              <CheckCircle2
+                className="w-6 h-6 text-brand-dark"
+                fill="currentColor"
+              />
             </div>
           )}
         </div>
@@ -45,22 +48,33 @@ export function DoctorProfileHeader({
         <div className="flex-1">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-3">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-brand-black tracking-tight mb-1">{name}</h1>
-              <p className="text-lg font-bold text-brand-dark tracking-wide uppercase text-[12px] opacity-80">{specialization}</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-brand-black tracking-tight mb-1">
+                {name}
+              </h1>
+              <p className="text-lg font-bold text-brand-dark tracking-wide uppercase text-[12px] opacity-80">
+                {specialization}
+              </p>
             </div>
-            
+
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="icon" className="rounded-2xl w-11 h-11 border-brand-light/20 hover:bg-brand-light/10">
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-2xl w-11 h-11 border-brand-light/20 hover:bg-brand-light/10"
+              >
                 <Share2 className="w-5 h-5 text-brand-dark" />
               </Button>
-              <Button variant="outline" size="icon" className="rounded-2xl w-11 h-11 border-brand-light/20 hover:bg-brand-light/10">
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-2xl w-11 h-11 border-brand-light/20 hover:bg-brand-light/10"
+              >
                 <Heart className="w-5 h-5 text-brand-dark" />
               </Button>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-6 text-sm">
-
             {/* Location */}
             <div className="flex items-center gap-2 text-gray-500 font-medium">
               <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">

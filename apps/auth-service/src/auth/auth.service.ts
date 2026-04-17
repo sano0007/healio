@@ -73,9 +73,7 @@ export class AuthService {
     return this.jwtService.verify<JwtPayload>(token);
   }
 
-  async refreshToken(
-    refreshToken: string,
-  ): Promise<{
+  async refreshToken(refreshToken: string): Promise<{
     access_token: string;
     refresh_token: string;
     user: { id: string; email: string; role: string; name: string };

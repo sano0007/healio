@@ -23,21 +23,26 @@ export function clearAuthTokens() {
 }
 
 export function getAccessToken(): string | null {
-  const lsToken = typeof window !== 'undefined' ? localStorage.getItem('healio_token') : null;
+  const lsToken =
+    typeof window !== 'undefined' ? localStorage.getItem('healio_token') : null;
   return authToken || lsToken;
 }
 
 export function getUserIdFromToken(): string | null {
-  const token = authToken || (typeof window !== 'undefined' ? localStorage.getItem('healio_token') : null);
+  const token =
+    authToken ||
+    (typeof window !== 'undefined'
+      ? localStorage.getItem('healio_token')
+      : null);
   if (!token) return null;
-    try {
-      const parts = token.split('.');
-      if (parts.length !== 3) return null;
-      const payload = JSON.parse(atob(parts[1]));
-        return payload.sub || null;
-    } catch {
-        return null;
-    }
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(atob(parts[1]));
+    return payload.sub || null;
+  } catch {
+    return null;
+  }
 }
 
 export class ApiError extends Error {
@@ -51,7 +56,11 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, options: RequestInit = {}, retry = true): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestInit = {},
+  retry = true,
+): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -66,10 +75,14 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
 
     if (res.status === 401 && retry && refreshToken) {
       try {
-        const refreshed = await request<AuthResponse>('/auth/refresh', {
-          method: 'POST',
-          body: JSON.stringify({ refreshToken }),
-        }, false);
+        const refreshed = await request<AuthResponse>(
+          '/auth/refresh',
+          {
+            method: 'POST',
+            body: JSON.stringify({ refreshToken }),
+          },
+          false,
+        );
         authToken = refreshed.access_token;
         refreshToken = refreshed.refresh_token || refreshToken;
         return request<T>(path, options, false);
@@ -95,70 +108,138 @@ export interface AuthResponse {
 
 export const api = {
   auth: {
-    register: (data: { name: string; email: string; password: string; role: string; phone?: string }) =>
-      request<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+    register: (data: {
+      name: string;
+      email: string;
+      password: string;
+      role: string;
+      phone?: string;
+    }) =>
+      request<AuthResponse>('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
     login: (data: { email: string; password: string }) =>
-      request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
+      request<AuthResponse>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
     refresh: (data: { refreshToken: string }) =>
-      request<AuthResponse>('/auth/refresh', { method: 'POST', body: JSON.stringify(data) }),
+      request<AuthResponse>('/auth/refresh', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
   },
   patients: {
     getMe: () => request<PatientProfile>('/patients/me'),
     updateMe: (data: Partial<PatientProfile>) =>
-      request<PatientProfile>('/patients/me', { method: 'PATCH', body: JSON.stringify(data) }),
+      request<PatientProfile>('/patients/me', {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
   },
   doctors: {
-    getAll: (filters?: { search?: string; specialty?: string; availability?: string; sort?: string; page?: number; limit?: number }) => {
+    getAll: (filters?: {
+      search?: string;
+      specialty?: string;
+      availability?: string;
+      sort?: string;
+      page?: number;
+      limit?: number;
+    }) => {
       const params = new URLSearchParams();
       if (filters?.search) params.append('search', filters.search);
-      if (filters?.specialty && filters.specialty !== 'All Specialties') params.append('specialty', filters.specialty);
-      if (filters?.availability) params.append('availability', filters.availability);
+      if (filters?.specialty && filters.specialty !== 'All Specialties')
+        params.append('specialty', filters.specialty);
+      if (filters?.availability)
+        params.append('availability', filters.availability);
       if (filters?.sort) params.append('sort', filters.sort);
       if (filters?.page) params.append('page', String(filters.page));
       if (filters?.limit) params.append('limit', String(filters.limit));
       const query = params.toString() ? `?${params.toString()}` : '';
-      return request<{ data: Doctor[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/doctors${query}`);
+      return request<{
+        data: Doctor[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+        };
+      }>(`/doctors${query}`);
     },
     getById: (id: string) => request<Doctor>(`/doctors/${id}`),
     getMe: () => request<Doctor>('/doctors/me'),
     updateMe: (data: Partial<DoctorProfile>) =>
-      request<DoctorProfile>('/doctors/me', { method: 'PATCH', body: JSON.stringify(data) }),
+      request<DoctorProfile>('/doctors/me', {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
     updateStatus: (status: string) =>
-      request<DoctorProfile>('/doctors/status', { method: 'PATCH', body: JSON.stringify({ status }) }),
+      request<DoctorProfile>('/doctors/status', {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }),
     setAvailability: (availability: AvailabilitySlot[]) =>
-      request<DoctorProfile>('/doctors/availability', { method: 'POST', body: JSON.stringify({ availability }) }),
+      request<DoctorProfile>('/doctors/availability', {
+        method: 'POST',
+        body: JSON.stringify({ availability }),
+      }),
     issuePrescription: (data: PrescriptionDto) =>
-      request('/doctors/prescriptions', { method: 'POST', body: JSON.stringify(data) }),
+      request('/doctors/prescriptions', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
   },
   appointments: {
     book: (data: { doctorId: string; scheduledAt: string; notes?: string }) =>
-      request<Appointment>('/appointments', { method: 'POST', body: JSON.stringify(data) }),
+      request<Appointment>('/appointments', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
     getMy: () => request<Appointment[]>('/appointments/my'),
     getById: (id: string) => request<Appointment>(`/appointments/${id}`),
     cancel: (id: string, reason: string) =>
-      request(`/appointments/${id}/cancel`, { method: 'PATCH', body: JSON.stringify({ reason }) }),
+      request(`/appointments/${id}/cancel`, {
+        method: 'PATCH',
+        body: JSON.stringify({ reason }),
+      }),
     updateStatus: (id: string, status: string) =>
-      request(`/appointments/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+      request(`/appointments/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }),
   },
   payments: {
-    initiate: (data: { appointmentId: string; amount: number; currency: string }) =>
-      request<{ paymentId: string; clientSecret: string }>('/payments/initiate', { method: 'POST', body: JSON.stringify(data) }),
+    initiate: (data: {
+      appointmentId: string;
+      amount: number;
+      currency: string;
+    }) =>
+      request<{ paymentId: string; clientSecret: string }>(
+        '/payments/initiate',
+        { method: 'POST', body: JSON.stringify(data) },
+      ),
     get: (id: string) => request<Payment>(`/payments/${id}`),
   },
   records: {
     getAll: () => request<MedicalRecord[]>('/records'),
     upload: (data: FormData) =>
-        request<MedicalRecord>('/records', {method: 'POST', body: data}),
+      request<MedicalRecord>('/records', { method: 'POST', body: data }),
     delete: (id: string) =>
-        request<void>(`/records/${id}`, {method: 'DELETE'}),
+      request<void>(`/records/${id}`, { method: 'DELETE' }),
   },
-prescriptions: {
+  prescriptions: {
     getMy: () => request<Prescription[]>('/doctors/prescriptions'),
-    getById: (id: string) => request<Prescription>(`/doctors/prescriptions/${id}`),
+    getById: (id: string) =>
+      request<Prescription>(`/doctors/prescriptions/${id}`),
   },
   admin: {
     getStats: () => request<AdminStats>('/admin/stats'),
-    getPatients: (filters?: { search?: string; page?: number; limit?: number }) => {
+    getPatients: (filters?: {
+      search?: string;
+      page?: number;
+      limit?: number;
+    }) => {
       const params = new URLSearchParams();
       if (filters?.search) params.append('search', filters.search);
       if (filters?.page) params.append('page', String(filters.page));
@@ -166,19 +247,33 @@ prescriptions: {
       const query = params.toString() ? `?${params.toString()}` : '';
       return request<PatientProfile[]>(`/admin/patients${query}`);
     },
-    getDoctors: (filters?: { search?: string; specialty?: string; isVerified?: boolean; page?: number; limit?: number }) => {
+    getDoctors: (filters?: {
+      search?: string;
+      specialty?: string;
+      isVerified?: boolean;
+      page?: number;
+      limit?: number;
+    }) => {
       const params = new URLSearchParams();
       if (filters?.search) params.append('search', filters.search);
       if (filters?.specialty) params.append('specialty', filters.specialty);
-      if (filters?.isVerified !== undefined) params.append('isVerified', String(filters.isVerified));
+      if (filters?.isVerified !== undefined)
+        params.append('isVerified', String(filters.isVerified));
       if (filters?.page) params.append('page', String(filters.page));
       if (filters?.limit) params.append('limit', String(filters.limit));
       const query = params.toString() ? `?${params.toString()}` : '';
       return request<Doctor[]>(`/admin/doctors${query}`);
     },
-    getAppointments: (filters?: { status?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) => {
+    getAppointments: (filters?: {
+      status?: string;
+      startDate?: string;
+      endDate?: string;
+      page?: number;
+      limit?: number;
+    }) => {
       const params = new URLSearchParams();
-      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+      if (filters?.status && filters.status !== 'all')
+        params.append('status', filters.status);
       if (filters?.startDate) params.append('startDate', filters.startDate);
       if (filters?.endDate) params.append('endDate', filters.endDate);
       if (filters?.page) params.append('page', String(filters.page));
@@ -186,9 +281,16 @@ prescriptions: {
       const query = params.toString() ? `?${params.toString()}` : '';
       return request<Appointment[]>(`/admin/appointments${query}`);
     },
-    getPayments: (filters?: { status?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) => {
+    getPayments: (filters?: {
+      status?: string;
+      startDate?: string;
+      endDate?: string;
+      page?: number;
+      limit?: number;
+    }) => {
       const params = new URLSearchParams();
-      if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+      if (filters?.status && filters.status !== 'all')
+        params.append('status', filters.status);
       if (filters?.startDate) params.append('startDate', filters.startDate);
       if (filters?.endDate) params.append('endDate', filters.endDate);
       if (filters?.page) params.append('page', String(filters.page));
@@ -197,7 +299,10 @@ prescriptions: {
       return request<Payment[]>(`/admin/payments${query}`);
     },
     verifyDoctor: (userId: string, isVerified: boolean) =>
-      request<Doctor>(`/admin/doctors/${userId}/verify`, { method: 'PATCH', body: JSON.stringify({ isVerified }) }),
+      request<Doctor>(`/admin/doctors/${userId}/verify`, {
+        method: 'PATCH',
+        body: JSON.stringify({ isVerified }),
+      }),
   },
   sessions: {
     create: (appointmentId: string) =>
@@ -207,7 +312,10 @@ prescriptions: {
         token?: string;
         roomSid?: string;
         twilioRoomSid?: string;
-      }>('/sessions', { method: 'POST', body: JSON.stringify({ appointmentId }) }),
+      }>('/sessions', {
+        method: 'POST',
+        body: JSON.stringify({ appointmentId }),
+      }),
     join: (sessionId: string) =>
       request<{
         sessionId: string;
@@ -216,9 +324,15 @@ prescriptions: {
         token?: string;
         twilioRoomSid?: string;
         status: string;
-      }>('/sessions/join', { method: 'POST', body: JSON.stringify({ sessionId }) }),
+      }>('/sessions/join', {
+        method: 'POST',
+        body: JSON.stringify({ sessionId }),
+      }),
     end: (sessionId: string) =>
-      request<{ sessionId: string; status: string }>(`/sessions/${sessionId}/end`, { method: 'PATCH' }),
+      request<{ sessionId: string; status: string }>(
+        `/sessions/${sessionId}/end`,
+        { method: 'PATCH' },
+      ),
   },
   ai: {
     checkSymptoms: (symptoms: string) =>
@@ -249,7 +363,12 @@ export interface PatientProfile {
   phone?: string;
   bloodGroup?: string;
   address?: string;
-    medicalReports?: { filename: string; originalName: string; url: string; uploadedAt: string }[];
+  medicalReports?: {
+    filename: string;
+    originalName: string;
+    url: string;
+    uploadedAt: string;
+  }[];
 }
 
 export interface DoctorProfile {
@@ -287,10 +406,20 @@ export interface Appointment {
   doctorId: string;
   patientId: string;
   scheduledAt: string;
-  status: 'pending' | 'awaiting_payment' | 'confirmed' | 'cancelled' | 'completed';
+  status:
+    | 'pending'
+    | 'awaiting_payment'
+    | 'confirmed'
+    | 'cancelled'
+    | 'completed';
   notes?: string;
   type?: 'video' | 'in-person';
-  prescriptions?: { name: string; dosage: string; frequency: string; duration: string }[];
+  prescriptions?: {
+    name: string;
+    dosage: string;
+    frequency: string;
+    duration: string;
+  }[];
   paymentStatus?: string;
   checkoutUrl?: string;
 }
@@ -315,7 +444,12 @@ export interface AdminStats {
   verifiedDoctors: number;
   pendingVerification: number;
   totalAppointments: number;
-  appointmentsByStatus: { pending: number; confirmed: number; completed: number; cancelled: number };
+  appointmentsByStatus: {
+    pending: number;
+    confirmed: number;
+    completed: number;
+    cancelled: number;
+  };
   totalRevenue: number;
   totalPayments: number;
   successfulPayments: number;
@@ -324,14 +458,24 @@ export interface AdminStats {
 export interface PrescriptionDto {
   patientId: string;
   appointmentId: string;
-  medications: { name: string; dosage: string; frequency: string; duration: string }[];
+  medications: {
+    name: string;
+    dosage: string;
+    frequency: string;
+    duration: string;
+  }[];
   notes?: string;
 }
 
 export interface Notification {
   _id: string;
   userId: string;
-  type: 'appointment' | 'payment' | 'consultation' | 'prescription' | 'verification';
+  type:
+    | 'appointment'
+    | 'payment'
+    | 'consultation'
+    | 'prescription'
+    | 'verification';
   title: string;
   description: string;
   timestamp: string;
@@ -360,6 +504,11 @@ export interface Prescription {
   specialty?: string;
   issuedAt: string;
   diagnosis?: string;
-  medications: { name: string; dosage: string; frequency: string; duration: string }[];
+  medications: {
+    name: string;
+    dosage: string;
+    frequency: string;
+    duration: string;
+  }[];
   notes?: string;
 }
