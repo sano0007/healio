@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Healio — Microservices API",
-    "description": "SE3020 Distributed Systems — Healio Healthcare Platform\nBase URL: http://localhost:3001/api\n\nServices & Ports:\n  API Gateway        → :3001  (all HTTP traffic)\n  Auth Service       → :5001  (TCP, internal)\n  Patient Service    → :5002  (TCP, internal)\n  Doctor Service     → :5003  (TCP, internal)\n  Appointment Svc    → :5004  (TCP, internal)\n  Telemedicine Svc   → :5005  (TCP, internal)\n  Payment Service    → :5006  (TCP, internal)\n  Notification Svc   → :5007  (TCP, internal)\n  AI Service         → :5008  (TCP, internal — requires GROQ_API_KEY)\n\nQuick start:\n1. Run 'Register Patient', 'Register Doctor', 'Register Admin' (tokens auto-saved)\n2. Doctor: set availability, update profile\n3. Admin: verify the doctor\n4. Patient: book appointment, initiate payment\n5. Doctor: confirm appointment, create session\n6. Patient: join session\n7. Patient: use AI Symptom Checker (section 7) — requires GROQ_API_KEY in .env\n\nCollection variables are auto-populated by test scripts.",
+    "description": "SE3020 Distributed Systems — Healio Healthcare Platform\nBase URL: http://localhost:3001/api\n\nServices & Ports:\n  API Gateway        → :3001  (all HTTP traffic)\n  Auth Service       → :5001  (TCP, internal)\n  Patient Service    → :5002  (TCP, internal)\n  Doctor Service     → :5003  (TCP, internal)\n  Appointment Svc    → :5004  (TCP, internal)\n  Telemedicine Svc   → :5005  (TCP, internal)\n  Payment Service    → :5006  (TCP, internal)\n  Notification Svc   → :5007  (TCP, internal)\n  AI Service         → :5008  (TCP, internal — requires GROQ_API_KEY)\n\nQuick start:\n1. Run 'Register Patient', 'Register Doctor', 'Register Admin' (tokens auto-saved)\n2. Doctor: set availability, update profile (set consultationFee)\n3. Admin: verify the doctor\n4. Patient: book appointment\n5. Doctor: confirm appointment (triggers Stripe Checkout)\n6. Patient: complete payment (auto-creates a Jitsi telemedicine session)\n7. Patient or Doctor: join session using the auto-created session_id\n8. Patient: use AI Symptom Checker (section 7) — requires GROQ_API_KEY in .env\n\nCollection variables are auto-populated by test scripts.",
     "_postman_id": "healio-microservices-2026",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -694,13 +694,14 @@
                 "status"
               ]
             },
-            "description": "Valid status values: pending → confirmed → completed"
+            "description": "Doctor only. When status is 'confirmed', triggers Stripe Checkout flow: creates a payment session, sets appointment to 'awaiting_payment', and sends payment URL to patient. After patient pays, the appointment is auto-confirmed and a Jitsi telemedicine session is auto-created. Valid flow: pending → confirmed (via payment) → completed."
           }
         }
       ]
     },
     {
       "name": "5. Payments",
+      "description": "Payment processing via Stripe Checkout. When a doctor confirms an appointment, a Stripe Checkout session is auto-created and the payment link is sent to the patient. After successful payment, the appointment is marked confirmed and a Jitsi telemedicine session is automatically created.\n\nThe 'Complete Payment' endpoint is a dev/testing fallback for manually confirming payment when webhooks are unavailable.",
       "item": [
         {
           "name": "Initiate Payment",
@@ -746,7 +747,7 @@
                 "initiate"
               ]
             },
-            "description": "Creates a Stripe PaymentIntent. Use the returned clientSecret with Stripe.js on the frontend to collect card details."
+            "description": "Creates a Stripe PaymentIntent. Use the returned clientSecret with Stripe.js on the frontend to collect card details. Note: payment is normally initiated automatically when a doctor confirms an appointment."
           }
         },
         {
@@ -770,11 +771,58 @@
               ]
             }
           }
+        },
+        {
+          "name": "Complete Payment (Dev Fallback)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "if (res.success) {",
+                  "  console.log('Payment completed. Appointment confirmed. Jitsi session auto-created.');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"checkoutSessionId\": \"<paste_stripe_checkout_session_id_here>\",\n  \"appointmentId\": \"{{appointment_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base}}/payments/complete",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "payments",
+                "complete"
+              ]
+            },
+            "description": "Dev/testing fallback for manually completing a payment when Stripe webhooks are not reachable (e.g. no ngrok tunnel). Pass the Stripe checkoutSessionId from the Checkout URL. This confirms the payment, marks the appointment as confirmed, and auto-creates a Jitsi telemedicine session."
+          }
         }
       ]
     },
     {
       "name": "6. Telemedicine",
+      "description": "Jitsi Meet-based video consultations.\n\nSessions are now auto-created when a payment completes successfully. The session_id and roomName are included in the payment success notification sent to both patient and doctor.\n\nYou can also manually create or join sessions using the endpoints below. The 'Create Session' endpoint is useful if you need to create a fresh session outside the normal payment flow.",
       "item": [
         {
           "name": "Create Session (Doctor)",
