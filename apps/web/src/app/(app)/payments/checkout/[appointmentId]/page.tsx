@@ -169,7 +169,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ appointment
                    doctor={{
                        name: appointment?.doctor?.name ?? 'Doctor',
                        specialization: appointment?.doctor?.specialty ?? 'Specialist',
-                       image: "/images/doctor-placeholder.png",
+                       image: "/images/doctor-1.png",
                        fee: appointment?.doctor?.consultationFee ?? 0,
                    }}
                    schedule={{

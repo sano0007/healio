@@ -2,13 +2,64 @@
 
 import {motion} from "framer-motion";
 import {Activity, Calendar, ChevronRight, Clock, ShieldCheck} from "lucide-react";
-import {useState} from "react";
+import {useState, useEffect} from "react";
+import {useRouter} from "next/navigation";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {cn} from "@/lib/utils";
 import {useAuth} from "@/contexts/auth";
+import {useDoctorAppointments} from "@/hooks/use-doctor-appointments";
+import {useDoctorProfile} from "@/hooks/use-doctors";
+import {api} from "@/lib/api";
 
 export function WelcomeBanner() {
+  const router = useRouter();
   const {user} = useAuth();
-  const [status, setStatus] = useState<"online" | "busy" | "offline">("online");
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const queryClient = useQueryClient();
+  const {data: doctor} = useDoctorProfile();
+  const {data: appointments} = useDoctorAppointments();
+  const statusMutation = useMutation({
+    mutationFn: (status: string) => api.doctors.updateStatus(status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['doctor-profile']});
+    },
+  });
+
+  const [localStatus, setLocalStatus] = useState<"online" | "busy" | "offline">("online");
+  const currentStatus = (doctor?.status as "online" | "busy" | "offline") || localStatus;
+  const setStatus = (newStatus: "online" | "busy" | "offline") => {
+    setLocalStatus(newStatus);
+    statusMutation.mutate(newStatus);
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const todayAppointments = appointments?.filter(a => {
+    const d = new Date(a.scheduledAt);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime() === today.getTime();
+  }) ?? [];
+
+  const appointmentCount = todayAppointments.length;
+  
+  const upcomingAppointments = todayAppointments
+    .filter(a => a.status !== 'completed' && new Date(a.scheduledAt) > currentTime)
+    .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
+  
+  const firstAppointment = upcomingAppointments[0];
+  let minutesUntilFirst = null;
+  if (firstAppointment) {
+    const diff = new Date(firstAppointment.scheduledAt).getTime() - currentTime.getTime();
+    minutesUntilFirst = Math.max(0, Math.floor(diff / 60000));
+  }
 
   const statusColors = {
     online: "text-emerald-500 bg-emerald-50 border-emerald-100",
@@ -36,7 +87,9 @@ export function WelcomeBanner() {
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
               <Clock className="w-4 h-4 text-brand-light" />
-              <span className="text-[11px] font-bold uppercase tracking-widest">09:12 AM</span>
+              <span className="text-[11px] font-bold uppercase tracking-widest">
+                {currentTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+              </span>
             </div>
           </motion.div>
 
@@ -47,23 +100,34 @@ export function WelcomeBanner() {
               <span className="text-brand-light italic">Dr. {user?.name || "Doctor"}</span>
             </h1>
             <p className="text-lg text-brand-light/60 font-medium max-w-lg leading-relaxed">
-              You have <span className="text-white font-bold">12 appointments</span> scheduled for today. Your first patient is arriving in <span className="text-white font-bold">45 minutes</span>.
+              You have <span className="text-white font-bold">{appointmentCount} appointment{appointmentCount !== 1 ? 's' : ''}</span> scheduled for today.
+              {minutesUntilFirst !== null && minutesUntilFirst > 0 && (
+                <> Your first patient is arriving in <span className="text-white font-bold">{minutesUntilFirst} minutes</span>.</>
+              )}
             </p>
           </div>
 
           {/* Quick Stats Pill */}
           <div className="flex items-center gap-8 pt-4">
-            <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-10 h-10 rounded-full border-2 border-brand-dark bg-gray-100 overflow-hidden shadow-xl">
-                  <img src={`/images/doctor-${i}.png`} alt={`Patient ${i}`} className="w-full h-full object-cover" />
+            {todayAppointments.length > 0 ? (
+              <>
+                <div className="flex -space-x-3">
+                  {todayAppointments.slice(0, 4).map((apt, i) => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-brand-dark bg-gray-100 overflow-hidden shadow-xl flex items-center justify-center">
+                      <span className="text-xs font-bold text-gray-400">P</span>
+                    </div>
+                  ))}
+                  {todayAppointments.length > 4 && (
+                    <div className="w-10 h-10 rounded-full border-2 border-brand-dark bg-white/10 backdrop-blur-md flex items-center justify-center text-[10px] font-bold">
+                      +{todayAppointments.length - 4}
+                    </div>
+                  )}
                 </div>
-              ))}
-              <div className="w-10 h-10 rounded-full border-2 border-brand-dark bg-white/10 backdrop-blur-md flex items-center justify-center text-[10px] font-bold">
-                +8
-              </div>
-            </div>
-            <div className="h-8 w-px bg-white/10" />
+                <div className="h-8 w-px bg-white/10" />
+              </>
+            ) : (
+              <div className="h-8 w-px bg-white/10" />
+            )}
             <div className="flex items-center gap-3">
               <ShieldCheck className="w-5 h-5 text-brand-light" />
               <span className="text-[10px] font-black uppercase tracking-widest opacity-80">HIPAA Compliant Session</span>
@@ -79,8 +143,8 @@ export function WelcomeBanner() {
         >
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-light">Availability</span>
-              <Activity className={cn("w-4 h-4 transition-colors", status === "online" ? "text-emerald-400" : "text-gray-400")} />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-light">Status</span>
+              <Activity className={cn("w-4 h-4 transition-colors", currentStatus === "online" ? "text-emerald-400" : "text-gray-400")} />
             </div>
             
             <div className="space-y-3">
@@ -90,7 +154,7 @@ export function WelcomeBanner() {
                   onClick={() => setStatus(s)}
                   className={cn(
                     "w-full px-5 py-4 rounded-2xl border transition-all flex items-center justify-between group/btn",
-                    status === s 
+                    currentStatus === s 
                       ? "bg-white text-brand-dark border-transparent shadow-xl" 
                       : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:text-white"
                   )}
@@ -99,14 +163,17 @@ export function WelcomeBanner() {
                   <div className={cn(
                     "w-2 h-2 rounded-full transition-all",
                     s === "online" ? "bg-emerald-500" : s === "busy" ? "bg-orange-500" : "bg-gray-400",
-                    status === s ? "scale-125" : "scale-100 group-hover/btn:scale-110"
+                    currentStatus === s ? "scale-125" : "scale-100 group-hover/btn:scale-110"
                   )} />
                 </button>
               ))}
             </div>
           </div>
 
-          <button className="w-full h-14 bg-brand-light text-brand-dark rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white transition-all shadow-lg active:scale-[0.98]">
+          <button 
+            onClick={() => router.push('/doctor/settings')}
+            className="w-full h-14 bg-brand-light text-brand-dark rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white transition-all shadow-lg active:scale-[0.98]"
+          >
             Edit Profile
             <ChevronRight className="w-4 h-4" />
           </button>

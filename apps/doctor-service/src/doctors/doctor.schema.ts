@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
+import {Document, Schema as MongooseSchema} from 'mongoose';
 
 export type DoctorDocument = Doctor & Document;
 
@@ -17,10 +17,10 @@ export class Doctor {
   @Prop({ required: true, unique: true })
   userId: string;
 
-  @Prop({ required: true })
+  @Prop()
   name: string;
 
-  @Prop({ required: true })
+  @Prop()
   email: string;
 
   @Prop()
@@ -49,6 +49,9 @@ export class Doctor {
 
   @Prop({ default: false })
   isVerified: boolean;
+
+  @Prop({ default: "online" })
+  status: string;
 
   @Prop({ type: [AvailabilitySlotSchema], default: [] })
   availability: { dayOfWeek: number; startTime: string; endTime: string }[];

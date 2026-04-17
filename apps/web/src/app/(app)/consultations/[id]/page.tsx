@@ -1,14 +1,14 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
-import { ConsultationHUD } from "@/components/consultations/consultation-hud";
-import { ConsultationGrid } from "@/components/consultations/consultation-grid";
-import { ConsultationControls } from "@/components/consultations/consultation-controls";
-import { ConsultationSidebar } from "@/components/consultations/consultation-sidebar";
-import { TwilioVideoRoom } from "@/components/consultations/twilio-video-room";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { useCreateSession, useEndSession } from "@/hooks/use-sessions";
+import {use, useEffect, useState} from "react";
+import {ConsultationHUD} from "@/components/consultations/consultation-hud";
+import {ConsultationGrid} from "@/components/consultations/consultation-grid";
+import {ConsultationControls} from "@/components/consultations/consultation-controls";
+import {ConsultationSidebar} from "@/components/consultations/consultation-sidebar";
+import {TwilioVideoRoom} from "@/components/consultations/twilio-video-room";
+import {useRouter} from "next/navigation";
+import {motion} from "framer-motion";
+import {useCreateSession, useEndSession} from "@/hooks/use-sessions";
 
 export default function ConsultationRoomPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -31,7 +31,7 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
   }>({
     name: "Doctor",
     specialty: "Specialist",
-    image: "/images/doctor-placeholder.png",
+      image: "/images/doctor-1.png",
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -131,7 +131,7 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
       <ConsultationHUD 
         doctorName={doctor.name}
         doctorSpecialty={doctor.specialty}
-        doctorImage={doctor.image}
+        doctorImage={doctor.image || "/images/doctor-1.png"}
       />
 
       {/* 2. Main Video Display Layer */}
@@ -143,8 +143,8 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
             onError={(err) => setError(err.message)}
           />
         ) : (
-          <ConsultationGrid 
-            doctorImage={doctor.image}
+          <ConsultationGrid
+              doctorImage={doctor.image || "/images/doctor-1.png"}
             isMuted={isMuted}
             isCameraOff={isCameraOff}
             isSidebarOpen={isSidebarOpen}

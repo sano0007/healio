@@ -24,4 +24,8 @@ export class PrescriptionsService {
   async getByAppointment(appointmentId: string) {
     return this.prescriptionModel.findOne({ appointmentId }).exec();
   }
+
+  async getById(prescriptionId: string) {
+    return this.prescriptionModel.findById(prescriptionId).exec();
+  }
 }

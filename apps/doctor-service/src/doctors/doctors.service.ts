@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { RpcException } from '@nestjs/microservices';
-import { Doctor, DoctorDocument } from './doctor.schema';
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from '@nestjs/mongoose';
+import {Model} from 'mongoose';
+import {RpcException} from '@nestjs/microservices';
+import {Doctor, DoctorDocument} from './doctor.schema';
 
 function normalisePhone(raw: string): string {
   const digits = raw.replace(/\D/g, '');
@@ -64,32 +64,48 @@ export class DoctorsService {
   }
 
   async getById(userId: string) {
-    const doctor = await this.doctorModel.findOne({ userId }).exec();
-    if (!doctor) throw new RpcException('Doctor not found');
+    let doctor = await this.doctorModel.findOne({userId}).exec();
+    if (!doctor) {
+      doctor = await this.doctorModel.create({userId, name: '', email: '', availability: [], status: 'online'});
+    }
+    if (!doctor.status) {
+      doctor.status = 'online';
+    }
     return doctor;
   }
 
   async update(userId: string, updates: Partial<Doctor>) {
-    const { isVerified: _, ...safeUpdates } = updates as Doctor & { isVerified?: boolean };
-    if (safeUpdates.phone) safeUpdates.phone = normalisePhone(safeUpdates.phone);
-    const doctor = await this.doctorModel.findOneAndUpdate({ userId }, safeUpdates, { new: true }).exec();
-    if (!doctor) throw new RpcException('Doctor not found');
+    if (updates.phone) updates.phone = normalisePhone(updates.phone);
+    let doctor = await this.doctorModel.findOne({userId}).exec();
+    if (!doctor) {
+      doctor = await this.doctorModel.create({userId, name: '', email: '', availability: []});
+    }
+    doctor = await this.doctorModel.findOneAndUpdate({userId}, updates, {new: true}).exec();
+    if (!doctor) throw new RpcException('Doctor profile not found');
     return doctor;
   }
 
   async verify(userId: string, isVerified: boolean) {
-    const doctor = await this.doctorModel.findOneAndUpdate({ userId }, { isVerified }, { new: true }).exec();
-    if (!doctor) throw new RpcException('Doctor not found');
+    let doctor = await this.doctorModel.findOne({userId}).exec();
+    if (!doctor) {
+      doctor = await this.doctorModel.create({userId, name: '', email: '', availability: []});
+    }
+    doctor = await this.doctorModel.findOneAndUpdate({userId}, {isVerified}, {new: true}).exec();
+    if (!doctor) throw new RpcException('Doctor profile not found');
     return doctor;
   }
 
   async setAvailability(userId: string, availability: unknown[]) {
-    const doctor = await this.doctorModel.findOneAndUpdate(
+    let doctor = await this.doctorModel.findOne({userId}).exec();
+    if (!doctor) {
+      doctor = await this.doctorModel.create({userId, name: '', email: '', availability: []});
+    }
+    doctor = await this.doctorModel.findOneAndUpdate(
       { userId },
       { availability },
       { new: true },
     ).exec();
-    if (!doctor) throw new RpcException('Doctor not found');
+    if (!doctor) throw new RpcException('Doctor profile not found');
     return doctor;
   }
 
@@ -97,5 +113,19 @@ export class DoctorsService {
     if (data.phone) data.phone = normalisePhone(data.phone);
     const doctor = new this.doctorModel(data);
     return doctor.save();
+  }
+
+  async updateStatus(userId: string, status: string) {
+    const validStatuses = ["online", "busy", "offline"];
+    if (!validStatuses.includes(status)) {
+      throw new RpcException('Invalid status. Must be online, busy, or offline');
+    }
+    const doctor = await this.doctorModel.findOneAndUpdate(
+      { userId },
+      { status },
+      { new: true },
+    ).exec();
+    if (!doctor) throw new RpcException('Doctor profile not found');
+    return doctor;
   }
 }

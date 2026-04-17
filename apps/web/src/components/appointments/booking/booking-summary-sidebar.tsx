@@ -1,8 +1,7 @@
 "use client";
 
-import { Video, User, Calendar, Clock, MapPin, ChevronRight, Info } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
-import { motion } from "framer-motion";
+import {Calendar, Clock, Info, User, Video} from "lucide-react";
+import {Avatar} from "@/components/ui/avatar";
 
 export interface BookingSummaryProps {
   doctor: {
@@ -26,7 +25,7 @@ export function BookingSummarySidebar({ doctor, details }: BookingSummaryProps) 
 
       {/* 1. Doctor Info */}
       <div className="flex items-center gap-4 mb-8 bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50">
-        <Avatar src={doctor.image} className="w-16 h-16 border-2 border-white shadow-sm" />
+          <Avatar src={doctor.image || "/images/doctor-1.png"} className="w-16 h-16 border-2 border-white shadow-sm"/>
         <div>
           <h3 className="text-sm font-bold text-brand-black leading-none mb-1">{doctor.name}</h3>
           <p className="text-[11px] font-bold text-brand-dark opacity-70 uppercase tracking-widest">{doctor.specialization}</p>

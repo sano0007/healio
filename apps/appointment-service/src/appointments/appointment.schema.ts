@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
+import {Document} from 'mongoose';
 
 export type AppointmentDocument = Appointment & Document;
 
@@ -31,6 +31,9 @@ export class Appointment {
 
   @Prop()
   roomName: string;
+
+    @Prop()
+    checkoutUrl: string;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);

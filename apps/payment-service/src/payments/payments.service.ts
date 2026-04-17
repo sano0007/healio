@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { ConfigService } from '@nestjs/config';
-import { Model } from 'mongoose';
-import { RpcException } from '@nestjs/microservices';
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from '@nestjs/mongoose';
+import {ConfigService} from '@nestjs/config';
+import {Model} from 'mongoose';
+import {RpcException} from '@nestjs/microservices';
 import Stripe from 'stripe';
-import { Payment, PaymentDocument } from './payment.schema';
-import { InitiatePaymentDto } from '@healio/shared-types';
+import {Payment, PaymentDocument} from './payment.schema';
+import {InitiatePaymentDto} from '@healio/shared-types';
 
 @Injectable()
 export class PaymentsService {
@@ -15,13 +15,22 @@ export class PaymentsService {
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
     private config: ConfigService,
   ) {
-    this.stripe = new Stripe(this.config.get('STRIPE_SECRET_KEY', ''), {
+    const stripeKey = this.config.get('STRIPE_SECRET_KEY', '');
+    this.stripe = stripeKey ? new Stripe(stripeKey, {
       apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
-    });
+    }) : null as any;
+  }
+
+  private getStripe(): Stripe {
+    if (!this.stripe) {
+      throw new Error('Stripe is not configured. Set STRIPE_SECRET_KEY environment variable.');
+    }
+    return this.stripe;
   }
 
   async initiatePayment(dto: InitiatePaymentDto) {
-    const session = await this.stripe.checkout.sessions.create({
+    const stripe = this.getStripe();
+    const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [
         {
@@ -56,7 +65,8 @@ export class PaymentsService {
   }
 
   async confirmPayment(checkoutSessionId: string) {
-    const session = await this.stripe.checkout.sessions.retrieve(checkoutSessionId);
+    const stripe = this.getStripe();
+    const session = await stripe.checkout.sessions.retrieve(checkoutSessionId);
     if (session.payment_status !== 'paid') {
       throw new RpcException('Payment has not been completed');
     }

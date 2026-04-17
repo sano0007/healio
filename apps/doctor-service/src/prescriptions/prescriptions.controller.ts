@@ -18,4 +18,9 @@ export class PrescriptionsController {
     if (data.patientId) return this.prescriptionsService.getByPatient(data.patientId);
     return [];
   }
+
+  @MessagePattern(MSG.DOCTOR_GET_PRESCRIPTION_BY_ID)
+  getPrescriptionById(@Payload() data: { prescriptionId: string }) {
+    return this.prescriptionsService.getById(data.prescriptionId);
+  }
 }

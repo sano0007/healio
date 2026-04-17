@@ -1,12 +1,16 @@
 "use client";
 
-import { Activity, Bell, Calendar, Plus, ShieldCheck, HeartPulse, Pill } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import {Activity, Calendar, HeartPulse, Plus, ShieldCheck} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {useState} from "react";
+import {cn} from "@/lib/utils";
+import {motion} from "framer-motion";
 
-export function PrescriptionHeader() {
+interface PrescriptionHeaderProps {
+    prescriptionCount?: number;
+}
+
+export function PrescriptionHeader({prescriptionCount = 0}: PrescriptionHeaderProps) {
   const [remindersEnabled, setRemindersEnabled] = useState(true);
 
   return (
@@ -21,18 +25,19 @@ export function PrescriptionHeader() {
         </h1>
         <div className="flex items-center gap-6">
           <p className="text-xs text-gray-400 font-medium italic">
-            You have <span className="text-brand-dark font-black">5 Active</span> medications.
+              You have <span
+              className="text-brand-dark font-black">{prescriptionCount} Active</span> medication{prescriptionCount !== 1 ? "s" : ""}.
           </p>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Daily Reminders</span>
-            <button 
+              <button
               onClick={() => setRemindersEnabled(!remindersEnabled)}
               className={cn(
                 "w-12 h-6 rounded-full relative transition-colors duration-300 shadow-inner",
                 remindersEnabled ? "bg-brand-dark" : "bg-gray-200"
               )}
             >
-              <motion.div 
+                  <motion.div
                 animate={{ x: remindersEnabled ? 24 : 2 }}
                 className="absolute top-1 left-0 w-4 h-4 bg-white rounded-full shadow-md"
               />
@@ -44,8 +49,9 @@ export function PrescriptionHeader() {
       <div className="flex items-center gap-6">
         {/* Prescription Summary (Desktop Only) */}
         <div className="hidden lg:flex items-center gap-8 pr-10 border-r border-gray-100">
-           <PrescriptionStat icon={<Activity className="text-brand-dark" />} label="Refills Due" value="02" />
-           <PrescriptionStat icon={<HeartPulse className="text-rose-500" />} label="Health Score" value="98%" />
+            <PrescriptionStat icon={<Activity className="text-brand-dark"/>} label="Total Prescriptions"
+                              value={String(prescriptionCount)}/>
+            <PrescriptionStat icon={<HeartPulse className="text-rose-500"/>} label="Health Score" value="--"/>
         </div>
 
         <div className="flex items-center gap-3">
@@ -55,7 +61,7 @@ export function PrescriptionHeader() {
            </Button>
            <Button variant="dark" className="rounded-2xl h-12 px-8 text-xs font-bold gap-2 shadow-xl shadow-brand-dark/10">
              <Plus className="w-4 h-4" />
-             Add Medication
+               Request Refill
            </Button>
         </div>
       </div>

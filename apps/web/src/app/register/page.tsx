@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import {Suspense, useEffect, useState} from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Activity } from 'lucide-react';
-import { useAuth } from '@/contexts/auth';
-import { Suspense } from 'react';
+import {useRouter, useSearchParams} from 'next/navigation';
+import {Activity} from 'lucide-react';
+import {useAuth} from '@/contexts/auth';
 
 function RegisterForm() {
   const { register, user, isLoading } = useAuth();
@@ -19,7 +18,9 @@ function RegisterForm() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && user) router.replace('/dashboard');
+    if (!isLoading && user) {
+      router.replace(user.role === 'doctor' ? '/doctor/dashboard' : '/dashboard');
+    }
   }, [user, isLoading, router]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -31,8 +32,8 @@ function RegisterForm() {
     }
     setSubmitting(true);
     try {
-      await register(name, email, password, role);
-      router.push('/dashboard');
+      const newUser = await register(name, email, password, role);
+      router.push(newUser.role === 'doctor' ? '/doctor/dashboard' : '/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {

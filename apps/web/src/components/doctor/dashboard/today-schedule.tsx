@@ -1,13 +1,17 @@
 "use client";
 
 import {motion} from "framer-motion";
-import {Phone, User, Video} from "lucide-react";
+import {User, Video} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {cn} from "@/lib/utils";
 import {useDoctorAppointments} from "@/hooks/use-doctor-appointments";
+import {usePatientsLookup} from "@/hooks/use-patient";
+import {useRouter} from "next/navigation";
 
 export function TodaySchedule() {
+    const router = useRouter();
     const {data: appointments} = useDoctorAppointments();
+    const {getPatientById} = usePatientsLookup();
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -33,10 +37,10 @@ export function TodaySchedule() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="h-10 rounded-xl text-[10px] font-bold uppercase tracking-widest border-gray-100 italic">
+          <Button variant="outline" className="h-10 rounded-xl text-[10px] font-bold uppercase tracking-widest border-gray-100 italic" onClick={() => router.push('/doctor/appointments')}>
             Full Agenda
           </Button>
-          <Button variant="dark" className="h-10 bg-brand-light text-brand-dark hover:bg-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-brand-dark/5">
+          <Button variant="dark" className="h-10 bg-brand-light text-brand-dark hover:bg-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-brand-dark/5" onClick={() => router.push('/doctor/availability')}>
             Add Slot
           </Button>
         </div>
@@ -51,7 +55,11 @@ export function TodaySchedule() {
                     <p className="text-sm font-medium text-gray-500 italic">No appointments scheduled for today.</p>
                 </div>
             ) : (
-                todayAppointments.map((session, index) => (
+                todayAppointments.map((session, index) => {
+                    const patient = getPatientById(session.patientId);
+                    const patientName = patient?.name || `Patient ${session.patientId.slice(0, 6)}`;
+
+                    return (
                     <motion.div
                         key={session._id}
                         initial={{opacity: 0, x: -20}}
@@ -90,7 +98,7 @@ export function TodaySchedule() {
                                     <User className="w-6 h-6"/>
                                 </div>
                                 <div className="space-y-0.5">
-                                    <h4 className="text-base font-bold text-brand-black">Patient</h4>
+                                    <h4 className="text-base font-bold text-brand-black">{patientName}</h4>
                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">ID: {session.patientId.slice(0, 8)}</p>
                                 </div>
                             </div>
@@ -112,10 +120,6 @@ export function TodaySchedule() {
                             </div>
 
                             <div className="flex items-center gap-3 shrink-0">
-                                <Button variant="outline" size="sm"
-                                        className="h-10 w-10 p-0 rounded-xl border-gray-100 group-hover:bg-brand-light/5">
-                                    <Phone className="w-4 h-4 text-gray-400"/>
-                                </Button>
                                 <Button
                                     variant={session.status === 'completed' ? "outline" : "dark"}
                                     className={cn(
@@ -124,6 +128,7 @@ export function TodaySchedule() {
                                             ? "border-gray-100"
                                             : "bg-brand-dark text-white shadow-xl shadow-brand-dark/20"
                                     )}
+                                    onClick={() => router.push(`/consultations/${session._id}`)}
                                 >
                                     <Video className="w-4 h-4"/>
                                     {session.status === 'completed' ? 'View Summary' : 'Start Call'}
@@ -131,7 +136,8 @@ export function TodaySchedule() {
                             </div>
                         </div>
                     </motion.div>
-                ))
+                    );
+                })
             )}
         </div>
       </div>

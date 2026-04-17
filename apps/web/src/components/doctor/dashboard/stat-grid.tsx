@@ -1,7 +1,7 @@
 "use client";
 
 import {motion} from "framer-motion";
-import {ArrowUpRight, CalendarDays, CheckCircle2, DollarSign, TrendingUp, UserPlus} from "lucide-react";
+import {ArrowUpRight, CalendarDays, CheckCircle2, TrendingUp, UserPlus} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {useDoctorAppointments} from "@/hooks/use-doctor-appointments";
 
@@ -64,15 +64,6 @@ export function StatGrid() {
             trend: `${appointments?.length ?? 0} total`,
             active: false,
         },
-        {
-            label: "Total Earnings",
-            value: "$0",
-            subtext: "Gross revenue",
-            icon: DollarSign,
-            color: "bg-orange-50 text-orange-600",
-            trend: "Connect payment to track",
-            active: false,
-        },
     ];
 
   return (
@@ -80,7 +71,7 @@ export function StatGrid() {
       variants={container}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
+      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
     >
       {stats.map((stat, i) => (
           <motion.div
@@ -88,17 +79,6 @@ export function StatGrid() {
           variants={item}
           className="group relative p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-2xl hover:shadow-brand-dark/5 hover:-translate-y-1 transition-all duration-500 overflow-hidden"
         >
-          {stat.label === "Total Earnings" && (
-            <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gray-50">
-                <motion.div
-                 initial={{ width: 0 }}
-                 animate={{width: "0%"}}
-                 transition={{ duration: 1.5, delay: 0.5 }}
-                 className="h-full bg-orange-400"
-               />
-            </div>
-          )}
-
           <div className="flex justify-between items-start relative z-10">
             <div className={cn("p-4 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", stat.color)}>
               <stat.icon className="w-6 h-6" />
