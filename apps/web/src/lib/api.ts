@@ -283,6 +283,7 @@ export interface Appointment {
   type?: 'video' | 'in-person';
   prescriptions?: { name: string; dosage: string; frequency: string; duration: string }[];
   paymentStatus?: string;
+  checkoutUrl?: string;
 }
 
 export interface Payment {

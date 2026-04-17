@@ -35,6 +35,15 @@ export default function AppointmentBookingPage() {
   const [bookedAppointment, setBookedAppointment] = useState<any>(null);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const date = params.get('date');
+    const time = params.get('time');
+    if (date && time) {
+      setBookingData(prev => ({...prev, selectedDate: date, selectedTime: decodeURIComponent(time)}));
+    }
+  }, []);
+
+  useEffect(() => {
     if (!doctorId && !isLoadingDoctor) {
       router.push("/doctors");
     }
@@ -53,17 +62,33 @@ export default function AppointmentBookingPage() {
       const selectedTimeStr = bookingData.selectedTime;
       
       let scheduledAt: string;
-      
-      if (selectedDateStr && selectedTimeStr) {
-        const dateParts = selectedDateStr.split('/').map(Number);
-        const timeParts = selectedTimeStr.split(':').map(Number);
-        const isPM = selectedTimeStr.toLowerCase().includes('pm') && timeParts[0] !== 12;
 
-        const year = dateParts[2];
-        const month = dateParts[0] - 1;
-        const day = dateParts[1];
-        const hours = timeParts[0] + (isPM ? 12 : 0);
-        const minutes = timeParts[1];
+      if (selectedDateStr && selectedTimeStr) {
+        const hasSlash = selectedDateStr.includes('/');
+        let year: number, month: number, day: number, hours: number, minutes: number;
+
+        if (hasSlash) {
+          const dateParts = selectedDateStr.split('/').map(Number);
+          const timeParts = selectedTimeStr.split(':').map(Number);
+          const isPM = selectedTimeStr.toLowerCase().includes('pm') && timeParts[0] !== 12;
+          year = dateParts[2];
+          month = dateParts[0] - 1;
+          day = dateParts[1];
+          hours = timeParts[0] + (isPM ? 12 : 0);
+          minutes = timeParts[1];
+        } else {
+          const [y, m, d] = selectedDateStr.split('-').map(Number);
+          const timeParts = selectedTimeStr.split(':');
+          const isPM = selectedTimeStr.toLowerCase().includes('pm');
+          let hourNum = parseInt(timeParts[0], 10);
+          if (isPM && hourNum !== 12) hourNum += 12;
+          if (!isPM && hourNum === 12) hourNum = 0;
+          year = y;
+          month = m - 1;
+          day = d;
+          hours = hourNum;
+          minutes = parseInt(timeParts[1], 10);
+        }
 
         // Format as ISO string without timezone conversion
         scheduledAt = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;

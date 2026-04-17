@@ -28,6 +28,12 @@ export function BookingWidget({ fee, doctorId }: { fee: number; doctorId?: strin
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTime, setSelectedTime] = useState("");
 
+  const handleBook = () => {
+    const day = next7Days[selectedDate];
+    const dateStr = `${day.full.getFullYear()}-${String(day.full.getMonth() + 1).padStart(2, '0')}-${String(day.full.getDate()).padStart(2, '0')}`;
+    router.push(`/appointments/book/${doctorId}?date=${dateStr}&time=${encodeURIComponent(selectedTime)}`);
+  };
+
   return (
     <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-brand-dark/5 sticky top-24 self-start">
       <h2 className="text-xl font-bold text-brand-black mb-6">Book Appointment</h2>
@@ -118,7 +124,8 @@ export function BookingWidget({ fee, doctorId }: { fee: number; doctorId?: strin
 
           <Button variant="dark"
                   className="w-full h-14 rounded-2xl text-sm font-bold gap-2 shadow-xl shadow-brand-dark/10 hover:scale-[1.02] active:scale-95 transition-all"
-                  onClick={() => router.push(`/appointments/book/${doctorId}`)}>
+                  onClick={handleBook}
+                  disabled={!selectedTime}>
           Book Appointment
           <ChevronRight className="w-4 h-4" />
         </Button>

@@ -41,6 +41,7 @@ interface AppointmentDetail {
     prescriptions: { name: string; dosage: string; frequency: string; duration: string }[];
   };
   documents: { name: string; size: string; type: "pdf" | "jpg" | "png" }[];
+  paymentUrl?: string;
 }
 
 export default function AppointmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -103,6 +104,7 @@ export default function AppointmentDetailPage({ params }: { params: Promise<{ id
             prescriptions: apt.prescriptions,
           } : undefined,
           documents: [],
+          paymentUrl: apt.checkoutUrl,
         });
       } catch (err) {
         setError("Failed to load appointment details.");
@@ -148,6 +150,8 @@ export default function AppointmentDetailPage({ params }: { params: Promise<{ id
           patient={appointment.patient}
           schedule={appointment.schedule}
           billing={appointment.billing}
+          paymentUrl={appointment.paymentUrl}
+          appointmentStatus={appointment.status}
       />
 
       {/* 3. Clinical Outcomes (Only for completed) */}

@@ -1,9 +1,12 @@
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import { AppModule } from './app.module';
+import {NestFactory} from '@nestjs/core';
+import {ValidationPipe} from '@nestjs/common';
+import {AppModule} from './app.module';
+import * as express from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { rawBody: true });
+    const app = await NestFactory.create(AppModule);
+
+    app.use('/api/payments/webhook', express.raw({type: 'application/json'}));
 
   app.enableCors({
     origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
