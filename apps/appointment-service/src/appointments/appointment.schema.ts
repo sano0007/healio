@@ -28,6 +28,9 @@ export class Appointment {
 
   @Prop()
   sessionId: string;
+
+  @Prop()
+  roomName: string;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);

@@ -20,6 +20,7 @@ export class PaymentGatewayController {
     @Inject('DOCTOR_SERVICE')       private doctorClient: ClientProxy,
     @Inject('APPOINTMENT_SERVICE')  private apptClient: ClientProxy,
     @Inject('NOTIFICATION_SERVICE') private notificationClient: ClientProxy,
+    @Inject('TELEMEDICINE_SERVICE') private teleClient: ClientProxy,
     private config: ConfigService,
   ) {
     this.stripe = new StripeLib(this.config.get('STRIPE_SECRET_KEY', ''));
@@ -75,22 +76,41 @@ export class PaymentGatewayController {
       this.paymentClient.send(MSG.PAYMENT_CONFIRM, { checkoutSessionId }),
     );
 
-    // Flip appointment to confirmed + mark payment paid
+    // Fetch the appointment to get doctorId for session creation
+    const appointment = await firstValueFrom(
+      this.apptClient.send(MSG.APPOINTMENT_GET, { appointmentId }),
+    );
+
+    // Auto-create a Jitsi telemedicine session so it is ready for both parties
+    const session = await firstValueFrom(
+      this.teleClient.send(MSG.TELE_CREATE_SESSION, {
+        appointmentId,
+        hostId: appointment.doctorId,
+      }),
+    ).catch((err) => {
+      console.error('Auto-create telemedicine session failed:', err);
+      return null;
+    });
+
+    // Flip appointment to confirmed + mark payment paid + attach session details
     await firstValueFrom(
       this.apptClient.send(MSG.APPOINTMENT_UPDATE_STATUS, {
         appointmentId,
         status: 'confirmed',
         paymentStatus: 'paid',
+        sessionId: session?.sessionId,
+        roomName: session?.roomName,
       }),
     );
 
-    // Notify patient + doctor (fire-and-forget)
-    this.emitPaymentSuccessNotification(appointmentId, payment).catch(() => {});
+    // Notify patient + doctor (fire-and-forget), include session link if created
+    this.emitPaymentSuccessNotification(appointmentId, payment, session).catch(() => {});
   }
 
   private async emitPaymentSuccessNotification(
     appointmentId: string,
     payment: { amount?: number; currency?: string; patientId?: string },
+    teleSession?: { sessionId?: string; roomName?: string } | null,
   ) {
     const appointment = await firstValueFrom(
       this.apptClient.send(MSG.APPOINTMENT_GET, { appointmentId }),
@@ -113,6 +133,8 @@ export class PaymentGatewayController {
       scheduledAt: appointment?.scheduledAt,
       patientName: patient?.name ?? 'Patient',
       doctorName: doctor?.name ?? 'Doctor',
+      sessionId: teleSession?.sessionId,
+      roomName: teleSession?.roomName,
     };
 
     if (patient?.email) {
