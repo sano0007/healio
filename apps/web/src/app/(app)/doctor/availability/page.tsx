@@ -31,13 +31,16 @@ export default function DoctorAvailabilityPage() {
 
     // Initialize from doctor profile when loaded
     useEffect(() => {
+        console.log('Doctor profile loaded:', doctor);
         if (doctor?.availability) {
+            console.log('Availability data:', doctor.availability);
             const slots = new Set<string>();
             doctor.availability.forEach((slot: { dayOfWeek: number; startTime: string; endTime: string }) => {
                 // Parse startTime to get the hour
                 const [h] = slot.startTime.split(':').map(Number);
                 slots.add(`${slot.dayOfWeek}-${h}`);
             });
+            console.log('Parsed slots:', Array.from(slots));
             setEnabledSlots(slots);
         }
     }, [doctor]);
@@ -58,6 +61,9 @@ export default function DoctorAvailabilityPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['doctor-profile']});
             setHasChanges(false);
+        },
+        onError: (error) => {
+            console.error('Failed to save availability:', error);
         },
     });
 
@@ -133,7 +139,7 @@ export default function DoctorAvailabilityPage() {
 
                     {/* Time Rows */}
                     {HOURS.map(({value, label}) => (
-                        <>
+                        <div key={value} className="contents">
                             <div key={`label-${value}`} className="flex items-center justify-end pr-4">
                                 <span
                                     className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</span>
@@ -159,7 +165,7 @@ export default function DoctorAvailabilityPage() {
                                     </motion.button>
                                 );
                             })}
-                        </>
+                        </div>
                     ))}
                 </div>
             </div>

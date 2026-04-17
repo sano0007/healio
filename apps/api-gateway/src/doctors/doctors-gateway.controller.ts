@@ -19,6 +19,13 @@ export interface DoctorFilters {
 export class DoctorsGatewayController {
   constructor(@Inject('DOCTOR_SERVICE') private doctorClient: ClientProxy) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getMe(@Request() req: { user: { userId: string } }) {
+    console.log('GET /doctors/me called, user:', req.user);
+    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET, { userId: req.user.userId }));
+  }
+
   @Get()
   getAll(@Query() filters: DoctorFilters) {
     return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET_ALL, filters));
