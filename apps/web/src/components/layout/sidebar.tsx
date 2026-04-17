@@ -37,6 +37,13 @@ const doctorNavigation = [
 
 const secondaryNavigation = [
   { name: "Notifications", href: "/notifications", icon: Bell },
+];
+
+const doctorSettingsNav = [
+  { name: "Settings", href: "/doctor/settings", icon: Settings },
+];
+
+const patientSettingsNav = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -47,6 +54,7 @@ export function Sidebar() {
 
   const isDoctor = user?.role === "doctor";
   const navigation = isDoctor ? doctorNavigation : patientNavigation;
+  const settingsNav = isDoctor ? doctorSettingsNav : patientSettingsNav;
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -92,7 +100,7 @@ export function Sidebar() {
 
         <div className="pt-6">
           <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest px-3 mb-2">Other</div>
-          {secondaryNavigation.map((item) => {
+          {settingsNav.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
