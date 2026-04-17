@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { BookingStepper } from "@/components/appointments/booking/booking-stepper";
-import { BookingSummarySidebar } from "@/components/appointments/booking/booking-summary-sidebar";
-import { PatientInfoStep } from "@/components/appointments/booking/steps/patient-info-step";
-import { ConsultationDetailsStep } from "@/components/appointments/booking/steps/consultation-details-step";
-import { PaymentStep } from "@/components/appointments/booking/steps/payment-step";
-import { SuccessState } from "@/components/appointments/booking/success-state";
-import { AnimatePresence } from "framer-motion";
-import { useDoctor } from "@/hooks/use-doctors";
-import { useBookAppointment } from "@/hooks/use-appointments";
-import { Skeleton } from "@/components/ui/skeleton";
+import {useEffect, useState} from "react";
+import {useParams, useRouter} from "next/navigation";
+import {BookingStepper} from "@/components/appointments/booking/booking-stepper";
+import {BookingSummarySidebar} from "@/components/appointments/booking/booking-summary-sidebar";
+import {PatientInfoStep} from "@/components/appointments/booking/steps/patient-info-step";
+import {ConsultationDetailsStep} from "@/components/appointments/booking/steps/consultation-details-step";
+import {PaymentStep} from "@/components/appointments/booking/steps/payment-step";
+import {SuccessState} from "@/components/appointments/booking/success-state";
+import {AnimatePresence} from "framer-motion";
+import {useDoctor} from "@/hooks/use-doctors";
+import {useBookAppointment} from "@/hooks/use-appointments";
+import {Skeleton} from "@/components/ui/skeleton";
 
 interface BookingData {
   patientName?: string;
@@ -58,14 +58,15 @@ export default function AppointmentBookingPage() {
         const dateParts = selectedDateStr.split('/').map(Number);
         const timeParts = selectedTimeStr.split(':').map(Number);
         const isPM = selectedTimeStr.toLowerCase().includes('pm') && timeParts[0] !== 12;
-        
-        scheduledAt = new Date(
-          dateParts[2],
-          dateParts[0] - 1,
-          dateParts[1],
-          timeParts[0] + (isPM ? 12 : 0),
-          timeParts[1]
-        ).toISOString();
+
+        const year = dateParts[2];
+        const month = dateParts[0] - 1;
+        const day = dateParts[1];
+        const hours = timeParts[0] + (isPM ? 12 : 0);
+        const minutes = timeParts[1];
+
+        // Format as ISO string without timezone conversion
+        scheduledAt = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
       } else {
         scheduledAt = new Date().toISOString();
       }

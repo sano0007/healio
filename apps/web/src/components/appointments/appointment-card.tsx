@@ -1,10 +1,10 @@
 "use client";
 
-import { Video, User, Calendar, Clock, MoreVertical, XCircle, RefreshCcw, FileText, Star } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import {Calendar, Clock, FileText, MoreVertical, RefreshCcw, Star, User, Video, XCircle} from "lucide-react";
+import {Avatar} from "@/components/ui/avatar";
+import {Button} from "@/components/ui/button";
+import {cn} from "@/lib/utils";
+import {motion} from "framer-motion";
 
 export interface Appointment {
   id: string;
@@ -15,7 +15,7 @@ export interface Appointment {
   date: string;
   time: string;
   type: "video" | "in-person";
-  status: "confirmed" | "pending" | "completed" | "canceled" | "rescheduled";
+  status: "confirmed" | "pending" | "completed" | "cancelled" | "awaiting_payment";
   fee: number;
 }
 
@@ -25,10 +25,10 @@ interface AppointmentCardProps {
 
 const statusConfig = {
   pending: { label: "Pending", color: "bg-amber-50 text-amber-600 border-amber-100" },
+  awaiting_payment: {label: "Awaiting Payment", color: "bg-orange-50 text-orange-600 border-orange-100"},
   confirmed: { label: "Confirmed", color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
   completed: { label: "Completed", color: "bg-blue-50 text-blue-600 border-blue-100" },
-  canceled: { label: "Canceled", color: "bg-rose-50 text-rose-600 border-rose-100" },
-  rescheduled: { label: "Rescheduled", color: "bg-amber-50 text-amber-600 border-amber-100" },
+  cancelled: {label: "Cancelled", color: "bg-rose-50 text-rose-600 border-rose-100"},
 };
 
 export function AppointmentCard({ appointment }: AppointmentCardProps) {
@@ -121,7 +121,7 @@ export function AppointmentCard({ appointment }: AppointmentCardProps) {
             </div>
           )}
 
-          {appointment.status === "canceled" && (
+          {appointment.status === "cancelled" && (
             <Button variant="dark" className="rounded-xl h-12 px-6 text-xs font-bold gap-2 shadow-lg shadow-brand-dark/10">
               Rebook Appointment
             </Button>

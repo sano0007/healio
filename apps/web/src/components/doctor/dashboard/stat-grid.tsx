@@ -1,83 +1,98 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { UserPlus, CheckCircle2, DollarSign, CalendarDays, ArrowUpRight, TrendingUp } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-const stats = [
-  {
-    label: "Today's Schedule",
-    value: "12",
-    subtext: "0 completed",
-    icon: CalendarDays,
-    color: "bg-blue-50 text-blue-600",
-    trend: "+2 from yesterday",
-    active: true,
-  },
-  {
-    label: "Pending Requests",
-    value: "05",
-    subtext: "Needs review",
-    icon: UserPlus,
-    color: "bg-brand-light/20 text-brand-dark",
-    trend: "Priority: High",
-    active: false,
-  },
-  {
-    label: "Consultations",
-    value: "142",
-    subtext: "This month",
-    icon: CheckCircle2,
-    color: "bg-emerald-50 text-emerald-600",
-    trend: "Target: 200",
-    active: false,
-  },
-  {
-    label: "Total Earnings",
-    value: "$8.4k",
-    subtext: "Gross revenue",
-    icon: DollarSign,
-    color: "bg-orange-50 text-orange-600",
-    trend: "+12.5% vs last month",
-    active: false,
-  },
-];
+import {motion} from "framer-motion";
+import {ArrowUpRight, CalendarDays, CheckCircle2, DollarSign, TrendingUp, UserPlus} from "lucide-react";
+import {cn} from "@/lib/utils";
+import {useDoctorAppointments} from "@/hooks/use-doctor-appointments";
 
 const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
+    hidden: {opacity: 0},
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        },
     },
-  },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
+    hidden: {opacity: 0, y: 20},
+    show: {opacity: 1, y: 0},
 };
 
 export function StatGrid() {
+    const {data: appointments} = useDoctorAppointments();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const todayCount = appointments?.filter(a => {
+        const d = new Date(a.scheduledAt);
+        d.setHours(0, 0, 0, 0);
+        return d.getTime() === today.getTime();
+    }).length ?? 0;
+
+    const pendingCount = appointments?.filter(a => a.status === 'pending').length ?? 0;
+
+    const confirmedCount = appointments?.filter(a => a.status === 'confirmed').length ?? 0;
+
+    const stats = [
+        {
+            label: "Today's Schedule",
+            value: todayCount,
+            subtext: `${appointments?.filter(a => a.status === 'completed').length ?? 0} completed`,
+            icon: CalendarDays,
+            color: "bg-blue-50 text-blue-600",
+            trend: `${pendingCount} pending`,
+            active: true,
+        },
+        {
+            label: "Pending Requests",
+            value: pendingCount,
+            subtext: "Needs review",
+            icon: UserPlus,
+            color: "bg-brand-light/20 text-brand-dark",
+            trend: pendingCount > 0 ? "Priority: High" : "All clear",
+            active: false,
+        },
+        {
+            label: "Consultations",
+            value: confirmedCount,
+            subtext: "Confirmed",
+            icon: CheckCircle2,
+            color: "bg-emerald-50 text-emerald-600",
+            trend: `${appointments?.length ?? 0} total`,
+            active: false,
+        },
+        {
+            label: "Total Earnings",
+            value: "$0",
+            subtext: "Gross revenue",
+            icon: DollarSign,
+            color: "bg-orange-50 text-orange-600",
+            trend: "Connect payment to track",
+            active: false,
+        },
+    ];
+
   return (
-    <motion.div 
+      <motion.div
       variants={container}
       initial="hidden"
       animate="show"
       className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
     >
       {stats.map((stat, i) => (
-        <motion.div 
-          key={i} 
+          <motion.div
+              key={i}
           variants={item}
           className="group relative p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-2xl hover:shadow-brand-dark/5 hover:-translate-y-1 transition-all duration-500 overflow-hidden"
         >
-          {/* Subtle Progress Overlay for Revenue */}
           {stat.label === "Total Earnings" && (
             <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gray-50">
-               <motion.div 
+                <motion.div
                  initial={{ width: 0 }}
-                 animate={{ width: "72%" }}
+                 animate={{width: "0%"}}
                  transition={{ duration: 1.5, delay: 0.5 }}
                  className="h-full bg-orange-400"
                />
@@ -111,7 +126,6 @@ export function StatGrid() {
             </div>
           </div>
 
-          {/* Decorative Corner Element */}
           <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-gray-50 rounded-full blur-2xl group-hover:bg-brand-light/10 transition-colors" />
         </motion.div>
       ))}

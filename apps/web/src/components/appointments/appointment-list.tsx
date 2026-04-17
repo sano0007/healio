@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { AppointmentTabs } from "./appointment-tabs";
-import { AppointmentCard, Appointment } from "./appointment-card";
-import { AppointmentEmptyState } from "./appointment-empty-state";
-import { AnimatePresence } from "framer-motion";
-import { Search, Filter } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { AppointmentWithDoctor } from "@/hooks/use-appointments";
+import {useState} from "react";
+import {AppointmentTabs} from "./appointment-tabs";
+import {Appointment, AppointmentCard} from "./appointment-card";
+import {AppointmentEmptyState} from "./appointment-empty-state";
+import {AnimatePresence} from "framer-motion";
+import {Filter, Search} from "lucide-react";
+import {Input} from "@/components/ui/input";
+import {AppointmentWithDoctor} from "@/hooks/use-appointments";
 
 interface AppointmentListProps {
   appointments: AppointmentWithDoctor[];
@@ -36,15 +36,15 @@ export function AppointmentList({ appointments }: AppointmentListProps) {
     date: formatDate(apt.scheduledAt),
     time: formatTime(apt.scheduledAt),
     type: "video" as const,
-    status: apt.status as "confirmed" | "completed" | "canceled" | "rescheduled",
+    status: apt.status as "confirmed" | "completed" | "cancelled" | "awaiting_payment",
     fee: apt.doctor?.consultationFee || 0,
   }));
 
   const filteredAppointments = transformedAppointments.filter((app) => {
-    const matchesTab = 
-      (activeTab === "upcoming" && (app.status === "confirmed" || app.status === "rescheduled")) ||
+    const matchesTab =
+        (activeTab === "upcoming" && (app.status === "confirmed" || app.status === "pending" || app.status === "awaiting_payment")) ||
       (activeTab === "completed" && app.status === "completed") ||
-      (activeTab === "canceled" && app.status === "canceled");
+        (activeTab === "canceled" && app.status === "cancelled");
     
     const matchesSearch = 
       app.doctorName.toLowerCase().includes(searchQuery.toLowerCase()) ||

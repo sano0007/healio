@@ -106,6 +106,7 @@ export const api = {
       return request<{ data: Doctor[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/doctors${query}`);
     },
     getById: (id: string) => request<Doctor>(`/doctors/${id}`),
+    getMe: () => request<Doctor>('/doctors/me'),
     updateMe: (data: Partial<DoctorProfile>) =>
       request<DoctorProfile>('/doctors/me', { method: 'PATCH', body: JSON.stringify(data) }),
     setAvailability: (availability: AvailabilitySlot[]) =>
@@ -117,6 +118,7 @@ export const api = {
     book: (data: { doctorId: string; scheduledAt: string; notes?: string }) =>
       request<Appointment>('/appointments', { method: 'POST', body: JSON.stringify(data) }),
     getMy: () => request<Appointment[]>('/appointments/my'),
+    getById: (id: string) => request<Appointment>(`/appointments/${id}`),
     cancel: (id: string, reason: string) =>
       request(`/appointments/${id}/cancel`, { method: 'PATCH', body: JSON.stringify({ reason }) }),
     updateStatus: (id: string, status: string) =>
@@ -126,6 +128,16 @@ export const api = {
     initiate: (data: { appointmentId: string; amount: number; currency: string }) =>
       request<{ paymentId: string; clientSecret: string }>('/payments/initiate', { method: 'POST', body: JSON.stringify(data) }),
     get: (id: string) => request<Payment>(`/payments/${id}`),
+  },
+  records: {
+    getAll: () => request<MedicalRecord[]>('/records'),
+    upload: (data: FormData) =>
+        request<MedicalRecord>('/records', {method: 'POST', body: data}),
+    delete: (id: string) =>
+        request<void>(`/records/${id}`, {method: 'DELETE'}),
+  },
+  prescriptions: {
+    getMy: () => request<Prescription[]>('/prescriptions'),
   },
   admin: {
     getStats: () => request<AdminStats>('/admin/stats'),
@@ -255,8 +267,11 @@ export interface Appointment {
   doctorId: string;
   patientId: string;
   scheduledAt: string;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  status: 'pending' | 'awaiting_payment' | 'confirmed' | 'cancelled' | 'completed';
   notes?: string;
+  type?: 'video' | 'in-person';
+  prescriptions?: { name: string; dosage: string; frequency: string; duration: string }[];
+  paymentStatus?: string;
 }
 
 export interface Payment {
@@ -268,7 +283,7 @@ export interface Payment {
 }
 
 export interface AvailabilitySlot {
-  day: string;
+  dayOfWeek: number;
   startTime: string;
   endTime: string;
 }
@@ -288,6 +303,41 @@ export interface AdminStats {
 export interface PrescriptionDto {
   patientId: string;
   appointmentId: string;
+  medications: { name: string; dosage: string; frequency: string; duration: string }[];
+  notes?: string;
+}
+
+export interface Notification {
+  _id: string;
+  userId: string;
+  type: 'appointment' | 'payment' | 'consultation' | 'prescription' | 'verification';
+  title: string;
+  description: string;
+  timestamp: string;
+  isRead: boolean;
+  link: string;
+}
+
+export interface MedicalRecord {
+  _id: string;
+  patientId: string;
+  title: string;
+  type: 'lab' | 'imaging' | 'prescription' | 'note' | 'other';
+  date: string;
+  doctorName: string;
+  status: 'verified' | 'pending';
+  size: string;
+  url?: string;
+}
+
+export interface Prescription {
+  _id: string;
+  patientId: string;
+  doctorId: string;
+  doctorName: string;
+  specialty?: string;
+  issuedAt: string;
+  diagnosis?: string;
   medications: { name: string; dosage: string; frequency: string; duration: string }[];
   notes?: string;
 }

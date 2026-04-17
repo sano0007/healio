@@ -1,21 +1,21 @@
 "use client";
 
-import { WelcomeBanner } from "@/components/dashboard/welcome-banner";
-import { QuickActions } from "@/components/dashboard/quick-actions";
-import { UpcomingAppointments } from "@/components/dashboard/upcoming-appointments";
-import { HealthStats } from "@/components/dashboard/health-stats";
-import { RecentActivity } from "@/components/dashboard/recent-activity";
-import { RecentPrescriptions } from "@/components/dashboard/recent-prescriptions";
-import { motion } from "framer-motion";
+import {useAuth} from "@/contexts/auth";
+import {WelcomeBanner} from "@/components/dashboard/welcome-banner";
+import {QuickActions} from "@/components/dashboard/quick-actions";
+import {UpcomingAppointments} from "@/components/dashboard/upcoming-appointments";
+import {HealthStats} from "@/components/dashboard/health-stats";
+import {RecentActivity} from "@/components/dashboard/recent-activity";
+import {RecentPrescriptions} from "@/components/dashboard/recent-prescriptions";
+import {motion} from "framer-motion";
 
 export default function DashboardPage() {
-  // Static mock name for now
-  const userName = "John Doe";
+  const {user} = useAuth();
 
   return (
     <div className="space-y-10">
       {/* 1. Welcome Section */}
-      <WelcomeBanner name={userName} />
+      <WelcomeBanner name={user?.name || "Guest"}/>
 
       {/* 2. Health Overview (Platform Metrics - Section 3.1.5) */}
       <section>

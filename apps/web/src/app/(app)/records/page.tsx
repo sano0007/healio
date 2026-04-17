@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { RecordsHeader } from "@/components/records/records-header";
-import { RecordsFilter } from "@/components/records/records-filter";
-import { RecordCard, RecordType } from "@/components/records/record-card";
-import { UploadModal } from "@/components/records/upload-modal";
-import { Skeleton } from "@/components/ui/skeleton";
-import { motion, AnimatePresence } from "framer-motion";
-import { LayoutGrid } from "lucide-react";
+import {useEffect, useState} from "react";
+import {RecordsHeader} from "@/components/records/records-header";
+import {RecordsFilter} from "@/components/records/records-filter";
+import {RecordCard, RecordType} from "@/components/records/record-card";
+import {UploadModal} from "@/components/records/upload-modal";
+import {Skeleton} from "@/components/ui/skeleton";
+import {AnimatePresence, motion} from "framer-motion";
+import {LayoutGrid} from "lucide-react";
 
 const mockRecords = [
   { id: "1", title: "Complete Blood Count (CBC)", type: "lab" as RecordType, date: "July 12, 2026", doctor: "Dr. Sarah Johnson", status: "verified" as const, size: "1.2 MB" },
@@ -33,7 +33,7 @@ export default function MedicalRecordsPage() {
 
   const filteredRecords = mockRecords.filter(record => {
     const matchesCategory = activeCategory === "all" || record.type === activeCategory;
-    const matchesSearch = record.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      const matchesSearch = record.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          record.doctor.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -44,7 +44,7 @@ export default function MedicalRecordsPage() {
       <RecordsHeader onUploadClick={() => setIsUploadModalOpen(true)} />
 
       {/* 2. Interactive Filtering Bar */}
-      <RecordsFilter 
+        <RecordsFilter
         activeCategory={activeCategory}
         onCategoryChange={setActiveCategory}
         searchQuery={searchQuery}
@@ -79,7 +79,7 @@ export default function MedicalRecordsPage() {
               </motion.div>
             ))
           ) : (
-            <motion.div 
+              <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="col-span-full py-20 flex flex-col items-center justify-center text-center space-y-4"
@@ -110,9 +110,9 @@ export default function MedicalRecordsPage() {
       )}
 
       {/* 5. Upload Modal */}
-      <UploadModal 
-        isOpen={isUploadModalOpen} 
-        onClose={() => setIsUploadModalOpen(false)} 
+        <UploadModal
+            isOpen={isUploadModalOpen}
+            onClose={() => setIsUploadModalOpen(false)}
       />
     </div>
   );

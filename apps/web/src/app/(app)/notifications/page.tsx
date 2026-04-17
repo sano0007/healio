@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { NotificationListItem, type NotificationType } from "@/components/notifications/notification-list-item";
-import { NotificationFilters, type FilterType } from "@/components/notifications/notification-filters";
-import { motion, AnimatePresence } from "framer-motion";
-import { Bell, CheckCheck, Settings, Info, Search, ChevronRight, Home } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {useMemo, useState} from "react";
+import {NotificationListItem, type NotificationType} from "@/components/notifications/notification-list-item";
+import {type FilterType, NotificationFilters} from "@/components/notifications/notification-filters";
+import {AnimatePresence, motion} from "framer-motion";
+import {Bell, CheckCheck, ChevronRight, Home, Info, Search, Settings} from "lucide-react";
+import {Button} from "@/components/ui/button";
 import Link from "next/link";
 
 interface Notification {
@@ -122,11 +122,11 @@ export default function NotificationsPage() {
                </div>
              </div>
            )}
-           
+
            <div className="flex items-center gap-3">
-              <Button 
+               <Button
                 onClick={markAllAsRead}
-                variant="outline" 
+                variant="outline"
                 className="h-12 rounded-2xl border-gray-100 text-[10px] font-bold uppercase tracking-widest gap-2 px-6 hover:bg-white hover:border-brand-dark/30 transition-all active:scale-[0.98] shadow-sm"
               >
                  <CheckCheck className="w-4 h-4" />
@@ -165,9 +165,9 @@ export default function NotificationsPage() {
                 ["today", "yesterday", "older"].map((group) => {
                   const groupItems = filteredNotifications.filter(n => n.group === group);
                   if (groupItems.length === 0) return null;
-                  
+
                   return (
-                    <motion.div 
+                      <motion.div
                       key={group}
                       layout
                       initial={{ opacity: 0, y: 20 }}
@@ -178,10 +178,10 @@ export default function NotificationsPage() {
                          <h3 className="text-[11px] font-black text-brand-dark uppercase tracking-widest shrink-0">{group}</h3>
                          <div className="h-px w-full bg-gradient-to-r from-gray-100 to-transparent" />
                       </div>
-                      
-                      <div className="space-y-4">
+
+                          <div className="space-y-4">
                          {groupItems.map((notification) => (
-                           <NotificationListItem 
+                             <NotificationListItem
                              key={notification.id}
                              {...notification}
                            />
@@ -191,7 +191,7 @@ export default function NotificationsPage() {
                   );
                 })
               ) : (
-                <motion.div 
+                  <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex flex-col items-center justify-center py-32 space-y-6 bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-200 text-center"

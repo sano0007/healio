@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { api, Doctor } from '@/lib/api';
+import {useQuery} from '@tanstack/react-query';
+import {api, Doctor} from '@/lib/api';
 
 export interface DoctorFilters {
   search?: string;
@@ -33,6 +33,14 @@ export function useDoctor(doctorId: string) {
     queryKey: ['doctor', doctorId],
     queryFn: () => api.doctors.getById(doctorId) as Promise<Doctor>,
     enabled: !!doctorId,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useDoctorProfile() {
+  return useQuery({
+    queryKey: ['doctor-profile'],
+    queryFn: () => api.doctors.getMe() as Promise<Doctor>,
     staleTime: 1000 * 60 * 5,
   });
 }

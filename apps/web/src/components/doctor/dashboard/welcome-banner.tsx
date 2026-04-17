@@ -1,13 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Clock, Calendar, ShieldCheck, ChevronRight, Activity } from "lucide-react";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import {motion} from "framer-motion";
+import {Activity, Calendar, ChevronRight, Clock, ShieldCheck} from "lucide-react";
+import {useState} from "react";
+import {cn} from "@/lib/utils";
+import {useAuth} from "@/contexts/auth";
 
 export function WelcomeBanner() {
+  const {user} = useAuth();
   const [status, setStatus] = useState<"online" | "busy" | "offline">("online");
-  const doctorName = "Sarah Johnson"; // Mock data
 
   const statusColors = {
     online: "text-emerald-500 bg-emerald-50 border-emerald-100",
@@ -43,7 +44,7 @@ export function WelcomeBanner() {
           <div className="space-y-4">
             <h1 className="text-5xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
               Good Morning, <br />
-              <span className="text-brand-light italic">Dr. {doctorName}</span>
+              <span className="text-brand-light italic">Dr. {user?.name || "Doctor"}</span>
             </h1>
             <p className="text-lg text-brand-light/60 font-medium max-w-lg leading-relaxed">
               You have <span className="text-white font-bold">12 appointments</span> scheduled for today. Your first patient is arriving in <span className="text-white font-bold">45 minutes</span>.

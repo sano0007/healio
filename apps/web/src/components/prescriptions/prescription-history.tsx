@@ -1,9 +1,9 @@
 "use client";
 
-import { FileText, ExternalLink, Download, Share2, ClipboardList, Send, Archive, HeartPulse } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import {Archive, Download, FileText, HeartPulse, Send, Share2} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {cn} from "@/lib/utils";
+import {motion} from "framer-motion";
 
 const mockHistory = [
   { id: "RX-1023", name: "Amoxicillin 500mg", doctor: "Dr. Sarah Johnson", date: "July 12, 2026", status: "Active", pharmacy: "CVS Pharmacy #402" },
