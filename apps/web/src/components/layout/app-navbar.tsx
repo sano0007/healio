@@ -1,6 +1,6 @@
 "use client";
 
-import {Bell, Menu, Search} from "lucide-react";
+import {Menu, Search} from "lucide-react";
 import {Avatar} from "@/components/ui/avatar";
 import Link from "next/link";
 import {useAuth} from "@/contexts/auth";
@@ -29,13 +29,6 @@ export function AppNavbar() {
 
       {/* Right: Notifications & Profile */}
       <div className="flex items-center gap-4 lg:gap-6">
-        <Link href="/notifications">
-          <button className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-brand-dark transition-all">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse" />
-          </button>
-        </Link>
-
         <div className="flex items-center gap-3 pl-4 border-l border-gray-100 cursor-pointer group">
           <div className="text-right hidden sm:block">
               <p className="text-sm font-semibold text-brand-black group-hover:text-brand-dark transition-colors">{user?.name || "Guest"}</p>
