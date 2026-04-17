@@ -146,8 +146,9 @@ export const api = {
     delete: (id: string) =>
         request<void>(`/records/${id}`, {method: 'DELETE'}),
   },
-  prescriptions: {
-      getMy: () => request<Prescription[]>('/doctors/prescriptions'),
+prescriptions: {
+    getMy: () => request<Prescription[]>('/doctors/prescriptions'),
+    getById: (id: string) => request<Prescription>(`/doctors/prescriptions/${id}`),
   },
   admin: {
     getStats: () => request<AdminStats>('/admin/stats'),
@@ -345,6 +346,7 @@ export interface Prescription {
   _id: string;
   patientId: string;
   doctorId: string;
+  appointmentId?: string;
   doctorName: string;
   specialty?: string;
   issuedAt: string;
