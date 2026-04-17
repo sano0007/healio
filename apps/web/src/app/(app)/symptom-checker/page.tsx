@@ -6,7 +6,7 @@ import { DiagnosticEngine } from "@/components/symptom-checker/diagnostic-engine
 import { TriageResults } from "@/components/symptom-checker/triage-results";
 import type { SymptomCheckResult } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck } from "lucide-react";
+
 
 type CheckerState = "input" | "analyzing" | "results";
 
@@ -38,10 +38,6 @@ export default function SymptomCheckerPage() {
         <div className="space-y-3">
           <h1 className="text-3xl font-bold text-brand-black tracking-tight flex items-center gap-3">
             AI Symptom Checker
-            <div className="px-3 py-1 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center gap-1.5 h-7">
-               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-               <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">HiPAA Compliant</span>
-            </div>
           </h1>
           <div className="flex items-center gap-6">
             <p className="text-xs text-gray-400 font-medium italic">
