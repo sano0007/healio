@@ -5,7 +5,6 @@ import {api} from "@/lib/api";
 import {AppointmentDetailHeader} from "@/components/appointments/detail/detail-header";
 import {InfoGrid} from "@/components/appointments/detail/info-grid";
 import {ClinicalOutcome} from "@/components/appointments/detail/clinical-outcome";
-import {DocumentList} from "@/components/appointments/detail/document-list";
 import {Skeleton} from "@/components/ui/skeleton";
 
 interface AppointmentDetail {
@@ -166,13 +165,7 @@ export default function AppointmentDetailPage({ params }: { params: Promise<{ id
         </section>
       )}
 
-      {/* 4. Documents & Attachments */}
-      {appointment.documents.length > 0 && (
-          <section className="space-y-10">
-            <div className="h-px bg-gray-100"/>
-            <DocumentList documents={appointment.documents}/>
-          </section>
-      )}
+      
 
       {/* 5. Footer Help Overlay */}
       <div className="pt-10 flex flex-col md:flex-row items-center justify-between border-t border-gray-50 gap-6">

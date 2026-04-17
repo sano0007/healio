@@ -5,7 +5,7 @@ import {ConsultationHUD} from "@/components/consultations/consultation-hud";
 import {ConsultationGrid} from "@/components/consultations/consultation-grid";
 import {ConsultationControls} from "@/components/consultations/consultation-controls";
 import {ConsultationSidebar} from "@/components/consultations/consultation-sidebar";
-import {TwilioVideoRoom} from "@/components/consultations/twilio-video-room";
+import {JitsiVideoRoom} from "@/components/consultations/jitsi-video-room";
 import {useRouter} from "next/navigation";
 import {motion} from "framer-motion";
 import {useCreateSession, useEndSession} from "@/hooks/use-sessions";
@@ -20,8 +20,8 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
 
   const [sessionData, setSessionData] = useState<{
     sessionId: string;
-    token?: string;
     roomName: string;
+    jitsiUrl?: string;
   } | null>(null);
 
   const [doctor, setDoctor] = useState<{
@@ -31,7 +31,7 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
   }>({
     name: "Doctor",
     specialty: "Specialist",
-      image: "/images/doctor-1.png",
+    image: "/images/doctor-1.png",
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -51,8 +51,8 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
         
         setSessionData({
           sessionId: result.sessionId,
-          token: result.token,
           roomName: result.roomName,
+          jitsiUrl: result.jitsiUrl,
         });
 
         setDoctor({
@@ -79,7 +79,18 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
         console.error("Failed to end session:", err);
       }
     }
-    router.push(`/appointments/${appointmentId}`);
+    router.push("/appointments");
+  };
+
+  const handleConferenceLeft = async () => {
+    if (sessionData?.sessionId) {
+      try {
+        await endSession.mutateAsync(sessionData.sessionId);
+      } catch (err) {
+        console.error("Failed to end session:", err);
+      }
+    }
+    router.push("/appointments");
   };
 
   if (isLoading) {
@@ -127,24 +138,23 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="relative h-full flex flex-col bg-brand-black">
-      {/* 1. Heads-Up Display (Overlay) */}
       <ConsultationHUD 
         doctorName={doctor.name}
         doctorSpecialty={doctor.specialty}
         doctorImage={doctor.image || "/images/doctor-1.png"}
       />
 
-      {/* 2. Main Video Display Layer */}
       <div className="flex-1 relative flex overflow-hidden">
-        {sessionData?.token ? (
-          <TwilioVideoRoom
-            token={sessionData.token}
+        {sessionData?.jitsiUrl ? (
+          <JitsiVideoRoom
+            jitsiUrl={sessionData.jitsiUrl}
             roomName={sessionData.roomName}
-            onError={(err) => setError(err.message)}
+            onReady={() => console.log("Jitsi ready")}
+            onConferenceLeft={handleConferenceLeft}
           />
         ) : (
           <ConsultationGrid
-              doctorImage={doctor.image || "/images/doctor-1.png"}
+            doctorImage={doctor.image || "/images/doctor-1.png"}
             isMuted={isMuted}
             isCameraOff={isCameraOff}
             isSidebarOpen={isSidebarOpen}
@@ -154,7 +164,6 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
         <ConsultationSidebar isOpen={isSidebarOpen} />
       </div>
 
-      {/* 3. Interaction Control Layer */}
       <ConsultationControls 
         isMuted={isMuted}
         onToggleMute={() => setIsMuted(!isMuted)}
@@ -167,7 +176,6 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
         onEndCall={handleEndCall}
       />
 
-      {/* 4. Immersive Gradient Background (Edge Cases) */}
       <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-brand-black to-transparent pointer-events-none opacity-40" />
     </div>
   );

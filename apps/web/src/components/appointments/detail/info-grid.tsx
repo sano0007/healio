@@ -32,9 +32,17 @@ export function InfoGrid({doctor, patient, schedule, billing, paymentUrl, appoin
           </DetailCard>
 
           <DetailCard icon={<User />} title="Patient Details">
-            <div className="mt-4">
-              <p className="text-sm font-bold text-brand-black leading-none mb-1">{patient.name}</p>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{patient.relationship || "Self"}</p>
+            <div className="mt-4 space-y-3">
+              <div>
+                <p className="text-sm font-bold text-brand-black leading-none mb-1">{patient.name}</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{patient.relationship || "Self"}</p>
+              </div>
+              {patient.email && (
+                <p className="text-xs text-gray-500">{patient.email}</p>
+              )}
+              {patient.phone && (
+                <p className="text-xs text-gray-500">{patient.phone}</p>
+              )}
             </div>
           </DetailCard>
         </div>
