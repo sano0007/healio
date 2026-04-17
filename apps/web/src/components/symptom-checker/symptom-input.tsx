@@ -104,7 +104,7 @@ export function SymptomInput({ onAnalyze }: SymptomInputProps) {
          <div className="space-y-1">
            <p className="text-xs font-bold text-blue-800">Clinical Accuracy Notice</p>
            <p className="text-[10px] font-medium text-blue-600/80 leading-relaxed">
-             Healio AI provides a preliminary triage based on probability models. It is NOT a medical diagnosis. If you are experiencing server chest pain, difficulty breathing, or severe bleeding, please call <span className="font-bold underline">Emergency Services (911)</span> immediately.
+             Healio AI provides a preliminary triage based on probability models. It is NOT a medical diagnosis. If you are experiencing server chest pain, difficulty breathing, or severe bleeding, please call <span className="font-bold underline">Emergency Services</span> immediately.
            </p>
          </div>
       </div>
