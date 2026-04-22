@@ -218,6 +218,7 @@
       "name": "web",
       "version": "0.1.0",
       "dependencies": {
+        "@jitsi/react-sdk": "^1.4.4",
         "@stripe/react-stripe-js": "^6.1.0",
         "@stripe/stripe-js": "^9.1.0",
         "@tanstack/react-query": "^5.99.0",
@@ -353,6 +354,8 @@
     "@img/sharp-win32-x64": ["@img/sharp-win32-x64@0.33.5", "", { "os": "win32", "cpu": "x64" }, "sha512-MpY/o8/8kj+EcnxwvrP4aTJSWw/aZ7JIGR4aBeZkZw5B7/Jn+tY9/VNwtcoGmdT7GfggGIU4kygOMSbYnOrAbg=="],
 
     "@isaacs/cliui": ["@isaacs/cliui@8.0.2", "", { "dependencies": { "string-width": "^5.1.2", "string-width-cjs": "npm:string-width@^4.2.0", "strip-ansi": "^7.0.1", "strip-ansi-cjs": "npm:strip-ansi@^6.0.1", "wrap-ansi": "^8.1.0", "wrap-ansi-cjs": "npm:wrap-ansi@^7.0.0" } }, "sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA=="],
+
+    "@jitsi/react-sdk": ["@jitsi/react-sdk@1.4.4", "", { "peerDependencies": { "react": "16 || 17 || 18 || 19", "react-dom": "16 || 17 || 18 || 19" } }, "sha512-VV5sy94zmGYByz8ebsOinwvzK/Srekbg+dECHBqGloeyPYpwlOLe6WiqmCCJ2l+wv2CT++xIznkZwcnh2YX2ug=="],
 
     "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@0.3.13", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA=="],
 

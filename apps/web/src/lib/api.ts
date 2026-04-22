@@ -151,6 +151,8 @@ export const api = {
 prescriptions: {
     getMy: () => request<Prescription[]>('/doctors/prescriptions'),
     getById: (id: string) => request<Prescription>(`/doctors/prescriptions/${id}`),
+    getByAppointment: (appointmentId: string) =>
+      request<Prescription | null>(`/doctors/prescriptions/by-appointment/${appointmentId}`),
   },
   admin: {
     getStats: () => request<AdminStats>('/admin/stats'),
@@ -203,6 +205,8 @@ prescriptions: {
         token?: string;
         roomSid?: string;
         twilioRoomSid?: string;
+        jitsiUrl?: string;
+        videoProvider?: string;
       }>('/sessions', { method: 'POST', body: JSON.stringify({ appointmentId }) }),
     join: (sessionId: string) =>
       request<{
@@ -212,6 +216,8 @@ prescriptions: {
         token?: string;
         twilioRoomSid?: string;
         status: string;
+        jitsiUrl?: string;
+        videoProvider?: string;
       }>('/sessions/join', { method: 'POST', body: JSON.stringify({ sessionId }) }),
     end: (sessionId: string) =>
       request<{ sessionId: string; status: string }>(`/sessions/${sessionId}/end`, { method: 'PATCH' }),
