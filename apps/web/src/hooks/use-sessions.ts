@@ -7,6 +7,8 @@ export interface CreateSessionResponse {
   token?: string;
   roomSid?: string;
   twilioRoomSid?: string;
+  jitsiUrl?: string;
+  videoProvider?: string;
 }
 
 export interface JoinSessionResponse {
@@ -16,6 +18,8 @@ export interface JoinSessionResponse {
   token?: string;
   twilioRoomSid?: string;
   status: string;
+  jitsiUrl?: string;
+  videoProvider?: string;
 }
 
 export function useCreateSession() {
