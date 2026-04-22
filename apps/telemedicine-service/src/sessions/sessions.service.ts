@@ -1,73 +1,44 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { Session } from './session.interface';
-import { TwilioConfigService } from '../twilio.config';
-
-let Twilio: any;
+import { JitsiConfigService } from '../jitsi.config';
 
 @Injectable()
 export class SessionsService implements OnModuleInit {
   private sessions = new Map<string, Session>();
+  private videoProvider: string;
 
-  constructor(private twilioConfig: TwilioConfigService) {}
+  constructor(
+    private jitsiConfig: JitsiConfigService,
+    private configService: ConfigService,
+  ) {
+    this.videoProvider = this.configService.get<string>('VIDEO_PROVIDER') || 'jitsi';
+  }
 
   async onModuleInit() {
-    try {
-      this.twilioConfig.validate();
-      Twilio = (await import('twilio')).default;
-      console.log('Twilio client initialized successfully');
-    } catch (error) {
-      console.warn('Twilio not configured, using mock mode:', error.message);
+    console.log(`Video provider: ${this.videoProvider}`);
+    if (this.videoProvider === 'jitsi') {
+      console.log('Jitsi video call enabled');
     }
   }
 
   async createSession(data: { appointmentId: string; hostId: string }) {
     const sessionId = uuidv4();
-    const roomName = `healio-${data.appointmentId.slice(-8)}-${Date.now().toString(36)}`;
+    const roomName = `healio-${data.appointmentId.slice(-8).replace(/[^a-zA-Z0-9]/g, '')}-${sessionId.slice(0, 8)}`;
+    
+    let jitsiUrl: string | undefined;
     let token: string | undefined;
-    let roomSid: string | undefined;
 
-    // Generate Twilio token for host if Twilio is configured
-    if (Twilio && this.twilioConfig.isConfigured()) {
-      token = this.generateToken(roomName, data.hostId, 'host');
-      
-      try {
-        const twilioClient = Twilio(
-          this.twilioConfig.accountSid,
-          this.twilioConfig.apiSecret
-        );
-        const twilioRoom = await twilioClient.video.v1.rooms.create({
-          uniqueName: roomName,
-          type: 'peer-to-peer',
-          maxParticipants: 2,
-        });
-        roomSid = twilioRoom.sid;
-        console.log(`Created Twilio room: ${roomSid}`);
-      } catch (error: any) {
-        // Room might already exist, try to fetch it
-        if (error.code === 53113) {
-          try {
-            const twilioClient = Twilio(
-              this.twilioConfig.accountSid,
-              this.twilioConfig.apiSecret
-            );
-            const twilioRoom = await twilioClient.video.v1.rooms(roomName).fetch();
-            roomSid = twilioRoom.sid;
-            console.log(`Using existing Twilio room: ${roomSid}`);
-          } catch (fetchError: any) {
-            console.error('Failed to fetch Twilio room:', fetchError.message);
-          }
-        } else {
-          console.error('Failed to create Twilio room:', error.message);
-        }
-      }
+    if (this.videoProvider === 'jitsi') {
+      jitsiUrl = this.jitsiConfig.getMeetingLink(roomName);
+      console.log(`Created Jitsi meeting: ${jitsiUrl}`);
     }
 
     const session: Session = {
       sessionId,
       appointmentId: data.appointmentId,
       roomName,
-      twilioRoomSid: roomSid,
       hostId: data.hostId,
       participants: [data.hostId],
       status: 'waiting',
@@ -78,9 +49,9 @@ export class SessionsService implements OnModuleInit {
     return {
       sessionId,
       roomName: session.roomName,
+      jitsiUrl,
       token,
-      roomSid,
-      twilioRoomSid: roomSid,
+      videoProvider: this.videoProvider,
     };
   }
 
@@ -98,19 +69,17 @@ export class SessionsService implements OnModuleInit {
       session.status = 'active';
     }
 
-    // Generate Twilio token for participant if Twilio is configured
-    let token: string | undefined;
-    if (Twilio && this.twilioConfig.isConfigured()) {
-      token = this.generateToken(session.roomName, data.userId, 'participant');
+    let jitsiUrl: string | undefined;
+    if (this.videoProvider === 'jitsi') {
+      jitsiUrl = this.jitsiConfig.getMeetingLink(session.roomName);
     }
 
     return {
       sessionId: session.sessionId,
       roomName: session.roomName,
-      roomSid: session.twilioRoomSid,
-      token,
-      twilioRoomSid: session.twilioRoomSid,
+      jitsiUrl,
       status: session.status,
+      videoProvider: this.videoProvider,
     };
   }
 
@@ -120,53 +89,13 @@ export class SessionsService implements OnModuleInit {
       throw new Error('Session not found');
     }
 
-    // End Twilio room if exists
-    if (Twilio && session.twilioRoomSid) {
-      try {
-        const twilioClient = Twilio(
-          this.twilioConfig.accountSid,
-          this.twilioConfig.apiSecret
-        );
-        await twilioClient.video.v1.rooms(session.twilioRoomSid).update({
-          status: 'completed',
-        });
-        console.log(`Ended Twilio room: ${session.twilioRoomSid}`);
-      } catch (error: any) {
-        console.error('Failed to end Twilio room:', error.message);
-      }
-    }
-
     session.status = 'ended';
+    console.log(`Session ended: ${sessionId}`);
+
     return {
       sessionId: session.sessionId,
       status: 'ended',
     };
-  }
-
-  private generateToken(roomName: string, identity: string, role: 'host' | 'participant'): string {
-    if (!Twilio) {
-      throw new Error('Twilio is not initialized');
-    }
-
-    const AccessToken = Twilio.jwt.AccessToken;
-    const VideoGrant = AccessToken.VideoGrant;
-
-    const token = new AccessToken(
-      this.twilioConfig.accountSid,
-      this.twilioConfig.apiKey,
-      this.twilioConfig.apiSecret,
-      {
-        identity: `${role}-${identity}-${Date.now()}`,
-        ttl: 14400, // 4 hours in seconds
-      }
-    );
-
-    const videoGrant = new VideoGrant({
-      room: roomName,
-    });
-    token.addGrant(videoGrant);
-
-    return token.toJwt();
   }
 
   getSession(sessionId: string): Session | undefined {
