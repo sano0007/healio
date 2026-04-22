@@ -79,7 +79,7 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
         console.error("Failed to end session:", err);
       }
     }
-    router.push("/appointments");
+    router.push("/doctor/appointments");
   };
 
   const handleConferenceLeft = async () => {
@@ -90,7 +90,7 @@ export default function ConsultationRoomPage({ params }: { params: Promise<{ id:
         console.error("Failed to end session:", err);
       }
     }
-    router.push("/appointments");
+    router.push("/doctor/appointments");
   };
 
   if (isLoading) {

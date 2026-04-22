@@ -88,6 +88,13 @@ export class DoctorsGatewayController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.DOCTOR)
+  @Get('prescriptions/by-appointment/:appointmentId')
+  getPrescriptionByAppointment(@Param('appointmentId') appointmentId: string) {
+    return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET_PRESCRIPTIONS, { appointmentId }));
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.DOCTOR)
   @Get('prescriptions/:id')
   getPrescriptionById(@Param('id') id: string) {
     return firstValueFrom(this.doctorClient.send(MSG.DOCTOR_GET_PRESCRIPTION_BY_ID, { prescriptionId: id }));

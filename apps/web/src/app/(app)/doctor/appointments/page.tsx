@@ -1,8 +1,10 @@
 "use client";
 
 import {useState} from "react";
+import {useRouter} from "next/navigation";
+import Link from "next/link";
 import {motion} from "framer-motion";
-import {Calendar, CheckCircle2, Clock, User, Video, XCircle} from "lucide-react";
+import {Calendar, CheckCircle2, Clock, User, Video, XCircle, Pill} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {cn} from "@/lib/utils";
 import {useAcceptAppointment, useDoctorAppointments, useRejectAppointment} from "@/hooks/use-doctor-appointments";
@@ -11,6 +13,7 @@ import {Skeleton} from "@/components/ui/skeleton";
 type Tab = "today" | "upcoming" | "pending" | "past";
 
 export default function DoctorAppointmentsPage() {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<Tab>("today");
     const [acceptError, setAcceptError] = useState<string | null>(null);
     const [rejectError, setRejectError] = useState<string | null>(null);
@@ -120,12 +123,12 @@ export default function DoctorAppointmentsPage() {
             ) : (
                 <div className="space-y-6">
                     {filtered.map((apt, i) => (
+                        <Link key={apt._id} href={`/appointments/${apt._id}`}>
                         <motion.div
-                            key={apt._id}
                             initial={{opacity: 0, y: 20}}
                             animate={{opacity: 1, y: 0}}
                             transition={{delay: i * 0.05}}
-                            className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm hover:shadow-md transition-shadow"
+                            className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                         >
                             <div className="flex flex-col lg:flex-row lg:items-center gap-8">
                                 {/* Patient Info */}
@@ -207,15 +210,31 @@ export default function DoctorAppointmentsPage() {
                                         </>
                                     )}
                                     {(apt.status === 'confirmed' || apt.status === 'completed') && (
-                                        <Button variant="dark"
-                                                className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest gap-2">
-                                            <Video className="w-4 h-4"/>
-                                            {apt.status === 'completed' ? 'View Summary' : 'Start Call'}
-                                        </Button>
+                                        <>
+                                            <Button variant="outline"
+                                                    className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 hover:border-brand-light hover:text-brand-dark"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        router.push(`/doctor/prescriptions/issue/${apt._id}`);
+                                                    }}>
+                                                <Pill className="w-4 h-4"/>
+                                                {apt.status === 'completed' ? 'Re-issue' : 'Prescribe'}
+                                            </Button>
+                                            <Button variant="dark"
+                                                    className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest gap-2"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        router.push(`/consultations/${apt._id}`);
+                                                    }}>
+                                                <Video className="w-4 h-4"/>
+                                                {apt.status === 'completed' ? 'View Summary' : 'Start Call'}
+                                            </Button>
+                                        </>
                                     )}
                                 </div>
                             </div>
                         </motion.div>
+                        </Link>
                     ))}
                 </div>
             )}
