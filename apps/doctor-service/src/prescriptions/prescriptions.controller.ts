@@ -13,9 +13,10 @@ export class PrescriptionsController {
   }
 
   @MessagePattern(MSG.DOCTOR_GET_PRESCRIPTIONS)
-  getPrescriptions(@Payload() data: { doctorId?: string; patientId?: string }) {
+  getPrescriptions(@Payload() data: { doctorId?: string; patientId?: string; appointmentId?: string }) {
     if (data.doctorId) return this.prescriptionsService.getByDoctor(data.doctorId);
     if (data.patientId) return this.prescriptionsService.getByPatient(data.patientId);
+    if (data.appointmentId) return this.prescriptionsService.getByAppointment(data.appointmentId);
     return [];
   }
 

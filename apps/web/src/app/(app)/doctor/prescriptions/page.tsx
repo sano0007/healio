@@ -6,7 +6,9 @@ import {usePrescriptions} from "@/hooks/use-prescriptions";
 import {Skeleton} from "@/components/ui/skeleton";
 
 export default function DoctorPrescriptionsPage() {
-    const {data: prescriptions, isLoading} = usePrescriptions();
+    const {data: prescriptions, isLoading, error} = usePrescriptions();
+
+    console.log('Prescriptions page:', { prescriptions, isLoading, error });
 
     return (
         <div className="max-w-[1600px] mx-auto px-6 py-10 space-y-10">
@@ -22,6 +24,16 @@ export default function DoctorPrescriptionsPage() {
                     {Array.from({length: 4}).map((_, i) => (
                         <Skeleton key={i} className="h-32 rounded-[2rem]"/>
                     ))}
+                </div>
+            ) : error ? (
+                <div className="py-24 text-center">
+                    <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-6">
+                        <Pill className="w-10 h-10 text-red-300"/>
+                    </div>
+                    <h3 className="text-lg font-bold text-red-600">Error loading prescriptions</h3>
+                    <p className="text-xs text-red-400 font-medium mt-2">
+                        {String(error)}
+                    </p>
                 </div>
             ) : !prescriptions || !Array.isArray(prescriptions) || prescriptions.length === 0 ? (
                 <div className="py-24 text-center">

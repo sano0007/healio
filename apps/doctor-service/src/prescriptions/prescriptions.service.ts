@@ -9,6 +9,15 @@ export class PrescriptionsService {
   constructor(@InjectModel(Prescription.name) private prescriptionModel: Model<PrescriptionDocument>) {}
 
   async issuePrescription(data: Partial<Prescription>) {
+    if (!data.patientId) {
+      throw new RpcException('Prescription validation failed: patientId: Path `patientId` is required.');
+    }
+    if (!data.doctorId) {
+      throw new RpcException('Prescription validation failed: doctorId: Path `doctorId` is required.');
+    }
+    if (!data.appointmentId) {
+      throw new RpcException('Prescription validation failed: appointmentId: Path `appointmentId` is required.');
+    }
     const prescription = new this.prescriptionModel(data);
     return prescription.save();
   }

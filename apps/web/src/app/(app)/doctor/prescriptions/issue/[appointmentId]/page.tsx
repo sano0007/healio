@@ -3,9 +3,10 @@
 import {use, useState} from "react";
 import Link from "next/link";
 import {motion} from "framer-motion";
-import {ArrowLeft, ChevronRight, FileText, Plus, Save, Trash2, User} from "lucide-react";
+import {ArrowLeft, ChevronRight, FileText, Plus, Save, Trash2, User, AlertCircle} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {useDoctorAppointments} from "@/hooks/use-doctor-appointments";
+import {usePrescriptionByAppointment} from "@/hooks/use-prescriptions";
 import {api} from "@/lib/api";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {useRouter} from "next/navigation";
@@ -24,6 +25,9 @@ export default function IssuePrescriptionPage({params}: { params: Promise<{ appo
 
     const {data: appointments} = useDoctorAppointments();
     const appointment = appointments?.find(a => a._id === resolvedParams.appointmentId);
+    const {data: existingPrescription, isLoading: loadingPrescription} = usePrescriptionByAppointment(resolvedParams.appointmentId);
+
+    console.log('Issue prescription page:', { appointments, appointment, existingPrescription });
 
     const [diagnosis, setDiagnosis] = useState("");
     const [notes, setNotes] = useState("");
@@ -33,9 +37,12 @@ export default function IssuePrescriptionPage({params}: { params: Promise<{ appo
 
     const issueMutation = useMutation({
         mutationFn: async () => {
+            if (!appointment?.patientId) {
+                throw new Error("Patient not found. Please refresh the page.");
+            }
             const validMeds = medications.filter(m => m.name.trim() && m.dosage.trim());
             await api.doctors.issuePrescription({
-                patientId: appointment?.patientId ?? "",
+                patientId: appointment.patientId,
                 appointmentId: resolvedParams.appointmentId,
                 medications: validMeds,
                 notes,
@@ -59,7 +66,7 @@ export default function IssuePrescriptionPage({params}: { params: Promise<{ appo
         setMedications(prev => prev.map((m, i) => i === index ? {...m, [field]: value} : m));
     };
 
-    const canSubmit = diagnosis.trim() && medications.some(m => m.name.trim());
+    const canSubmit = appointment?.patientId && diagnosis.trim() && medications.some(m => m.name.trim());
 
     return (
         <div className="max-w-4xl mx-auto px-6 py-10 space-y-10">
@@ -105,6 +112,31 @@ export default function IssuePrescriptionPage({params}: { params: Promise<{ appo
                                 month: 'long', day: 'numeric', year: 'numeric'
                             })}
                         </p>
+                    </div>
+                </motion.div>
+            )}
+
+            {/* Existing Prescription Notice */}
+            {!loadingPrescription && existingPrescription && (
+                <motion.div
+                    initial={{opacity: 0, y: 10}}
+                    animate={{opacity: 1, y: 0}}
+                    className="bg-amber-50 border border-amber-200 rounded-[2rem] p-6 flex items-start gap-4"
+                >
+                    <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5"/>
+                    <div>
+                        <h3 className="text-sm font-bold text-amber-800">Prescription Already Issued</h3>
+                        <p className="text-xs text-amber-700 mt-1">
+                            A prescription was already issued on {new Date(existingPrescription.issuedAt).toLocaleDateString()}. 
+                            You can issue a new prescription to update the medications.
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            {existingPrescription.medications?.map((med, idx) => (
+                                <span key={idx} className="text-xs bg-white px-3 py-1 rounded-full text-amber-800 border border-amber-200">
+                                    {med.name} ({med.dosage})
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 </motion.div>
             )}
